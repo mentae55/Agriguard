@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:agriguard_project/core/core.dart';
+import 'robot_control_screen.dart'; // [NEW] Robot controller UI
 
 class DeviceSettingsScreen extends StatefulWidget {
   final String serial;
@@ -91,6 +91,10 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                   ),
                   const SizedBox(height: 24),
 
+                  // [NEW] Robot Control Action Card
+                  _buildRobotControlCard(),
+                  const SizedBox(height: 24),
+
                   // General Info Panel
                   _buildSettingsPanel(
                     title: 'General Info',
@@ -129,6 +133,85 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // [NEW] Robot Control Card — navigates to RobotControlScreen
+  // ---------------------------------------------------------------------------
+  Widget _buildRobotControlCard() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RobotControlScreen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [primaryColor, primaryColor.withAlpha(180)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withAlpha(80),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Icon container
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(30),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                Icons.videogame_asset_rounded,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Text
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Robot Controller',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'AbhayaLibre',
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Control movement in real time',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                color: Colors.white70, size: 18),
           ],
         ),
       ),
@@ -245,7 +328,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: Colors.white,
+            activeThumbColor: Colors.white,   // [fixed] was deprecated activeColor
             activeTrackColor: primaryColor,
             inactiveTrackColor: Colors.grey.shade300,
             inactiveThumbColor: Colors.white,

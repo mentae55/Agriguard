@@ -8,6 +8,8 @@ import 'features/authentication/view_model/user_view_model.dart';
 import 'features/connection_to_device/services/device_provider.dart';
 import 'features/connection_to_device/view_model/connection_view_model.dart';
 import 'core/widgets/global_connection_monitor.dart'; // [Added] global monitor
+import 'features/chatbot/view_model/chatbot_view_model.dart';
+import 'features/home/view/home_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -20,6 +22,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => DeviceProvider()),
         ChangeNotifierProvider(create: (_) => ConnectionViewModel()),
+        ChangeNotifierProvider(create: (_) => ChatbotViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -49,7 +52,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(primaryColor: primaryColor),
           debugShowCheckedModeBanner: false,
           title: 'AgriGuard',
-          home: const SplashScreen(),
+          home: const HomeScreen(serial: '',),
         );
       },
     );

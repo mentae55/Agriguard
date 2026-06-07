@@ -131,6 +131,32 @@ class DeviceProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> updateDeviceOnlineStatus(
+    String macAddress,
+    bool online,
+  ) async {
+    try {
+      final updates = <String, dynamic>{
+        'online': online,
+      };
+      if (!online) {
+        updates['cmd'] = 'STOP';
+        updates['status'] = 0;
+      }
+      
+      await _db.child('Devices/$macAddress').update(updates);
+      
+      // Keep compatibility with old firmware that does not use colons
+      final macWithoutColons = macAddress.replaceAll(':', '');
+      await _db.child('Devices/$macWithoutColons').update(updates);
+
+      _isDeviceOnline = online;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('updateDeviceOnlineStatus Error: $e');
+    }
+  }
+
   void _resetDeviceData() {
     _savedMac = null;
     _savedSerial = null;

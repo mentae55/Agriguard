@@ -10,6 +10,7 @@ import 'package:agriguard_project/features/profile/view/profile_screen.dart';
 import 'soil_analysis_screen.dart';
 import 'weather_details_screen.dart';
 import 'package:agriguard_project/features/map/view/map_screen.dart'; // [Added] map screen
+import 'package:agriguard_project/features/chatbot/view/phone_capture_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String serial;
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen>
             fontFamily: 'AbhayaLibre',
           ),
         ),
-        if (trailing != null) trailing,
+        ?trailing,
       ],
     );
   }
@@ -408,7 +409,8 @@ class _HomeScreenState extends State<HomeScreen>
                 subtitle: 'Click here to view!',
                 fallbackIcon: Icons.location_on_rounded,
                 onTap: () {
-                   // Placeholder for Live Location
+                  // Navigate to Map tab (index 0) to see robot GPS live
+                  setState(() => _selectedNavIndex = 0);
                 },
               ),
             ),
@@ -436,7 +438,10 @@ class _HomeScreenState extends State<HomeScreen>
                 subtitle: 'Get analysis of an image!',
                 fallbackIcon: Icons.camera_alt_rounded,
                 onTap: () {
-                   // Placeholder for Phone Capture
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PhoneCaptureScreen()),
+                  );
                 },
               ),
             ),
@@ -494,7 +499,7 @@ class _HomeScreenState extends State<HomeScreen>
                 child: Image.asset(
                   image,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (ctx, err, st) => Container(
                     color: const Color(0xFFF0FDF4),
                     child: Center(
                       child: Icon(fallbackIcon, color: primaryColor, size: 40),
