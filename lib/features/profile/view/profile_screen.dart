@@ -8,6 +8,7 @@ import '../controllers/profile_provider.dart';
 import 'edit_profile_screen.dart';
 import 'package:agriguard_project/features/home/view/soil_analysis_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -23,6 +24,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProfileProvider>().loadProfile();
     });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (!mounted) return;
+    if (pickedFile != null) {
+      final provider = context.read<ProfileProvider>();
+      final user = provider.userProfile;
+      if (user != null) {
+        try {
+          await provider.updateProfile(
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username: user.username,
+            phone: user.phone,
+            newImage: File(pickedFile.path),
+          );
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error updating profile picture: $e'),
+              ),
+            );
+          }
+        }
+      }
+    }
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -183,36 +213,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Row(
                         children: [
                           // Avatar
-                          Stack(
-                            children: [
-                              Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.secondary,
-                                  border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300, width: 2),
-                                ),
-                                child: ClipOval(
-                                  child: _buildAvatarImage(profileProvider.userProfile!.profileImageUrl),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: languageProvider.isArabic ? null : 0,
-                                left: languageProvider.isArabic ? 0 : null,
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.surface,
-                                    border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(Icons.camera_alt_outlined, size: 16, color: theme.colorScheme.onSurface),
-                                ),
-                              ),
-                            ],
-                          ),
+                          GestureDetector(
+                             onTap: _pickImage,
+                             child: Stack(
+                               children: [
+                                 Container(
+                                   width: 90,
+                                   height: 90,
+                                   decoration: BoxDecoration(
+                                     shape: BoxShape.circle,
+                                     color: theme.colorScheme.secondary,
+                                     border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300, width: 2),
+                                   ),
+                                   child: ClipOval(
+                                     child: _buildAvatarImage(profileProvider.userProfile!.profileImageUrl),
+                                   ),
+                                 ),
+                                 Positioned(
+                                   bottom: 0,
+                                   right: languageProvider.isArabic ? null : 0,
+                                   left: languageProvider.isArabic ? 0 : null,
+                                   child: Container(
+                                     padding: const EdgeInsets.all(6),
+                                     decoration: BoxDecoration(
+                                       color: theme.colorScheme.surface,
+                                       border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300),
+                                       shape: BoxShape.circle,
+                                     ),
+                                     child: Icon(Icons.camera_alt_outlined, size: 16, color: theme.colorScheme.onSurface),
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
                           const SizedBox(width: 20),
                           // Text Info
                           Expanded(
