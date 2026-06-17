@@ -14,13 +14,16 @@ class _PasswordFieldWidgetsState extends State<PasswordFieldWidgets> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 12 : 8),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -32,7 +35,7 @@ class _PasswordFieldWidgetsState extends State<PasswordFieldWidgets> {
         style: TextStyle(
           fontFamily: 'AbhayaLibre',
           fontWeight: FontWeight.w700,
-          color: blackColor,
+          color: theme.colorScheme.onSurface,
         ),
         validator: (v) =>
             (v == null || v.isEmpty) ? 'Please enter your password' : null,
@@ -59,10 +62,20 @@ class _PasswordFieldWidgetsState extends State<PasswordFieldWidgets> {
                 setState(() => isPasswordHidden = !isPasswordHidden),
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide(
+              color: isDark ? theme.colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4),
+              width: 1.2,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: isDark ? theme.colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4),
+              width: 1.2,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -72,7 +85,7 @@ class _PasswordFieldWidgetsState extends State<PasswordFieldWidgets> {
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(color: redColor, width: 1.5),
           ),
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,
           ),
@@ -81,4 +94,3 @@ class _PasswordFieldWidgetsState extends State<PasswordFieldWidgets> {
     );
   }
 }
-

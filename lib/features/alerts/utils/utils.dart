@@ -17,14 +17,14 @@ class AlertFormatters {
     }
   }
 
-  static Color severityBg(AlertSeverity s) {
+  static Color severityBg(AlertSeverity s, {bool isDark = false}) {
     switch (s) {
       case AlertSeverity.critical:
-        return const Color(0xFFFFEBEE);
+        return isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE);
       case AlertSeverity.warning:
-        return const Color(0xFFFFF8E1);
+        return isDark ? const Color(0xFF3A2F1A) : const Color(0xFFFFF8E1);
       case AlertSeverity.info:
-        return const Color(0xFFF0FDF4);
+        return isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4);
     }
   }
 

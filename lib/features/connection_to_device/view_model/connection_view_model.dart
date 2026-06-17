@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../services/connection_service.dart';
 
 class ConnectionViewModel extends ChangeNotifier {

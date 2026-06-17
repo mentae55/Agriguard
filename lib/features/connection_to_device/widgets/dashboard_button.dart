@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
 
 class DashboardButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -8,17 +7,21 @@ class DashboardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final buttonColor = isDark ? Colors.green.shade700 : Colors.green.shade600;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.green,
+          color: buttonColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.green.withOpacity(0.3),
+              color: buttonColor.withOpacity(0.3),
               blurRadius: 14,
               offset: const Offset(0, 5),
             ),
@@ -27,12 +30,12 @@ class DashboardButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.dashboard_rounded, color: Colors.white, size: 20),
-            SizedBox(width: 8),
+            Icon(Icons.dashboard_rounded, color: theme.colorScheme.onPrimary, size: 20),
+            const SizedBox(width: 8),
             Text(
               'Go to Dashboard',
               style: TextStyle(
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'AbhayaLibre',

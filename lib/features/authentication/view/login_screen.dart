@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             Icon(
               isError ? Icons.error_outline : Icons.check_circle_outline,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               size: 20,
             ),
             SizedBox(width: 10),
@@ -89,9 +89,12 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     final authViewModel = context.watch<AuthViewModel>();
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBF8),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background decoration circles
@@ -103,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen>
               height: 220,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withOpacity(0.05),
+                color: primaryColor.withAlpha(isDark ? 20 : 13),
               ),
             ),
           ),
@@ -112,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen>
             left: 0,
             right: 0,
             child: Opacity(
-              opacity: 0.8,
+              opacity: isDark ? 0.3 : 0.8,
               child: Image.asset(
                 'assets/app_images/images/plant.png',
                 fit: BoxFit.cover,
@@ -142,10 +145,10 @@ class _LoginScreenState extends State<LoginScreen>
                           height: 86,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white,
+                            color: colorScheme.surface,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(5),
+                                color: colorScheme.onSurface.withAlpha(isDark ? 15 : 5),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -163,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen>
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'AbhayaLibre',
-                            color: blackColor,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         SizedBox(height: 6),
@@ -183,11 +186,11 @@ class _LoginScreenState extends State<LoginScreen>
                         Container(
                           padding: EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(4),
+                                color: colorScheme.onSurface.withAlpha(isDark ? 15 : 4),
                                 blurRadius: 16,
                                 offset: const Offset(0, 6),
                               ),
@@ -362,8 +365,8 @@ class _LoginScreenState extends State<LoginScreen>
 
           if (authViewModel.isLoading)
             Container(
-              color: Colors.black.withOpacity(0.25),
-              child: Center(child: CircularProgressIndicator()),
+              color: colorScheme.onSurface.withAlpha(64),
+              child: Center(child: CircularProgressIndicator(color: primaryColor)),
             ),
         ],
       ),
@@ -379,6 +382,10 @@ class _LoginScreenState extends State<LoginScreen>
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -388,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen>
             fontSize: 13,
             fontWeight: FontWeight.w800,
             fontFamily: 'AbhayaLibre',
-            color: blackColor.withOpacity(0.7),
+            color: colorScheme.onSurface.withAlpha(178),
           ),
         ),
         SizedBox(height: 6),
@@ -396,21 +403,21 @@ class _LoginScreenState extends State<LoginScreen>
           controller: controller,
           obscureText: obscure,
           validator: validator,
-          style: TextStyle(fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w700, color: blackColor),
+          style: TextStyle(fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w700, color: colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: grayColor.withOpacity(0.4), fontFamily: 'AbhayaLibre'),
+            hintStyle: TextStyle(color: grayColor.withAlpha(102), fontFamily: 'AbhayaLibre'),
             prefixIcon: Icon(icon, color: primaryColor, size: 20),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: const Color(0xFFF5F8F3),
+            fillColor: isDark ? colorScheme.tertiary : const Color(0xFFF5F8F3),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Color(0xFFE2E8E4), width: 1.5),
+              borderSide: BorderSide(color: isDark ? colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4), width: 1.5),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Color(0xFFE2E8E4), width: 1.2),
+              borderSide: BorderSide(color: isDark ? colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4), width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -436,6 +443,9 @@ class _LoginScreenState extends State<LoginScreen>
     required bool isLoading,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -443,9 +453,9 @@ class _LoginScreenState extends State<LoginScreen>
         onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
-          disabledBackgroundColor: primaryColor.withOpacity(0.6),
+          disabledBackgroundColor: primaryColor.withAlpha(153),
           elevation: 2,
-          shadowColor: primaryColor.withOpacity(0.4),
+          shadowColor: primaryColor.withAlpha(102),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -454,12 +464,12 @@ class _LoginScreenState extends State<LoginScreen>
             ? SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2.5),
               )
             : Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'AbhayaLibre',
@@ -473,14 +483,18 @@ class _LoginScreenState extends State<LoginScreen>
     required bool isLoading,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: OutlinedButton(
         onPressed: isLoading ? null : onTap,
         style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white,
-          side: BorderSide(color: Color(0xFFE2E8E4), width: 1.5),
+          backgroundColor: colorScheme.surface,
+          side: BorderSide(color: isDark ? colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4), width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -494,7 +508,7 @@ class _LoginScreenState extends State<LoginScreen>
             Text(
               'Continue with Google',
               style: TextStyle(
-                color: blackColor,
+                color: colorScheme.onSurface,
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'AbhayaLibre',

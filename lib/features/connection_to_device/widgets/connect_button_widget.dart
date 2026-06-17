@@ -13,12 +13,13 @@ class ConnectButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: isSending ? null : onPressed,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSending ? primaryColor.withOpacity(0.5) : primaryColor,
           borderRadius: BorderRadius.circular(16),
@@ -26,7 +27,7 @@ class ConnectButtonWidget extends StatelessWidget {
               ? []
               : [
                   BoxShadow(
-                    color: primaryColor.withOpacity(0.35),
+                    color: primaryColor.withAlpha(90),
                     blurRadius: 14,
                     offset: const Offset(0, 5),
                   ),
@@ -41,18 +42,18 @@ class ConnectButtonWidget extends StatelessWidget {
                 height: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
             ] else ...[
-              Icon(Icons.wifi_rounded, color: Colors.white, size: 20),
-              SizedBox(width: 8),
+              Icon(Icons.wifi_rounded, color: theme.colorScheme.onPrimary, size: 20),
+              const SizedBox(width: 8),
             ],
             Text(
               isSending ? 'Connecting...' : 'Connect',
               style: TextStyle(
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'AbhayaLibre',

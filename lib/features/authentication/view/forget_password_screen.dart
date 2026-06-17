@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:agriguard_project/core/core.dart';
 import '../view_model/user_view_model.dart';
@@ -47,9 +46,12 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
   Widget build(BuildContext context) {
     final authViewModel = context.watch<AuthViewModel>();
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8F3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           Positioned(
@@ -60,7 +62,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
               height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withOpacity(0.06),
+                color: primaryColor.withAlpha(isDark ? 20 : 13),
               ),
             ),
           ),
@@ -68,10 +70,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
             bottom: 0,
             left: 0,
             right: 0,
-            child: Image.asset(
-              'assets/app_images/images/plant.png',
-              fit: BoxFit.cover,
-              height: size.height * 0.5,
+            child: Opacity(
+              opacity: isDark ? 0.3 : 0.8,
+              child: Image.asset(
+                'assets/app_images/images/plant.png',
+                fit: BoxFit.cover,
+                height: size.height * 0.5,
+              ),
             ),
           ),
 
@@ -100,11 +105,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                 width: 44,
                                 height: 44,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: colorScheme.surface,
                                   borderRadius: BorderRadius.circular(14),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.06),
+                                      color: colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
@@ -123,7 +128,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                             height: 100,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: primaryColor.withOpacity(0.1),
+                              color: primaryColor.withAlpha(30),
                             ),
                             child: Icon(Icons.lock_reset_rounded, color: primaryColor, size: 46),
                           ),
@@ -136,7 +141,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                               fontSize: 30,
                               fontWeight: FontWeight.w900,
                               fontFamily: 'AbhayaLibre',
-                              color: blackColor,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                           SizedBox(height: 8),
@@ -157,11 +162,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                           Container(
                             padding: EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: BorderRadius.circular(28),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
+                                  color: colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
                                   blurRadius: 20,
                                   offset: const Offset(0, 6),
                                 ),
@@ -176,7 +181,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
                                     fontFamily: 'AbhayaLibre',
-                                    color: blackColor.withOpacity(0.7),
+                                    color: colorScheme.onSurface.withAlpha(178),
                                   ),
                                 ),
                                 SizedBox(height: 6),
@@ -190,13 +195,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     }
                                     return null;
                                   },
-                                  style: TextStyle(fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w700, color: blackColor),
+                                  style: TextStyle(fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w700, color: colorScheme.onSurface),
                                   decoration: InputDecoration(
                                     hintText: 'Enter your email',
-                                    hintStyle: TextStyle(color: grayColor.withOpacity(0.6), fontFamily: 'AbhayaLibre'),
+                                    hintStyle: TextStyle(color: grayColor.withAlpha(102), fontFamily: 'AbhayaLibre'),
                                     prefixIcon: Icon(Icons.email_outlined, color: primaryColor, size: 20),
                                     filled: true,
-                                    fillColor: const Color(0xFFF5F8F3),
+                                    fillColor: isDark ? colorScheme.tertiary : const Color(0xFFF5F8F3),
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
                                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
                                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: primaryColor, width: 1.5)),
@@ -261,7 +266,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     child: Center(
                                       child: Text(
                                         authViewModel.isLoading ? 'Sending...' : 'Send Reset Link',
-                                        style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
+                                        style: TextStyle(color: colorScheme.onPrimary, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
                                       ),
                                     ),
                                   ),
@@ -297,8 +302,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
 
           if (authViewModel.isLoading)
             Container(
-              color: Colors.black.withOpacity(0.25),
-              child: Center(child: CircularProgressIndicator()),
+              color: colorScheme.onSurface.withAlpha(64),
+              child: Center(child: CircularProgressIndicator(color: primaryColor)),
             ),
         ],
       ),

@@ -29,22 +29,25 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
   }
 
   void _confirmDelete(BuildContext context, ChatbotViewModel chatbotVm) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     showDialog(
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: Text('Delete Messages?', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Text('This action cannot be undone. Selected messages will be permanently removed.'),
+          backgroundColor: colorScheme.surface,
+          title: Text('Delete Messages?', style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+          content: Text('This action cannot be undone. Selected messages will be permanently removed.', style: TextStyle(color: colorScheme.onSurface.withAlpha(200))),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              child: const Text('Cancel', style: TextStyle(color: grayColor, fontWeight: FontWeight.bold)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: redColor,
+                foregroundColor: colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () {
@@ -55,7 +58,7 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                 }
                 Navigator.pop(ctx);
               },
-              child: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -65,6 +68,10 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     final chatbotVm = context.watch<ChatbotViewModel>();
     final isSelectionMode = chatbotVm.isSelectionMode;
     final selectedCount = chatbotVm.selectedMessageIds.length;
@@ -73,26 +80,26 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
       initialIndex: widget.initialIndex,
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FBF8),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: isSelectionMode
             ? AppBar(
-                backgroundColor: primaryColor.withAlpha(20),
+                backgroundColor: primaryColor.withAlpha(isDark ? 35 : 20),
                 elevation: 0,
                 leading: IconButton(
-                  icon: Icon(Icons.close_rounded, color: Colors.black87),
+                  icon: Icon(Icons.close_rounded, color: colorScheme.onSurface),
                   onPressed: () => chatbotVm.unselectAllMessages(),
                 ),
                 title: Text(
                   '$selectedCount Selected',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.select_all_rounded, color: Colors.black87),
+                    icon: Icon(Icons.select_all_rounded, color: colorScheme.onSurface),
                     onPressed: () => chatbotVm.selectAllMessages(),
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outline_rounded, color: Colors.red),
+                    icon: const Icon(Icons.delete_outline_rounded, color: redColor),
                     onPressed: () => _confirmDelete(context, chatbotVm),
                   ),
                 ],
@@ -102,14 +109,14 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                 ),
               )
             : AppBar(
-                backgroundColor: Colors.white,
+                backgroundColor: colorScheme.surface,
                 elevation: 1,
-                shadowColor: Colors.black12,
+                shadowColor: isDark ? Colors.black.withAlpha(40) : Colors.black12,
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
                   onPressed: () => Navigator.pop(context),
                 ),
-                title: Text(
+                title: const Text(
                   'AgriGuard AI',
                   style: TextStyle(
                     color: primaryColor,
@@ -121,10 +128,10 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                 centerTitle: true,
                 bottom: TabBar(
                   labelColor: primaryColor,
-                  unselectedLabelColor: Colors.grey,
+                  unselectedLabelColor: isDark ? Colors.white60 : Colors.grey,
                   indicatorColor: primaryColor,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   tabs: const [
                     Tab(
                       icon: Icon(Icons.chat_bubble_outline_rounded, size: 20),

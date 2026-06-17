@@ -68,20 +68,21 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
   }
 
   void _showToast(BuildContext context, String message, {required bool isSuccess}) {
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
               isSuccess ? Icons.check_circle_outline : Icons.error_outline,
-              color: Colors.white,
+              color: theme.colorScheme.onPrimary,
               size: 20,
             ),
             SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'AbhayaLibre',
                   fontWeight: FontWeight.w700,
                 ),
@@ -92,7 +93,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
         backgroundColor: isSuccess ? primaryColor : Colors.red.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -107,13 +108,17 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ConnectionViewModel>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8F3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        leading: InkWell(
-          onTap: () => Navigator.pop(context),
-          child: Image.asset('assets/app_images/icons/back.png'),
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.primaryColor),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: FadeTransition(
@@ -121,18 +126,18 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                SizedBox(height: 10),
-                _buildHeroSection(viewModel),
-                SizedBox(height: 28),
-                _buildStepsCard(),
-                SizedBox(height: 24),
-                _buildScanButton(viewModel),
-                SizedBox(height: 20),
-                _buildScanResults(viewModel),
-                SizedBox(height: 30),
+                const SizedBox(height: 10),
+                _buildHeroSection(viewModel, theme),
+                const SizedBox(height: 28),
+                _buildStepsCard(theme, isDark),
+                const SizedBox(height: 24),
+                _buildScanButton(viewModel, theme),
+                const SizedBox(height: 20),
+                _buildScanResults(viewModel, theme, isDark),
+                const SizedBox(height: 30),
               ],
             ),
           ),
@@ -141,7 +146,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
     );
   }
 
-  Widget _buildHeroSection(ConnectionViewModel viewModel) {
+  Widget _buildHeroSection(ConnectionViewModel viewModel, ThemeData theme) {
     return Column(
       children: [
         AnimatedBuilder(
@@ -154,11 +159,11 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                 height: 160,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: primaryColor.withOpacity(0.08),
+                  color: primaryColor.withAlpha(20),
                   boxShadow: viewModel.isScanning
                       ? [
                           BoxShadow(
-                            color: primaryColor.withOpacity(0.2),
+                            color: primaryColor.withAlpha(40),
                             blurRadius: 30,
                             spreadRadius: 10,
                           ),
@@ -166,7 +171,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                       : [],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(28),
+                  padding: const EdgeInsets.all(28),
                   child: SvgPicture.asset(
                     'assets/app_images/images/agri.svg',
                   ),
@@ -175,7 +180,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             );
           },
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Text(
           'Connect Your AgriGuard',
           textAlign: TextAlign.center,
@@ -183,17 +188,17 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             fontSize: 26,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
-            color: Colors.black,
+            color: theme.colorScheme.onSurface,
             height: 1.2,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           viewModel.isScanning
               ? 'Searching for nearby devices...'
               : 'Tap scan to find your device',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 15,
             fontFamily: 'AbhayaLibre',
             color: Colors.grey,
@@ -204,15 +209,15 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
     );
   }
 
-  Widget _buildStepsCard() {
+  Widget _buildStepsCard(ThemeData theme, bool isDark) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -224,35 +229,35 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withAlpha(25),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(Icons.info_outline, color: primaryColor, size: 18),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 'Before you start',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'AbhayaLibre',
-                  color: Colors.black,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
-          _buildStep(1, 'Power on your AgriGuard device', Icons.power_settings_new),
-          SizedBox(height: 12),
-          _buildStep(2, 'Enable Bluetooth on your phone', Icons.bluetooth),
+          const SizedBox(height: 16),
+          _buildStep(1, 'Power on your AgriGuard device', Icons.power_settings_new, theme),
+          const SizedBox(height: 12),
+          _buildStep(2, 'Enable Bluetooth on your phone', Icons.bluetooth, theme),
         ],
       ),
     );
   }
 
-  Widget _buildStep(int number, String text, IconData icon) {
+  Widget _buildStep(int number, String text, IconData icon, ThemeData theme) {
     return Row(
       children: [
         Container(
@@ -266,7 +271,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             child: Text(
               '$number',
               style: TextStyle(
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
                 fontFamily: 'AbhayaLibre',
@@ -274,9 +279,9 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             ),
           ),
         ),
-        SizedBox(width: 12),
-        Icon(Icons.info_outline, color: Colors.grey, size: 18),
-        SizedBox(width: 8),
+        const SizedBox(width: 12),
+        const Icon(Icons.info_outline, color: Colors.grey, size: 18),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
@@ -284,7 +289,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
               fontSize: 14,
               fontFamily: 'AbhayaLibre',
               fontWeight: FontWeight.w700,
-              color: Colors.black.withOpacity(0.75),
+              color: theme.colorScheme.onSurface.withAlpha(190),
             ),
           ),
         ),
@@ -292,15 +297,15 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
     );
   }
 
-  Widget _buildScanButton(ConnectionViewModel viewModel) {
+  Widget _buildScanButton(ConnectionViewModel viewModel, ThemeData theme) {
     return GestureDetector(
       onTap: viewModel.isScanning ? null : viewModel.startScan,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 18),
+        padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
-          color: viewModel.isScanning ? Colors.grey.withOpacity(0.2) : primaryColor,
+          color: viewModel.isScanning ? theme.colorScheme.onSurface.withAlpha(30) : primaryColor,
           borderRadius: BorderRadius.circular(18),
           boxShadow: viewModel.isScanning
               ? []
@@ -325,12 +330,12 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                 ),
               )
             else
-              Icon(Icons.bluetooth_searching, color: Colors.white, size: 22),
-            SizedBox(width: 10),
+              Icon(Icons.bluetooth_searching, color: theme.colorScheme.onPrimary, size: 22),
+            const SizedBox(width: 10),
             Text(
               viewModel.isScanning ? 'Scanning...' : 'Scan for Devices',
               style: TextStyle(
-                color: viewModel.isScanning ? primaryColor : Colors.white,
+                color: viewModel.isScanning ? primaryColor : theme.colorScheme.onPrimary,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'AbhayaLibre',
@@ -342,13 +347,13 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
     );
   }
 
-  Widget _buildScanResults(ConnectionViewModel viewModel) {
+  Widget _buildScanResults(ConnectionViewModel viewModel, ThemeData theme, bool isDark) {
     if (!viewModel.isScanning && viewModel.scanResults.isEmpty) {
       return Column(
         children: [
           Icon(Icons.bluetooth_disabled, color: Colors.grey.withOpacity(0.4), size: 48),
-          SizedBox(height: 10),
-          Text(
+          const SizedBox(height: 10),
+          const Text(
             'No devices found yet',
             style: TextStyle(
               color: Colors.grey,
@@ -366,10 +371,10 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
       children: [
         if (viewModel.scanResults.isNotEmpty) ...[
           Padding(
-            padding: EdgeInsets.only(left: 4, bottom: 12),
+            padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Text(
               '${viewModel.scanResults.length} device${viewModel.scanResults.length > 1 ? 's' : ''} found',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 14,
                 fontFamily: 'AbhayaLibre',
@@ -382,38 +387,45 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: viewModel.scanResults.length,
-          separatorBuilder: (_, __) => SizedBox(height: 10),
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final result = viewModel.scanResults[index];
             final device = result.device;
             final isThisConnecting =
                 viewModel.connectingDeviceId == device.remoteId.toString();
 
-            return _buildDeviceCard(context, device, isThisConnecting, viewModel.isConnecting);
+            return _buildDeviceCard(context, device, isThisConnecting, viewModel.isConnecting, theme, isDark);
           },
         ),
       ],
     );
   }
 
-  Widget _buildDeviceCard(BuildContext context, BluetoothDevice device, bool isThisConnecting, bool isAnyConnecting) {
+  Widget _buildDeviceCard(
+    BuildContext context,
+    BluetoothDevice device,
+    bool isThisConnecting,
+    bool isAnyConnecting,
+    ThemeData theme,
+    bool isDark,
+  ) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isThisConnecting
-            ? primaryColor.withOpacity(0.06)
-            : Colors.white,
+            ? primaryColor.withAlpha(20)
+            : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isThisConnecting
-              ? primaryColor.withOpacity(0.3)
+              ? primaryColor.withAlpha(60)
               : Colors.transparent,
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -426,17 +438,17 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             height: 48,
             decoration: BoxDecoration(
               color: isThisConnecting
-                  ? primaryColor.withOpacity(0.15)
-                  : const Color(0xFFE8F5E9),
+                  ? primaryColor.withAlpha(35)
+                  : primaryColor.withAlpha(25),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
               Icons.bluetooth,
-              color: isThisConnecting ? primaryColor : const Color(0xFF4CAF50),
+              color: primaryColor,
               size: 24,
             ),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,13 +461,13 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                     fontWeight: FontWeight.w900,
                     fontFamily: 'AbhayaLibre',
                     fontSize: 16,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
                   device.remoteId.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 12,
                     fontFamily: 'AbhayaLibre',
@@ -478,20 +490,20 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             GestureDetector(
               onTap: isAnyConnecting ? null : () => _connectToDevice(context, device),
               child: Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 9,
                 ),
                 decoration: BoxDecoration(
                   color: isAnyConnecting
-                      ? Colors.grey.withOpacity(0.15)
+                      ? theme.colorScheme.onSurface.withAlpha(30)
                       : primaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   'Connect',
                   style: TextStyle(
-                    color: isAnyConnecting ? Colors.grey : Colors.white,
+                    color: isAnyConnecting ? Colors.grey : theme.colorScheme.onPrimary,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'AbhayaLibre',
                     fontSize: 14,

@@ -11,12 +11,10 @@ class AppTheme {
       colorScheme: ColorScheme.light(
         primary: primaryColor,
         secondary: secondaryColor,
-        background: whiteColor,
         surface: whiteColor,
         error: redColor,
         onPrimary: whiteColor,
         onSecondary: blackColor,
-        onBackground: blackColor,
         onSurface: blackColor,
       ),
       appBarTheme: AppBarTheme(
@@ -60,16 +58,18 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: primaryColor,
       scaffoldBackgroundColor: const Color(0xFF121212),
+      cardColor: const Color(0xFF1E1E1E),
+      dividerColor: Colors.white12,
       fontFamily: 'AbhayaLibre',
       colorScheme: ColorScheme.dark(
         primary: primaryColor,
         secondary: const Color(0xFF1E1E1E),
-        background: const Color(0xFF121212),
+        tertiary: const Color(0xFF2A2A2A),
+        onTertiary: Colors.white70,
         surface: const Color(0xFF1E1E1E),
         error: redColor,
         onPrimary: whiteColor,
         onSecondary: whiteColor,
-        onBackground: whiteColor,
         onSurface: whiteColor,
       ),
       appBarTheme: AppBarTheme(
@@ -98,6 +98,11 @@ class AppTheme {
             fontFamily: 'AbhayaLibre',
           ),
         ),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        fillColor: Color(0xFF1E1E1E),
+        filled: true,
+        hintStyle: TextStyle(color: Color(0xFF95989A)),
       ),
       textTheme: const TextTheme(
         displayLarge: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),

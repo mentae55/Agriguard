@@ -205,6 +205,7 @@ class _HomeScreenState extends State<HomeScreen>
             : 'Good Evening';
 
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -231,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen>
               height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withAlpha(15),
+                color: colorScheme.onPrimary.withAlpha(15),
               ),
             ),
           ),
@@ -243,13 +244,13 @@ class _HomeScreenState extends State<HomeScreen>
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withAlpha(10),
+                color: colorScheme.onPrimary.withAlpha(10),
               ),
             ),
           ),
           // Content
           Padding(
-            padding: EdgeInsets.fromLTRB(24, 20, 24, 30),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -260,18 +261,18 @@ class _HomeScreenState extends State<HomeScreen>
                     SvgPicture.asset(
                       'assets/app_images/icons/logo.svg',
                       height: 38,
-                      colorFilter: const ColorFilter.mode(
-                          Colors.white, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                          colorScheme.onPrimary, BlendMode.srcIn),
                       errorBuilder: (ctx, err, st) => Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.eco_rounded,
-                              color: Colors.white, size: 26),
-                          SizedBox(width: 6),
+                              color: colorScheme.onPrimary, size: 26),
+                          const SizedBox(width: 6),
                           Text(
                             'AGRIGUARD',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: colorScheme.onPrimary,
                               fontWeight: FontWeight.w900,
                               fontFamily: 'AbhayaLibre',
                               fontSize: 18,
@@ -288,24 +289,24 @@ class _HomeScreenState extends State<HomeScreen>
                             builder: (_) => const SelectDeviceScreen()),
                       ),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(30),
+                          color: colorScheme.onPrimary.withAlpha(30),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: Colors.white.withAlpha(60), width: 1),
+                              color: colorScheme.onPrimary.withAlpha(60), width: 1),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(Icons.swap_horiz_rounded,
-                                color: Colors.white, size: 16),
-                            SizedBox(width: 6),
+                                color: colorScheme.onPrimary, size: 16),
+                            const SizedBox(width: 6),
                             Text(
                               'Switch',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 13,
                                 fontFamily: 'AbhayaLibre',
@@ -317,44 +318,44 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 // Greeting
                 Text(
                   greeting,
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: colorScheme.onPrimary.withAlpha(180),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'Device #$formattedSerial',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                     fontSize: 30,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'AbhayaLibre',
                     letterSpacing: -0.5,
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFF4ADE80),
                         shape: BoxShape.circle,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       'Online & Transmitting',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: colorScheme.onPrimary.withAlpha(180),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -428,18 +429,20 @@ class _HomeScreenState extends State<HomeScreen>
     VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return ScaleOnTap(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(14),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: theme.dividerColor.withAlpha(50), width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(6),
-              blurRadius: 12,
+              color: Colors.black.withAlpha(isDark ? 40 : 8),
+              blurRadius: isDark ? 8 : 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -451,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen>
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  padding: EdgeInsets.all(9),
+                  padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: iconColor.withAlpha(22),
                     borderRadius: BorderRadius.circular(12),
@@ -463,17 +466,17 @@ class _HomeScreenState extends State<HomeScreen>
                     top: -4,
                     right: -4,
                     child: Container(
-                      padding: EdgeInsets.all(3),
+                      padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                         color: redColor,
                         shape: BoxShape.circle,
                         border:
-                            Border.all(color: Colors.white, width: 1.5),
+                            Border.all(color: colorScheme.surface, width: 1.5),
                       ),
                       child: Text(
                         badge,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                         ),
@@ -482,13 +485,13 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             if (isLoading)
               Container(
                 width: 40,
                 height: 16,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8EEE8),
+                  color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
                   borderRadius: BorderRadius.circular(4),
                 ),
               )
@@ -501,10 +504,10 @@ class _HomeScreenState extends State<HomeScreen>
                   fontFamily: 'AbhayaLibre',
                 ),
               ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: grayColor,
@@ -524,18 +527,21 @@ class _HomeScreenState extends State<HomeScreen>
     if (!_dataLoaded) return _buildAlertBannerSkeleton();
 
     final top = _topAlert;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     // Healthy state
     if (top == null) {
       return Container(
-        padding: EdgeInsets.all(18),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0FDF4),
+          color: isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Theme.of(context).primaryColor.withAlpha(60)),
+          border: Border.all(color: theme.primaryColor.withAlpha(60)),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).primaryColor.withAlpha(12),
+              color: theme.primaryColor.withAlpha(isDark ? 25 : 12),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -544,15 +550,15 @@ class _HomeScreenState extends State<HomeScreen>
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withAlpha(25),
+                color: theme.primaryColor.withAlpha(25),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.verified_rounded,
-                  color: Theme.of(context).primaryColor, size: 26),
+                  color: theme.primaryColor, size: 26),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,14 +566,14 @@ class _HomeScreenState extends State<HomeScreen>
                   Text(
                     'All Systems Healthy',
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'AbhayaLibre',
                     ),
                   ),
-                  SizedBox(height: 2),
-                  Text(
+                  const SizedBox(height: 2),
+                  const Text(
                     'Soil parameters are within optimal ranges.',
                     style: TextStyle(
                       color: grayColor,
@@ -587,8 +593,8 @@ class _HomeScreenState extends State<HomeScreen>
     final isCritical = top.severity == AlertSeverity.critical;
     final color = isCritical ? redColor : orangeColor;
     final bg = isCritical
-        ? const Color(0xFFFFEBEE)
-        : const Color(0xFFFFF8E1);
+        ? (isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE))
+        : (isDark ? const Color(0xFF3A2F1A) : const Color(0xFFFFF8E1));
 
     return ScaleOnTap(
       onTap: () => Navigator.push(
@@ -598,14 +604,14 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ),
       child: Container(
-        padding: EdgeInsets.all(18),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color.withAlpha(70), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: color.withAlpha(20),
+              color: color.withAlpha(isDark ? 35 : 20),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -615,14 +621,14 @@ class _HomeScreenState extends State<HomeScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: color.withAlpha(25),
                 shape: BoxShape.circle,
               ),
               child: Icon(top.icon, color: color, size: 26),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -630,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen>
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 7, vertical: 2),
                         decoration: BoxDecoration(
                           color: color,
@@ -639,7 +645,7 @@ class _HomeScreenState extends State<HomeScreen>
                         child: Text(
                           isCritical ? 'CRITICAL' : 'WARNING',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: colorScheme.onPrimary,
                             fontSize: 9,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.6,
@@ -647,10 +653,10 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                       if (_totalAlerts > 1) ...[
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
                           '+${_totalAlerts - 1} more',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: grayColor,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -659,20 +665,20 @@ class _HomeScreenState extends State<HomeScreen>
                       ]
                     ],
                   ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Text(
                     top.title,
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'AbhayaLibre',
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     '${top.paramName}: ${top.value.toStringAsFixed(top.value < 10 ? 2 : 1)} ${top.unit}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: grayColor,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -681,7 +687,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded,
+            const Icon(Icons.chevron_right_rounded,
                 color: grayColor, size: 22),
           ],
         ),
@@ -690,13 +696,15 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildAlertBannerSkeleton() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       height: 80,
-      padding: EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE8EEE8)),
+        border: Border.all(color: isDark ? theme.colorScheme.onSurface.withAlpha(30) : Colors.grey.withAlpha(40)),
       ),
       child: Row(
         children: [
@@ -704,11 +712,11 @@ class _HomeScreenState extends State<HomeScreen>
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: const Color(0xFFEEEEEE),
+              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
               shape: BoxShape.circle,
             ),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -718,14 +726,14 @@ class _HomeScreenState extends State<HomeScreen>
                     height: 14,
                     width: 140,
                     decoration: BoxDecoration(
-                        color: const Color(0xFFEEEEEE),
+                        color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
                         borderRadius: BorderRadius.circular(4))),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Container(
                     height: 10,
                     width: 200,
                     decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
+                        color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF5F5F5),
                         borderRadius: BorderRadius.circular(4))),
               ],
             ),
@@ -741,6 +749,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildSectionLabel(String label) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Text(
       label,
       style: theme.textTheme.displayMedium?.copyWith(
@@ -752,7 +761,7 @@ class _HomeScreenState extends State<HomeScreen>
         fontSize: 20,
         fontWeight: FontWeight.w900,
         fontFamily: 'AbhayaLibre',
-        color: Colors.black87,
+        color: colorScheme.onSurface,
         letterSpacing: -0.3,
       ),
     );
@@ -830,16 +839,19 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildGridCard(_GridItem item) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return ScaleOnTap(
       onTap: item.onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(8),
-              blurRadius: 16,
+              color: Colors.black.withAlpha(isDark ? 40 : 8),
+              blurRadius: isDark ? 8 : 16,
               offset: const Offset(0, 6),
             ),
           ],
@@ -873,7 +885,7 @@ class _HomeScreenState extends State<HomeScreen>
                       loadingBuilder: (ctx, child, progress) {
                         if (progress == null) return child;
                         return Container(
-                          color: const Color(0xFFF0F4F0),
+                          color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F4F0),
                           child: Center(
                             child: Icon(item.icon,
                                 color: item.iconColor.withAlpha(120), size: 36),
@@ -888,12 +900,12 @@ class _HomeScreenState extends State<HomeScreen>
                       right: 0,
                       child: Container(
                         height: 50,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withAlpha(60),
+                              Color(0x3C000000),
                               Colors.transparent,
                             ],
                           ),
@@ -905,9 +917,9 @@ class _HomeScreenState extends State<HomeScreen>
                       top: 10,
                       left: 10,
                       child: Container(
-                        padding: EdgeInsets.all(7),
+                        padding: const EdgeInsets.all(7),
                         decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(220),
+                          color: colorScheme.surface.withAlpha(220),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(item.icon,
@@ -920,7 +932,7 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             // Text area
             Padding(
-              padding: EdgeInsets.fromLTRB(12, 10, 12, 12),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -930,13 +942,13 @@ class _HomeScreenState extends State<HomeScreen>
                       fontSize: 15,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'AbhayaLibre',
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     item.subtitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: grayColor,
@@ -956,26 +968,29 @@ class _HomeScreenState extends State<HomeScreen>
   // ─────────────────────────────────────────────────────────
 
   Widget _buildDeviceStatusCard() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final statusLabel = _soilStatus != null
         ? _soilStatus![0].toUpperCase() + _soilStatus!.substring(1)
         : 'Loading…';
     final statusColor = _soilStatus == null
         ? grayColor
         : _soilStatus == 'healthy'
-            ? Theme.of(context).primaryColor
+            ? theme.primaryColor
             : _soilStatus == 'warning'
                 ? orangeColor
                 : redColor;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE8EEE8), width: 1),
+        border: Border.all(color: isDark ? colorScheme.onSurface.withAlpha(30) : Colors.grey.withAlpha(40), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(6),
+            color: Colors.black.withAlpha(isDark ? 40 : 6),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -986,15 +1001,15 @@ class _HomeScreenState extends State<HomeScreen>
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withAlpha(20),
+                  color: theme.primaryColor.withAlpha(20),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(Icons.smart_toy_rounded,
-                    color: Theme.of(context).primaryColor, size: 24),
+                    color: theme.primaryColor, size: 24),
               ),
-              SizedBox(width: 14),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1005,11 +1020,11 @@ class _HomeScreenState extends State<HomeScreen>
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'AbhayaLibre',
-                        color: Colors.black87,
+                        color: colorScheme.onSurface,
                       ),
                     ),
-                    SizedBox(height: 2),
-                    Text(
+                    const SizedBox(height: 2),
+                    const Text(
                       'Active & Transmitting',
                       style: TextStyle(
                         fontSize: 11,
@@ -1023,7 +1038,7 @@ class _HomeScreenState extends State<HomeScreen>
               // Soil status pill
               Container(
                 padding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
                   color: statusColor.withAlpha(20),
                   borderRadius: BorderRadius.circular(20),
@@ -1041,15 +1056,15 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ],
           ),
-          SizedBox(height: 18),
-          const Divider(height: 1, color: Color(0xFFEEF2EE)),
-          SizedBox(height: 16),
+          const SizedBox(height: 18),
+          Divider(height: 1, color: theme.dividerColor),
+          const SizedBox(height: 16),
           // Battery row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildStatusChip(
-                  Icons.battery_charging_full_rounded, '70%', 'Battery', Theme.of(context).primaryColor),
+                  Icons.battery_charging_full_rounded, '70%', 'Battery', theme.primaryColor),
               _buildStatusChip(
                   Icons.sensors_rounded, 'ON', 'Sensors', const Color(0xFF4ADE80)),
               _buildStatusChip(
@@ -1072,29 +1087,30 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildStatusChip(
       IconData icon, String value, String label, Color color) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: color.withAlpha(20),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(icon, color: color, size: 20),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(
           value,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
-            color: Colors.black87,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w600,
             color: grayColor,
@@ -1109,25 +1125,27 @@ class _HomeScreenState extends State<HomeScreen>
   // ─────────────────────────────────────────────────────────
 
   Widget _buildBottomNavigationBar() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return SafeArea(
       top: false,
       bottom: true,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         height: 72,
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
+          color: theme.primaryColor,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).primaryColor.withAlpha(90),
+              color: theme.primaryColor.withAlpha(isDark ? 50 : 90),
               blurRadius: 28,
               offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1151,6 +1169,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildNavItem(int index, IconData outlined, IconData solid,
       {String? badge}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final bool isSelected = _selectedNavIndex == index;
     return ScaleOnTap(
       onTap: () => setState(() => _selectedNavIndex = index),
@@ -1166,8 +1186,8 @@ class _HomeScreenState extends State<HomeScreen>
                 isSelected ? solid : outlined,
                 key: ValueKey(isSelected),
                 color: isSelected
-                    ? Colors.white
-                    : Colors.white.withAlpha(130),
+                    ? colorScheme.onPrimary
+                    : colorScheme.onPrimary.withAlpha(130),
                 size: isSelected ? 28 : 24,
               ),
             ),
@@ -1176,16 +1196,16 @@ class _HomeScreenState extends State<HomeScreen>
                 top: 10,
                 right: 5,
                 child: Container(
-                  padding: EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     color: redColor,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Theme.of(context).primaryColor, width: 1.5),
+                    border: Border.all(color: theme.primaryColor, width: 1.5),
                   ),
                   child: Text(
                     badge,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                     ),
@@ -1199,6 +1219,9 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildFloatingHomeItem(int index) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final bool isSelected = _selectedNavIndex == index;
     return ScaleOnTap(
       onTap: () => setState(() => _selectedNavIndex = index),
@@ -1207,12 +1230,12 @@ class _HomeScreenState extends State<HomeScreen>
         width: 52,
         height: 52,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.onPrimary,
           shape: BoxShape.circle,
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withAlpha(25),
+                    color: Colors.black.withAlpha(isDark ? 40 : 25),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -1222,7 +1245,7 @@ class _HomeScreenState extends State<HomeScreen>
         child: Center(
           child: Icon(
             isSelected ? Icons.home_rounded : Icons.home_outlined,
-            color: Theme.of(context).primaryColor,
+            color: theme.primaryColor,
             size: 28,
           ),
         ),

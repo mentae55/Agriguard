@@ -1,29 +1,23 @@
 import 'package:flutter/material.dart';
 
+const Color secondaryColor = Color(0xFFEFE9E3);
+const Color primaryColor = Color(0xFF66785F);
+const Color whiteColor = Color(0xFFFFFFFF);
+const Color whiteD9Color = Color(0xFFD9D9D9);
+const Color blackColor = Colors.black;
 
-Color secondaryColor = Color(0xFFEFE9E3);
-Color primaryColor = Color(0xFF66785F);
-Color whiteColor = Color(0xFFffffff);
-Color whiteD9Color = Color(0xFFD9D9D9);
-Color blackColor = Colors.black;
+// green
+const Color lightGreenColor = Color(0xFFD0E0CC);
 
+// gray
+const Color grayColor = Color(0xFF95989A);
+const Color gray70Color = Color(0xFF707070);
+const Color gray82Color = Color(0xFF828282);
+const Color gray88Color = Color(0xFF888888);
 
-
-//green
-Color lightGreenColor = Color(0xFFd0e0cc);
-
-//gray
-Color grayColor = Color(0xFF95989A);
-Color gray70Color = Color(0xFF707070);
-Color gray82Color = Color(0xFF828282);
-Color gray88Color = Color(0xFF888888);
-
-//red
-Color redColor = Color(0xFFC91C1C);
-//orange
-Color orangeColor = Color(0xFFFEA031);
-//naive
-Color navyColor = Color(0xFF002347);
-
-
-
+// red
+const Color redColor = Color(0xFFC91C1C);
+// orange
+const Color orangeColor = Color(0xFFFEA031);
+// navy
+const Color navyColor = Color(0xFF002347);

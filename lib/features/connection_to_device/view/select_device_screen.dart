@@ -49,9 +49,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
   }
 
   void _showRemoveDialog(BuildContext context, DeviceProvider provider) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Remove Device?',
@@ -59,7 +61,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             fontFamily: 'AbhayaLibre',
             fontWeight: FontWeight.w900,
             fontSize: 20,
-            color: blackColor,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         content: Text(
@@ -94,10 +96,10 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 18, vertical: 9),
               decoration: BoxDecoration(
-                color: Colors.red.shade500,
+                color: Colors.red.shade600,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text(
+              child: const Text(
                 'Remove',
                 style: TextStyle(
                   color: Colors.white,
@@ -118,16 +120,18 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
   Widget build(BuildContext context) {
     final name = FirebaseAuth.instance.currentUser?.displayName ?? '';
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8F3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Consumer<DeviceProvider>(
         builder: (context, deviceProvider, _) {
           if (deviceProvider.status == DeviceStatus.loading) {
-            return _buildLoadingState();
+            return _buildLoadingState(theme);
           }
           if (deviceProvider.status == DeviceStatus.error) {
-            return _buildErrorState(context);
+            return _buildErrorState(context, theme);
           }
 
           return Stack(
@@ -140,7 +144,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   height: 200,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: primaryColor.withOpacity(0.06),
+                    color: primaryColor.withAlpha(isDark ? 20 : 15),
                   ),
                 ),
               ),
@@ -152,7 +156,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   height: 130,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: primaryColor.withOpacity(0.04),
+                    color: primaryColor.withAlpha(isDark ? 12 : 10),
                   ),
                 ),
               ),
@@ -160,10 +164,13 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Image.asset(
-                  'assets/app_images/images/plant.png',
-                  fit: BoxFit.cover,
-                  height: size.height * 0.5,
+                child: Opacity(
+                  opacity: isDark ? 0.2 : 0.8,
+                  child: Image.asset(
+                    'assets/app_images/images/plant.png',
+                    fit: BoxFit.cover,
+                    height: size.height * 0.5,
+                  ),
                 ),
               ),
               Positioned.fill(
@@ -175,7 +182,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildHeader(name),
+                          _buildHeader(name, theme, isDark),
                           Expanded(
                             child: Center(
                               child: SingleChildScrollView(
@@ -191,9 +198,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                                         context,
                                         deviceProvider,
                                         size,
+                                        theme,
+                                        isDark,
                                       )
                                     else
-                                      _buildNoDeviceState(size),
+                                      _buildNoDeviceState(size, theme, isDark),
                                   ],
                                 ),
                               ),
@@ -216,6 +225,8 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     BuildContext context,
     DeviceProvider deviceProvider,
     Size size,
+    ThemeData theme,
+    bool isDark,
   ) {
     final isOnline = deviceProvider.isDeviceOnline;
 
@@ -226,11 +237,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
           width: double.infinity,
           padding: EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
                 blurRadius: 18,
                 offset: const Offset(0, 5),
               ),
@@ -247,7 +258,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                     height: 80,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withAlpha(25),
                     ),
                     padding: EdgeInsets.all(18),
                     child: SvgPicture.asset(
@@ -260,7 +271,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                     decoration: BoxDecoration(
                       color: isOnline ? Colors.green : Colors.orange,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: theme.colorScheme.surface, width: 2),
                     ),
                     child: Icon(
                       isOnline ? Icons.check_rounded : Icons.wifi_off_rounded,
@@ -279,7 +290,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'AbhayaLibre',
-                  color: blackColor,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -292,7 +303,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F8F3),
+                  color: isDark ? theme.colorScheme.tertiary : const Color(0xFFF5F8F3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -317,8 +328,8 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 ),
                 decoration: BoxDecoration(
                   color: isOnline
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
+                      ? Colors.green.withAlpha(25)
+                      : Colors.orange.withAlpha(25),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -367,6 +378,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               icon: Icons.dashboard_rounded,
               label: 'Go to Dashboard',
               color: primaryColor,
+              theme: theme,
             ),
           )
         // ===== Offline → Connect Device =====
@@ -375,15 +387,15 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
           Container(
             padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.08),
+              color: Colors.orange.withAlpha(20),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              border: Border.all(color: Colors.orange.withAlpha(60)),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.info_outline_rounded,
-                  color: Colors.orange.shade700,
+                  color: Colors.orange.shade400,
                   size: 18,
                 ),
                 SizedBox(width: 10),
@@ -394,7 +406,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                       fontSize: 13,
                       fontFamily: 'AbhayaLibre',
                       fontWeight: FontWeight.w700,
-                      color: Colors.orange.shade800,
+                      color: Colors.orange.shade400,
                       height: 1.4,
                     ),
                   ),
@@ -414,12 +426,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               icon: Icons.bluetooth_searching_rounded,
               label: 'Connect Device',
               color: primaryColor,
+              theme: theme,
             ),
           ),
 
           SizedBox(height: 10),
-
-          // Refresh button
         ],
 
         // Remove Device
@@ -432,7 +443,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.red.withOpacity(0.3),
+                color: Colors.red.withAlpha(80),
                 width: 1.5,
               ),
             ),
@@ -468,6 +479,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     required IconData icon,
     required String label,
     required Color color,
+    required ThemeData theme,
   }) {
     return Container(
       width: double.infinity,
@@ -486,12 +498,12 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 20),
+          Icon(icon, color: theme.colorScheme.onPrimary, size: 20),
           SizedBox(width: 8),
           Text(
             label,
             style: TextStyle(
-              color: Colors.white,
+              color: theme.colorScheme.onPrimary,
               fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFamily: 'AbhayaLibre',
@@ -502,7 +514,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     );
   }
 
-  Widget _buildNoDeviceState(Size size) {
+  Widget _buildNoDeviceState(Size size, ThemeData theme, bool isDark) {
     return Column(
       children: [
         Container(
@@ -510,7 +522,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
           height: 130,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: primaryColor.withOpacity(0.08),
+            color: primaryColor.withAlpha(20),
           ),
           padding: EdgeInsets.all(28),
           child: SvgPicture.asset('assets/app_images/images/selectdevice.svg'),
@@ -522,7 +534,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             fontSize: 26,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
-            color: blackColor,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         SizedBox(height: 8),
@@ -540,11 +552,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
         SizedBox(height: 28),
         Row(
           children: [
-            _buildFeatureChip(Icons.water_drop_outlined, 'Monitor'),
+            _buildFeatureChip(Icons.water_drop_outlined, 'Monitor', theme, isDark),
             SizedBox(width: 10),
-            _buildFeatureChip(Icons.thermostat_outlined, 'Control'),
+            _buildFeatureChip(Icons.thermostat_outlined, 'Control', theme, isDark),
             SizedBox(width: 10),
-            _buildFeatureChip(Icons.notifications_outlined, 'Alerts'),
+            _buildFeatureChip(Icons.notifications_outlined, 'Alerts', theme, isDark),
           ],
         ),
         SizedBox(height: 32),
@@ -557,6 +569,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             icon: Icons.add_rounded,
             label: 'Add Device',
             color: primaryColor,
+            theme: theme,
           ),
         ),
         SizedBox(height: size.height * 0.22),
@@ -564,19 +577,19 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     );
   }
 
-  Widget _buildHeader(String name) {
+  Widget _buildHeader(String name, ThemeData theme, bool isDark) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(24, 20, 24, 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -594,7 +607,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'AbhayaLibre',
-                    color: blackColor,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -614,7 +627,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: primaryColor.withAlpha(25),
               borderRadius: BorderRadius.circular(14),
             ),
             padding: EdgeInsets.all(10),
@@ -625,16 +638,16 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     );
   }
 
-  Widget _buildFeatureChip(IconData icon, String label) {
+  Widget _buildFeatureChip(IconData icon, String label, ThemeData theme, bool isDark) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: theme.colorScheme.onSurface.withAlpha(isDark ? 12 : 8),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -659,7 +672,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -669,7 +682,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             height: 70,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: primaryColor.withOpacity(0.1),
+              color: primaryColor.withAlpha(25),
             ),
             child: Padding(
               padding: EdgeInsets.all(18),
@@ -694,7 +707,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
     );
   }
 
-  Widget _buildErrorState(BuildContext context) {
+  Widget _buildErrorState(BuildContext context, ThemeData theme) {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(32),
@@ -706,9 +719,9 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withAlpha(25),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.wifi_off_rounded,
                 color: Colors.red,
                 size: 36,
@@ -721,7 +734,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'AbhayaLibre',
-                color: blackColor,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             SizedBox(height: 8),
@@ -761,12 +774,12 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                    Icon(Icons.refresh_rounded, color: theme.colorScheme.onPrimary, size: 18),
                     SizedBox(width: 8),
                     Text(
                       'Try Again',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'AbhayaLibre',
                         fontSize: 15,

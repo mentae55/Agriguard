@@ -253,16 +253,16 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     }
   }
 
-  Color _statusBg(String status) {
+  Color _statusBg(String status, {bool isDark = false}) {
     switch (status.toLowerCase()) {
       case 'healthy':
-        return const Color(0xFFE8F5E9);
+        return isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4);
       case 'warning':
-        return const Color(0xFFFFF8E1);
+        return isDark ? const Color(0xFF3A2F1A) : const Color(0xFFFFF8E1);
       case 'critical':
-        return const Color(0xFFFFEBEE);
+        return isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE);
       default:
-        return const Color(0xFFF5F5F5);
+        return isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5);
     }
   }
 
@@ -315,10 +315,12 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBF8),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: secondaryColor,
+        backgroundColor: colorScheme.secondary,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.keyboard_return_rounded, color: primaryColor),
@@ -327,7 +329,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
         title: Text(
           'Soil Analysis',
           style: TextStyle(
-            color: Colors.black87,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
             fontSize: 24,
@@ -337,7 +339,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           // Live pulse indicator
           if (!_isLoading && !_hasError)
             Padding(
-              padding: EdgeInsets.only(right: 8.0),
+              padding: const EdgeInsets.only(right: 8.0),
               child: Center(
                 child: AnimatedBuilder(
                   animation: _pulseController,
@@ -354,9 +356,8 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ),
             ),
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child:
-            SvgPicture.asset(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: SvgPicture.asset(
               'assets/app_images/icons/logo.svg',
               width: width50,
               height: height48,
@@ -378,7 +379,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: const [
           CircularProgressIndicator(color: primaryColor, strokeWidth: 3),
           SizedBox(height: 20),
           Text(
@@ -398,38 +399,41 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   // ── Error state ────────────────────────────
 
   Widget _buildError() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFEBEE),
+                color: isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: redColor.withAlpha(60)),
               ),
               child: Column(
                 children: [
-                  Icon(Icons.sensors_off_rounded,
+                  const Icon(Icons.sensors_off_rounded,
                       color: redColor, size: 48),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     'Could not connect to sensors',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontFamily: 'AbhayaLibre',
                       fontSize: 18,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     _errorMessage,
-                    style: TextStyle(color: grayColor, fontSize: 12),
+                    style: const TextStyle(color: grayColor, fontSize: 12),
                     textAlign: TextAlign.center,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
@@ -437,12 +441,12 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             GestureDetector(
               onTap: _initAndStartPolling,
               child: Container(
                 padding:
-                    EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                 decoration: BoxDecoration(
                   color: primaryColor,
                   borderRadius: BorderRadius.circular(16),
@@ -458,12 +462,12 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.refresh_rounded,
-                        color: Colors.white, size: 20),
-                    SizedBox(width: 8),
+                        color: colorScheme.onPrimary, size: 20),
+                    const SizedBox(width: 8),
                     Text(
                       'Retry',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'AbhayaLibre',
                         fontSize: 16,
@@ -485,38 +489,38 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     final snap = _latest!;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.fromLTRB(20, 16, 20, 100),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Section 1 — Status Bar
           _buildStatusBar(snap),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Section 2 — Live Sensor Gauges
           _buildSectionHeader('Live Sensor Gauges', Icons.sensors_rounded),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildGaugesGrid(snap),
-          SizedBox(height: 28),
+          const SizedBox(height: 28),
 
           // Section 3 — Recommendation
           _buildSectionHeader(
               'AI Recommendation', Icons.lightbulb_outline_rounded),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildRecommendationCard(snap),
-          SizedBox(height: 28),
+          const SizedBox(height: 28),
 
           // Section 4 — Active Alerts
           _buildSectionHeader(
               'Active Alerts', Icons.warning_amber_rounded),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildAlertsSection(snap),
-          SizedBox(height: 28),
+          const SizedBox(height: 28),
 
           // Section 5 — Historical Trends
           _buildSectionHeader(
               'Historical Trends', Icons.show_chart_rounded),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildTrendsSection(),
         ],
       ),
@@ -528,24 +532,26 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   // ═════════════════════════════════════════════
 
   Widget _buildSectionHeader(String title, IconData icon) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(7),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
             color: primaryColor.withAlpha(25),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: primaryColor, size: 18),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Text(
           title,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
-            color: Colors.black87,
+            color: colorScheme.onSurface,
           ),
         ),
       ],
@@ -557,19 +563,22 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   // ═════════════════════════════════════════════
 
   Widget _buildStatusBar(SoilSnapshot snap) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final sc = _statusColor(snap.soilStatus);
-    final sb = _statusBg(snap.soilStatus);
+    final sb = _statusBg(snap.soilStatus, isDark: isDark);
 
     return Container(
-      padding: EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: sc.withAlpha(60), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 12,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -581,7 +590,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               // Status badge
               Container(
                 padding:
-                    EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
                   color: sb,
                   borderRadius: BorderRadius.circular(20),
@@ -596,7 +605,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                       decoration:
                           BoxDecoration(color: sc, shape: BoxShape.circle),
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       snap.soilStatus.toUpperCase(),
                       style: TextStyle(
@@ -614,12 +623,12 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               // Timestamp
               Row(
                 children: [
-                  Icon(Icons.access_time_rounded,
+                  const Icon(Icons.access_time_rounded,
                       size: 14, color: grayColor),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     _formatTimestamp(snap.timestamp),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: grayColor,
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -629,16 +638,16 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ),
             ],
           ),
-          SizedBox(height: 14),
-          const Divider(height: 1),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
+          Divider(height: 1, color: theme.dividerColor),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
                 child: _buildInfoChip(Icons.location_on_outlined, 'Field',
                     snap.reading.locationId),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildInfoChip(Icons.memory_rounded, 'Device',
                     snap.reading.deviceId),
@@ -651,28 +660,31 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   }
 
   Widget _buildInfoChip(IconData icon, String label, String value) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F8F3),
+        color: isDark ? colorScheme.onSurface.withAlpha(15) : const Color(0xFFF5F8F3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           Icon(icon, size: 16, color: primaryColor),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: grayColor,
                         fontSize: 10,
                         fontWeight: FontWeight.w600)),
                 Text(value,
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       fontFamily: 'AbhayaLibre',
@@ -725,6 +737,9 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   }
 
   Widget _buildGaugeCard(_GaugeData g) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final alertColor = _alertColorForParam(g.paramKey);
     final isAlert = alertColor != null;
     final cardBorder = isAlert ? alertColor : Colors.transparent;
@@ -734,16 +749,16 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     final barColor = alertColor ?? primaryColor;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: cardBorder.withAlpha(isAlert ? 100 : 0), width: 1.5),
+            color: cardBorder.withAlpha(isAlert ? (isDark ? 160 : 100) : 0), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 10,
             offset: const Offset(0, 3),
           ),
         ],
@@ -759,11 +774,11 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(g.icon, size: 14, color: grayColor),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Flexible(
                       child: Text(
                         g.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: grayColor,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -785,7 +800,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                 ),
             ],
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -795,15 +810,15 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'AbhayaLibre',
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
               if (g.unit.isNotEmpty) ...[
-                SizedBox(width: 3),
+                const SizedBox(width: 3),
                 Padding(
-                  padding: EdgeInsets.only(bottom: 3),
+                  padding: const EdgeInsets.only(bottom: 3),
                   child: Text(g.unit,
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: grayColor,
                           fontSize: 11,
                           fontWeight: FontWeight.w600)),
@@ -811,21 +826,21 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ],
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           // Progress bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: barColor.withAlpha(30),
+              backgroundColor: barColor.withAlpha(isDark ? 45 : 30),
               color: barColor,
               minHeight: 5,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             '${g.min} – ${g.max} ${g.unit}',
-            style: TextStyle(
+            style: const TextStyle(
                 color: grayColor, fontSize: 9, fontWeight: FontWeight.w600),
           ),
         ],
@@ -838,19 +853,22 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   // ═════════════════════════════════════════════
 
   Widget _buildRecommendationCard(SoilSnapshot snap) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final sc = _statusColor(snap.soilStatus);
-    final sb = _statusBg(snap.soilStatus);
+    final sb = _statusBg(snap.soilStatus, isDark: isDark);
     final pct = (snap.confidence * 100).toStringAsFixed(0);
 
     return Container(
-      padding: EdgeInsets.all(22),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: sb,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: sc.withAlpha(60), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: sc.withAlpha(20),
+            color: sc.withAlpha(isDark ? 35 : 20),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -862,7 +880,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: sc.withAlpha(30),
                   shape: BoxShape.circle,
@@ -870,7 +888,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                 child: Icon(Icons.agriculture_rounded,
                     color: sc, size: 22),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -878,15 +896,15 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                     Text(
                       'Recommended Action',
                       style: TextStyle(
-                        color: Colors.black54,
+                        color: colorScheme.onSurface.withAlpha(160),
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.5,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
                         color: sc.withAlpha(30),
@@ -906,14 +924,14 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             snap.primaryAction,
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFamily: 'AbhayaLibre',
-              color: Colors.black87,
+              color: colorScheme.onSurface,
               height: 1.4,
             ),
           ),
@@ -927,35 +945,38 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   // ═════════════════════════════════════════════
 
   Widget _buildAlertsSection(SoilSnapshot snap) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     if (snap.nAlerts == 0) {
       return Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFFE8F5E9),
+          color: isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: Colors.green.shade300.withAlpha(100), width: 1.5),
+              color: isDark ? Colors.green.withAlpha(90) : Colors.green.shade300.withAlpha(100), width: 1.5),
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.green.withAlpha(30),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.check_circle_outline_rounded,
+              child: const Icon(Icons.check_circle_outline_rounded,
                   color: Colors.green, size: 24),
             ),
-            SizedBox(width: 14),
-            const Expanded(
+            const SizedBox(width: 14),
+            Expanded(
               child: Text(
                 '✅ Soil is healthy — no active alerts.',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'AbhayaLibre',
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -967,7 +988,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     return Column(
       children: snap.alerts
           .map((a) => Padding(
-                padding: EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: _buildAlertCard(a),
               ))
           .toList(),
@@ -975,21 +996,26 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   }
 
   Widget _buildAlertCard(SoilAlert a) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final isCritical = a.severity.toLowerCase() == 'critical';
     final sevColor = isCritical ? redColor : orangeColor;
     final sevBg =
-        isCritical ? const Color(0xFFFFEBEE) : const Color(0xFFFFF8E1);
+        isCritical
+            ? (isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE))
+            : (isDark ? const Color(0xFF3A2F1A) : const Color(0xFFFFF8E1));
 
     return Container(
-      padding: EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: sevColor.withAlpha(60), width: 1.5),
+        border: Border.all(color: sevColor.withAlpha(isDark ? 90 : 60), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 10,
             offset: const Offset(0, 3),
           ),
         ],
@@ -1006,7 +1032,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                 color: sevColor,
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   _formatParamName(a.param),
@@ -1014,14 +1040,14 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'AbhayaLibre',
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
               // Severity badge
               Container(
                 padding:
-                    EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: sevBg,
                   borderRadius: BorderRadius.circular(10),
@@ -1039,15 +1065,15 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           // Value + status row
           Row(
             children: [
               Container(
                 padding:
-                    EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F8F3),
+                  color: isDark ? colorScheme.onSurface.withAlpha(15) : const Color(0xFFF5F8F3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -1056,14 +1082,14 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'AbhayaLibre',
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Container(
                 padding:
-                    EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: sevColor.withAlpha(20),
                   borderRadius: BorderRadius.circular(8),
@@ -1079,11 +1105,11 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             a.recommendation,
             style: TextStyle(
-              color: Colors.black87.withAlpha(180),
+              color: colorScheme.onSurface.withAlpha(180),
               fontSize: 13,
               height: 1.4,
               fontWeight: FontWeight.w600,
@@ -1099,16 +1125,19 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   // ═════════════════════════════════════════════
 
   Widget _buildTrendsSection() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     if (_history.length < 2) {
       return Container(
         height: 80,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(5),
-              blurRadius: 10,
+              color: Colors.black.withAlpha(isDark ? 40 : 5),
+              blurRadius: isDark ? 8 : 10,
               offset: const Offset(0, 3),
             ),
           ],
@@ -1117,14 +1146,14 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(
                     color: primaryColor, strokeWidth: 2),
               ),
-              SizedBox(width: 12),
-              Text(
+              const SizedBox(width: 12),
+              const Text(
                 'Collecting data for trends...',
                 style: TextStyle(
                   color: grayColor,
@@ -1148,7 +1177,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           safeMin: 15,
           safeMax: 50,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildLineChart(
           title: 'pH',
           color: Colors.purple.shade400,
@@ -1156,9 +1185,9 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           safeMin: 5.5,
           safeMax: 7.8,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildNPKChart(),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildLineChart(
           title: 'Temperature (°C)',
           color: Colors.orange.shade400,
@@ -1167,7 +1196,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           safeMin: 8,
           safeMax: 38,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildLineChart(
           title: 'EC (dS/m)',
           color: Colors.teal.shade400,
@@ -1186,15 +1215,18 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     required double safeMin,
     required double safeMax,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 10,
             offset: const Offset(0, 3),
           ),
         ],
@@ -1210,14 +1242,14 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                 decoration:
                     BoxDecoration(color: color, shape: BoxShape.circle),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'AbhayaLibre',
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
@@ -1232,7 +1264,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               ),
             ],
           ),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           SizedBox(
             height: 80,
             child: CustomPaint(
@@ -1242,6 +1274,7 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
                 color: color,
                 safeMin: safeMin,
                 safeMax: safeMax,
+                surfaceColor: colorScheme.surface,
               ),
             ),
           ),
@@ -1251,15 +1284,18 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
   }
 
   Widget _buildNPKChart() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 10,
             offset: const Offset(0, 3),
           ),
         ],
@@ -1273,21 +1309,21 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
               fontSize: 14,
               fontWeight: FontWeight.w900,
               fontFamily: 'AbhayaLibre',
-              color: Colors.black87,
+              color: colorScheme.onSurface,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           // Legend
           Row(
             children: [
               _legend('N', Colors.green.shade600),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               _legend('P', Colors.blue.shade400),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               _legend('K', Colors.orange.shade400),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           SizedBox(
             height: 80,
             child: CustomPaint(
@@ -1310,9 +1346,9 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
           decoration:
               BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
         Text(label,
-            style: TextStyle(
+            style: const TextStyle(
                 color: grayColor,
                 fontSize: 10,
                 fontWeight: FontWeight.w700)),
@@ -1320,7 +1356,6 @@ class _SoilAnalysisScreenState extends State<SoilAnalysisScreen>
     );
   }
 }
-
 
 // ═════════════════════════════════════════════
 //  CUSTOM PAINTERS
@@ -1331,12 +1366,14 @@ class _LinePainter extends CustomPainter {
   final Color color;
   final double safeMin;
   final double safeMax;
+  final Color surfaceColor;
 
   _LinePainter({
     required this.values,
     required this.color,
     required this.safeMin,
     required this.safeMax,
+    required this.surfaceColor,
   });
 
   @override
@@ -1421,7 +1458,7 @@ class _LinePainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.fill;
     final dotBorderPaint = Paint()
-      ..color = Colors.white
+      ..color = surfaceColor
       ..style = PaintingStyle.fill;
     for (int i = 0; i < values.length; i++) {
       final offset = Offset(i * step, toY(values[i]));

@@ -22,6 +22,9 @@ class ProfileTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -30,26 +33,28 @@ class ProfileTextField extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade500,
+            color: theme.colorScheme.onSurface.withAlpha(150),
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         TextFormField(
           initialValue: initialValue,
           readOnly: readOnly,
           style: TextStyle(
              fontSize: 16,
              fontWeight: FontWeight.w700,
-             color: readOnly ? Colors.grey.shade600 : Colors.black87,
+             color: readOnly
+                 ? theme.colorScheme.onSurface.withAlpha(120)
+                 : theme.colorScheme.onSurface,
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFF1EFE9), // Soft beige
+            fillColor: isDark ? theme.colorScheme.tertiary : const Color(0xFFF1EFE9),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           keyboardType: isEmail ? TextInputType.emailAddress : keyboardType,
           onSaved: onSaved,

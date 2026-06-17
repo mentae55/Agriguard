@@ -7,38 +7,41 @@ class NoWifiScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       backgroundColor: primaryColor,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.wifi_off_rounded, size: 100, color: Colors.white),
-              SizedBox(height: 32),
+              Icon(Icons.wifi_off_rounded, size: 100, color: colorScheme.onPrimary),
+              const SizedBox(height: 32),
               Text(
                 'No Internet Connection',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   fontFamily: 'AbhayaLibre',
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Please turn on your Wi-Fi or mobile data to continue using AgriGuard.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white.withAlpha(178),
+                  color: colorScheme.onPrimary.withAlpha(178),
                 ),
               ),
-              SizedBox(height: 16),
-              const CircularProgressIndicator(color: Colors.white), // Visual cue it's waiting
+              const SizedBox(height: 16),
+              CircularProgressIndicator(color: colorScheme.onPrimary), // Visual cue it's waiting
             ],
           ),
         ),
@@ -54,42 +57,45 @@ class DeviceOfflineScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: secondaryColor, // Soft cream background
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.device_unknown_rounded, size: 100, color: Colors.red.shade400),
-              SizedBox(height: 32),
+              Icon(Icons.device_unknown_rounded, size: 100, color: redColor),
+              const SizedBox(height: 32),
               Text(
                 'Device Disconnected',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                   fontFamily: 'AbhayaLibre',
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'The ESP32 firmware is offline. Please turn on your device, check its power supply, and ensure it has internet access.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: colorScheme.onSurface.withAlpha(180),
                 ),
               ),
-              SizedBox(height: 48),
+              const SizedBox(height: 48),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  foregroundColor: colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -102,7 +108,7 @@ class DeviceOfflineScreen extends StatelessWidget {
                     (route) => false,
                   );
                 },
-                child: Text('Go to Connect Page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: const Text('Go to Connect Page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ],
           ),

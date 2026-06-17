@@ -28,8 +28,7 @@ class ProfileProvider with ChangeNotifier {
       
       if (user == null) {
         // Mock user when not logged in
-        if (_userProfile == null) {
-          _userProfile = UserProfile(
+        _userProfile ??= UserProfile(
             uid: 'mock_uid_123',
             firstName: 'Sabrina',
             lastName: 'Aryan',
@@ -38,7 +37,6 @@ class ProfileProvider with ChangeNotifier {
             phone: '+234 123 4567',
             profileImageUrl: '', // Empty uses placeholder
           );
-        }
       } else {
         _userProfile = await _profileService.getUserProfile(user.uid);
         // If profile doesn't exist in Firestore, create default

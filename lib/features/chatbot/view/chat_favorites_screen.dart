@@ -20,21 +20,28 @@ class ChatFavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final chatbotVm = context.watch<ChatbotViewModel>();
     final user = FirebaseAuth.instance.currentUser;
     final List<Map<String, dynamic>> favorites = chatbotVm.favoriteMessages;
 
     if (user == null) {
-      return Center(child: Text('Please log in to view favorites.'));
+      return Center(
+        child: Text(
+          'Please log in to view favorites.',
+          style: TextStyle(color: colorScheme.onSurface, fontSize: 16),
+        ),
+      );
     }
 
     if (favorites.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20.0),
       itemCount: favorites.length,
       itemBuilder: (context, index) {
         final item = favorites[index];
@@ -46,23 +53,26 @@ class ChatFavoritesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: primaryColor.withAlpha(20),
+                color: primaryColor.withAlpha(isDark ? 35 : 20),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.star_outline_rounded, size: 64, color: primaryColor),
+              child: const Icon(Icons.star_outline_rounded, size: 64, color: primaryColor),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'No saved messages',
               style: TextStyle(
                 fontSize: 20,
@@ -71,11 +81,11 @@ class ChatFavoritesScreen extends StatelessWidget {
                 color: primaryColor,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Star important answers in your chat to save them here for quick access.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
+              style: TextStyle(color: colorScheme.onSurface.withAlpha(160), fontSize: 13, height: 1.5),
             ),
           ],
         ),
@@ -90,11 +100,15 @@ class ChatFavoritesScreen extends StatelessWidget {
     ChatbotViewModel chatbotVm,
     String userId,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     final cleanDisease = session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
     final bool isUser = message.senderType == 'user';
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: GestureDetector(
         onTap: () {
           // 1. Load the corresponding session
@@ -111,18 +125,18 @@ class ChatFavoritesScreen extends StatelessWidget {
           );
         },
         child: Container(
-          padding: EdgeInsets.all(18),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(4),
-                blurRadius: 10,
+                color: Colors.black.withAlpha(isDark ? 40 : 4),
+                blurRadius: isDark ? 8 : 10,
                 offset: const Offset(0, 4),
               ),
             ],
-            border: Border.all(color: Colors.grey.withAlpha(20), width: 1),
+            border: Border.all(color: isDark ? Colors.white10 : Colors.grey.withAlpha(20), width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -134,7 +148,7 @@ class ChatFavoritesScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '${session.cropType} — $cleanDisease',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: primaryColor,
                         fontSize: 12,
@@ -146,7 +160,7 @@ class ChatFavoritesScreen extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.copy_rounded, color: Colors.grey, size: 18),
+                        icon: const Icon(Icons.copy_rounded, color: grayColor, size: 18),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: message.text));
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -158,7 +172,7 @@ class ChatFavoritesScreen extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.star_rounded, color: Colors.orange, size: 22),
+                        icon: const Icon(Icons.star_rounded, color: Colors.orange, size: 22),
                         onPressed: () {
                           chatbotVm.toggleMessageFavorite(userId, session.id, message.id, message.isFavorite);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -173,17 +187,17 @@ class ChatFavoritesScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               // Message content
               Text(
                 message.text,
                 style: TextStyle(
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                   fontSize: 14,
                   height: 1.45,
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               // Footer: Timestamp and Sender type tag
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,21 +205,23 @@ class ChatFavoritesScreen extends StatelessWidget {
                   Text(
                     _formatDate(message.timestamp),
                     style: TextStyle(
-                      color: Colors.grey.shade400,
+                      color: colorScheme.onSurface.withAlpha(120),
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isUser ? primaryColor.withAlpha(20) : Colors.grey.withAlpha(30),
+                      color: isUser 
+                          ? colorScheme.primary.withAlpha(isDark ? 35 : 20) 
+                          : (isDark ? Colors.white10 : Colors.grey.withAlpha(30)),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       isUser ? 'USER QUESTION' : 'AI RESPONSE',
                       style: TextStyle(
-                        color: isUser ? primaryColor : Colors.black54,
+                        color: isUser ? primaryColor : (isDark ? Colors.white60 : Colors.black54),
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),

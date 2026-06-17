@@ -18,14 +18,16 @@ class NetworkListWidget extends StatelessWidget {
     final selectedSSID = viewModel.selectedSSID;
     final isHiddenNetwork = viewModel.isHiddenNetwork;
     final showHiddenNetworkSection = viewModel.showHiddenNetworkSection;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 12 : 8),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -47,13 +49,13 @@ class NetworkListWidget extends StatelessWidget {
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? primaryColor.withOpacity(0.06)
+                          ? primaryColor.withAlpha(20)
                           : Colors.transparent,
                       borderRadius: BorderRadius.only(
                         topLeft: index == 0 ? const Radius.circular(20) : Radius.zero,
@@ -73,8 +75,8 @@ class NetworkListWidget extends StatelessWidget {
                           height: 38,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? primaryColor.withOpacity(0.12)
-                                : const Color(0xFFF5F8F3),
+                                ? primaryColor.withAlpha(35)
+                                : (isDark ? theme.colorScheme.tertiary : const Color(0xFFF5F8F3)),
                             borderRadius: BorderRadius.circular(11),
                           ),
                           child: Icon(
@@ -83,7 +85,7 @@ class NetworkListWidget extends StatelessWidget {
                             size: 20,
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             network,
@@ -91,7 +93,7 @@ class NetworkListWidget extends StatelessWidget {
                               fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
                               fontFamily: 'AbhayaLibre',
                               fontSize: 15,
-                              color: isSelected ? primaryColor : blackColor,
+                              color: isSelected ? primaryColor : theme.colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -105,7 +107,7 @@ class NetworkListWidget extends StatelessWidget {
                             ),
                             child: Icon(
                               Icons.check_rounded,
-                              color: Colors.white,
+                              color: theme.colorScheme.onPrimary,
                               size: 14,
                             ),
                           ),
@@ -118,13 +120,13 @@ class NetworkListWidget extends StatelessWidget {
                     height: 1,
                     indent: 16,
                     endIndent: 16,
-                    color: grayColor.withOpacity(0.1),
+                    color: theme.dividerColor,
                   ),
               ],
             );
           }),
 
-          Divider(height: 1, color: grayColor.withOpacity(0.1)),
+          Divider(height: 1, color: theme.dividerColor),
 
           // Hidden Network Toggle
           GestureDetector(
@@ -138,10 +140,10 @@ class NetworkListWidget extends StatelessWidget {
               }
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: showHiddenNetworkSection
-                    ? primaryColor.withOpacity(0.06)
+                    ? primaryColor.withAlpha(20)
                     : Colors.transparent,
                 borderRadius: showHiddenNetworkSection
                     ? BorderRadius.zero
@@ -157,8 +159,8 @@ class NetworkListWidget extends StatelessWidget {
                     height: 38,
                     decoration: BoxDecoration(
                       color: showHiddenNetworkSection
-                          ? primaryColor.withOpacity(0.12)
-                          : const Color(0xFFF5F8F3),
+                          ? primaryColor.withAlpha(35)
+                          : (isDark ? theme.colorScheme.tertiary : const Color(0xFFF5F8F3)),
                       borderRadius: BorderRadius.circular(11),
                     ),
                     child: Icon(
@@ -167,7 +169,7 @@ class NetworkListWidget extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Add Hidden Network',
@@ -193,22 +195,22 @@ class NetworkListWidget extends StatelessWidget {
 
           if (showHiddenNetworkSection)
             Container(
-              margin: EdgeInsets.fromLTRB(12, 0, 12, 12),
-              padding: EdgeInsets.all(16),
+              margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F8F3),
+                color: isDark ? theme.colorScheme.tertiary : const Color(0xFFF5F8F3),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Column(
                 children: [
                   if (isHiddenNetwork) ...[
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     TextFormField(
                       controller: hiddenSSIDController,
                       style: TextStyle(
                         fontFamily: 'AbhayaLibre',
                         fontWeight: FontWeight.w700,
-                        color: blackColor,
+                        color: theme.colorScheme.onSurface,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Enter your hidden WiFi name',
@@ -222,16 +224,26 @@ class NetworkListWidget extends StatelessWidget {
                           size: 20,
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: theme.colorScheme.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
+                          borderSide: BorderSide(
+                            color: isDark ? theme.colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4),
+                            width: 1.2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: isDark ? theme.colorScheme.onSurface.withAlpha(30) : const Color(0xFFE2E8E4),
+                            width: 1.2,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: primaryColor, width: 1.5),
                         ),
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 12,
                         ),
@@ -252,5 +264,3 @@ class NetworkListWidget extends StatelessWidget {
     );
   }
 }
-
-

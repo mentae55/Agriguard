@@ -30,7 +30,6 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
 
-  // علشان ما نحفظش الجهاز أكتر من مرة لو الـ listener اتنادى مرتين
   bool _deviceSaved = false;
 
   @override
@@ -44,30 +43,21 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
     _animController.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // تحميل شبكات الـ WiFi
       context.read<ConnectionViewModel>().loadWifiNetworks();
-
-      // ✅ الـ FIX الأساسي:
-      // بدل ما نشيك على isSuccess مباشرةً بعد connectToWifi() (اللي بترجع قبل ما Firebase يرد)،
-      // بنضيف listener على الـ ViewModel نفسه بيشتغل لما isSuccess يتغير لـ true.
       context.read<ConnectionViewModel>().addListener(_onViewModelChanged);
     });
   }
 
-  // ده بيتنادى أتوماتيكلي لما أي حاجة في الـ ViewModel تتغير
   void _onViewModelChanged() {
     if (!mounted) return;
     final viewModel = context.read<ConnectionViewModel>();
-    // لو النجاح اتأكد وما حفظناش الجهاز قبل كده
     if (viewModel.isSuccess && !_deviceSaved) {
       _deviceSaved = true;
       _saveDeviceAfterSuccess(viewModel);
     }
   }
 
-  // حفظ الجهاز في Firebase بعد ما الـ ESP يأكد الاتصال
   Future<void> _saveDeviceAfterSuccess(ConnectionViewModel viewModel) async {
-    // الـ MAC محفوظ في الـ ViewModel قبل ما BLE ينقطع
     final mac = viewModel.lastConnectedMac ?? '';
     debugPrint('DEBUG [Screen]: isSuccess=true. Saving device MAC: $mac');
 
@@ -85,7 +75,6 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
 
   @override
   void dispose() {
-    // مهم: إزالة الـ listener عشان نمنع memory leak
     context.read<ConnectionViewModel>().removeListener(_onViewModelChanged);
     _animController.dispose();
     passwordController.dispose();
@@ -106,8 +95,6 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
       return;
     }
 
-    // إرسال الـ credentials، الـ ViewModel سيبدأ ينتظر تأكيد Firebase
-    // لما الـ ESP يتصل وisonline يبقى true، الـ _onViewModelChanged هينادي _saveDeviceAfterSuccess
     await viewModel.connectToWifi(
       password: passwordController.text,
       hiddenSSID: _hiddenSSIDController.text,
@@ -115,20 +102,21 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
   }
 
   void _showSnackBar(String message, {bool isError = true}) {
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
               isError ? Icons.error_outline : Icons.check_circle_outline,
-              color: Colors.white,
+              color: theme.colorScheme.onPrimary,
               size: 18,
             ),
             SizedBox(width: 8),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'AbhayaLibre',
                   fontWeight: FontWeight.w700,
                 ),
@@ -139,7 +127,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
         backgroundColor: isError ? redColor : primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -148,9 +136,11 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final viewModel = context.watch<ConnectionViewModel>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8F3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           Positioned(
@@ -161,7 +151,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withOpacity(0.06),
+                color: primaryColor.withAlpha(isDark ? 20 : 15),
               ),
             ),
           ),
@@ -170,20 +160,21 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
               opacity: _fadeAnim,
               child: Column(
                 children: [
-                  HeaderWidget(),
+                  const HeaderWidget(),
                   Expanded(
                     child: Form(
                       key: formKey,
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             _buildSectionHeader(
                               icon: Icons.wifi_rounded,
                               title: 'Select WiFi Network',
+                              theme: theme,
                               trailing: viewModel.isLoadingNetworks
                                   ? SizedBox(
                                       width: 16,
@@ -196,9 +187,9 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                   : GestureDetector(
                                       onTap: viewModel.loadWifiNetworks,
                                       child: Container(
-                                        padding: EdgeInsets.all(6),
+                                        padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: primaryColor.withOpacity(0.1),
+                                          color: primaryColor.withAlpha(25),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
@@ -209,28 +200,29 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                       ),
                                     ),
                             ),
-                            SizedBox(height: 12),
+                            const SizedBox(height: 12),
                             if (viewModel.isLoadingNetworks)
-                              LoadingCardWidget()
+                              const LoadingCardWidget()
                             else if (viewModel.wifiNetworks.isEmpty)
                               const EmptyNetworkWidget()
                             else
                               NetworkListWidget(
                                 hiddenSSIDController: _hiddenSSIDController,
                               ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             if (viewModel.selectedSSID != null || viewModel.isHiddenNetwork) ...[
                               _buildSectionHeader(
                                 icon: Icons.lock_outline_rounded,
                                 title: viewModel.isHiddenNetwork
                                     ? 'Password for hidden network'
                                     : 'Password for "${viewModel.selectedSSID}"',
+                                theme: theme,
                               ),
-                              SizedBox(height: 12),
+                              const SizedBox(height: 12),
                               PasswordFieldWidgets(
                                 controller: passwordController,
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                             ],
                             if (viewModel.statusMessage.isNotEmpty) ...[
                               StatusCardWidget(
@@ -238,14 +230,14 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                 viewModel.isSuccess,
                                 viewModel.isSending,
                               ),
-                              SizedBox(height: 16),
+                              const SizedBox(height: 16),
                             ],
                             if (viewModel.selectedSSID != null || viewModel.isHiddenNetwork) ...[
                               ConnectButtonWidget(
                                 isSending: viewModel.isSending,
                                 onPressed: () => _handleConnect(viewModel),
                               ),
-                              SizedBox(height: 12),
+                              const SizedBox(height: 12),
                             ],
                             if (viewModel.isSuccess) ...[
                               DashboardButton(
@@ -259,7 +251,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                   );
                                 },
                               ),
-                              SizedBox(height: 12),
+                              const SizedBox(height: 12),
                             ],
                             SizedBox(height: size.height * 0.05),
                           ],
@@ -279,19 +271,20 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
   Widget _buildSectionHeader({
     required IconData icon,
     required String title,
+    required ThemeData theme,
     Widget? trailing,
   }) {
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(7),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
+            color: primaryColor.withAlpha(25),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: primaryColor, size: 16),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             title,
@@ -299,11 +292,11 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
               fontSize: 15,
               fontWeight: FontWeight.w900,
               fontFamily: 'AbhayaLibre',
-              color: blackColor,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ),
-        if (trailing != null) trailing,
+        ?trailing,
       ],
     );
   }

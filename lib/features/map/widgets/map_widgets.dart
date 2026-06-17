@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:agriguard_project/core/core.dart'; // To use primaryColor
+import 'package:agriguard_project/core/core.dart';
 
 class MapWidgets {
   static Widget buildFloatingButton({
@@ -9,6 +9,8 @@ class MapWidgets {
     String? tooltip,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Tooltip(
       message: tooltip ?? '',
       child: GestureDetector(
@@ -17,13 +19,13 @@ class MapWidgets {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(14),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Colors.black12,
+                color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
                 blurRadius: 14,
-                offset: Offset(0, 8),
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -39,19 +41,21 @@ class MapWidgets {
 
   static Widget buildRouteLoadingIndicator(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Positioned(
       top: 100,
       left: 0,
       right: 0,
       child: Center(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(14),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Colors.black12,
+                color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
                 blurRadius: 10,
               ),
             ],
@@ -67,7 +71,7 @@ class MapWidgets {
                   valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Text(
                 'Finding route...',
                 style: theme.textTheme.titleMedium,
@@ -81,15 +85,17 @@ class MapWidgets {
 
   static Widget buildSearchLoadingIndicator(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      margin: EdgeInsets.only(top: 8),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 12 : 8),
             blurRadius: 6,
           ),
         ],
@@ -113,15 +119,17 @@ class MapWidgets {
         required Function(Map<String, dynamic>) onLocationSelected,
       }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      margin: EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: 8),
       constraints: const BoxConstraints(maxHeight: 400),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 12 : 8),
             blurRadius: 6,
           ),
         ],
@@ -137,7 +145,7 @@ class MapWidgets {
         itemBuilder: (context, index) {
           final result = searchResults[index];
           return ListTile(
-            contentPadding: EdgeInsets.symmetric(
+            contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 8,
             ),
@@ -148,13 +156,13 @@ class MapWidgets {
             ),
             title: Text(
               result['name'] ?? '',
-              style: Theme.of(context).textTheme.titleSmall,
+              style: theme.textTheme.titleSmall,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             subtitle: result['address'] != null ? Text(
               result['address'],
-              style: Theme.of(context).textTheme.bodySmall,
+              style: theme.textTheme.bodySmall,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ) : null,
@@ -172,18 +180,23 @@ class MapWidgets {
         VoidCallback? onClose,
       }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final distanceInKm = distance / 1000;
     final durationInMinutes = (duration / 60).ceil();
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor.withAlpha(240),
+        color: theme.colorScheme.surface.withAlpha(240),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4)),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
-        border: Border.all(color: primaryColor.withAlpha(80), width: 1),
+        border: Border.all(color: primaryColor.withAlpha(isDark ? 120 : 60), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -197,18 +210,24 @@ class MapWidgets {
             ],
           ),
           if (onClose != null) ...[
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             InkWell(
               onTap: onClose,
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: primaryColor.withAlpha(30),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
-                  child: Text('Close Route', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'Close Route',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -228,7 +247,7 @@ class MapWidgets {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: primaryColor, size: 40),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           value,
           style: theme.textTheme.titleMedium?.copyWith(

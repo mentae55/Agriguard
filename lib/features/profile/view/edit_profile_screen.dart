@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:agriguard_project/core/core.dart';
 import 'package:agriguard_project/core/localization/app_localizations.dart';
 import '../controllers/profile_provider.dart';
 import '../widgets/profile_text_field.dart';
@@ -24,7 +25,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    // Allow user to pick image from gallery
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
@@ -38,6 +38,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _formKey.currentState!.save();
 
     final provider = context.read<ProfileProvider>();
+    final theme = Theme.of(context);
     
     try {
       await provider.updateProfile(
@@ -51,8 +52,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.tr(context, 'profile_updated')),
-            backgroundColor: Colors.green,
+            content: Text(
+              AppLocalizations.tr(context, 'profile_updated'),
+              style: TextStyle(color: theme.colorScheme.onPrimary),
+            ),
+            backgroundColor: primaryColor,
           ),
         );
         Navigator.pop(context);
@@ -61,8 +65,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${AppLocalizations.tr(context, 'error_occurred')}: $e'),
-            backgroundColor: Colors.red,
+            content: Text(
+              '${AppLocalizations.tr(context, 'error_occurred')}: $e',
+              style: TextStyle(color: theme.colorScheme.onPrimary),
+            ),
+            backgroundColor: redColor,
           ),
         );
       }
@@ -72,13 +79,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final provider = context.watch<ProfileProvider>();
     final user = provider.userProfile;
 
     if (user == null && provider.isLoading) {
       return Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.tr(context, 'edit_profile'))),
-        body: Center(child: CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -104,7 +112,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 16.0),
             child: Icon(Icons.smart_toy_rounded, color: theme.primaryColor, size: 36),
           ),
         ],
@@ -115,20 +123,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
-               padding: EdgeInsets.all(24.0),
+               padding: const EdgeInsets.all(24.0),
                child: Opacity(
-                 opacity: 0.8,
+                 opacity: isDark ? 0.3 : 0.8,
                  child: Image.asset(
                    'assets/app_images/images/plant.png',
                    height: 120,
-                   errorBuilder: (_, __, ___) => SizedBox(),
+                   errorBuilder: (_, _, _) => const SizedBox(),
                  ),
                ),
             ),
           ),
           
           SingleChildScrollView(
-            padding: EdgeInsets.all(32),
+            padding: const EdgeInsets.all(32),
             physics: const BouncingScrollPhysics(),
             child: Form(
               key: _formKey,
@@ -147,7 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: theme.colorScheme.secondary,
-                              border: Border.all(color: Colors.grey.shade200, width: 2),
+                              border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade200, width: 2),
                               image: _selectedImage != null
                                   ? DecorationImage(
                                       image: FileImage(_selectedImage!),
@@ -168,22 +176,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           Positioned(
                             bottom: 0,
-                            right: 0, // Using standard right for edit icon generally
+                            right: 0,
                             child: Container(
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: theme.primaryColor.withAlpha(200),
+                                color: theme.primaryColor,
                                 shape: BoxShape.circle,
                                 border: Border.all(color: theme.colorScheme.surface, width: 2),
                               ),
-                              child: Icon(Icons.edit, size: 14, color: Colors.white),
+                              child: Icon(Icons.edit, size: 14, color: theme.colorScheme.onPrimary),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   // Form Fields
                   ProfileTextField(
@@ -192,28 +200,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     validator: (val) => val == null || val.isEmpty ? AppLocalizations.tr(context, 'required_field') : null,
                     onSaved: (val) => _firstName = val,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ProfileTextField(
                     label: AppLocalizations.tr(context, 'last_name'),
                     initialValue: user.lastName,
                     validator: (val) => val == null || val.isEmpty ? AppLocalizations.tr(context, 'required_field') : null,
                     onSaved: (val) => _lastName = val,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ProfileTextField(
                     label: AppLocalizations.tr(context, 'username'),
                     initialValue: user.username,
                     validator: (val) => val == null || val.isEmpty ? AppLocalizations.tr(context, 'required_field') : null,
                     onSaved: (val) => _username = val,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ProfileTextField(
                     label: AppLocalizations.tr(context, 'email'),
                     initialValue: user.email,
                     isEmail: true,
-                    readOnly: true, // Typically emails are not editable directly here or need auth flow
+                    readOnly: true,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ProfileTextField(
                     label: AppLocalizations.tr(context, 'phone_number'),
                     initialValue: user.phone,
@@ -226,7 +234,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onSaved: (val) => _phone = val,
                   ),
                   
-                  SizedBox(height: 48),
+                  const SizedBox(height: 48),
 
                   // Save Changes Button
                   provider.isLoading
@@ -234,13 +242,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       : GestureDetector(
                           onTap: _saveProfile,
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: theme.primaryColor.withAlpha(200),
+                              color: theme.primaryColor,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: theme.primaryColor.withAlpha(40),
+                                  color: theme.primaryColor.withOpacity(0.35),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -250,7 +258,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: Text(
                                 AppLocalizations.tr(context, 'save_changes'),
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onPrimary,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 0.5,

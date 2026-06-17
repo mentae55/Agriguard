@@ -34,7 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   final RobotGpsService _robotGpsService = RobotGpsService();
   StreamSubscription<LatLng>? _robotGpsSub;
 
-  final Set<Marker> _markers = {};   // [fixed] final — mutated in-place, never reassigned
+  final Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
   Position? _currentPosition;
 
@@ -42,7 +42,6 @@ class _MapScreenState extends State<MapScreen> {
   bool _showRoute = false;
   double _routeDistance = 0.0;
   double _routeDuration = 0.0;
-  // _destination removed — was written but never read (replaced with local var)
 
   // [NEW] Track the robot's last known position for the info chip
   LatLng? _robotPosition;
@@ -57,7 +56,6 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _initServices();
-    // Delay GPS subscription until device MAC is available in DeviceProvider
     WidgetsBinding.instance.addPostFrameCallback((_) => _startRobotGpsStream());
   }
 
@@ -131,7 +129,6 @@ class _MapScreenState extends State<MapScreen> {
   void _updateRobotMarker(LatLng pos) {
     setState(() {
       _robotPosition = pos;
-      // Remove old robot marker, then add updated one
       _markers.removeWhere((m) => m.markerId.value == 'robot');
       _markers.add(
         Marker(
@@ -142,13 +139,11 @@ class _MapScreenState extends State<MapScreen> {
             snippet: 'Lat: ${pos.latitude.toStringAsFixed(5)}, '
                 'Lng: ${pos.longitude.toStringAsFixed(5)}',
           ),
-          // Green hue marker to distinguish robot from user location
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
         ),
       );
     });
 
-    // Smooth camera follow — only animate if controller is ready
     if (_controller.isCompleted) {
       _controller.future.then((controller) {
         controller.animateCamera(
@@ -189,7 +184,6 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _onMapLongPress(LatLng tappedPoint) {
-    // tappedPoint is used directly — no need to store in a field
     _addMarker(tappedPoint, "destination", "Destination");
 
     if (_currentPosition != null) {
@@ -205,19 +199,17 @@ class _MapScreenState extends State<MapScreen> {
       _showRoute = false;
       _polylines.clear();
       _markers.removeWhere((m) => m.markerId.value == "destination");
-      // destination marker removed from set above — no field to null
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: Stack(
         children: [
-          // [EXISTING] Google Map — all existing params preserved
           GoogleMap(
             mapType: MapType.normal,
             initialCameraPosition: _initialPosition,
@@ -234,23 +226,32 @@ class _MapScreenState extends State<MapScreen> {
 
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // [EXISTING] Simulated search / hint bar
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
+                          blurRadius: 10,
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.search, color: Colors.grey),
-                        SizedBox(width: 12),
-                        Expanded(child: Text('Long press map to set destination', style: TextStyle(color: Colors.grey))),
+                        Icon(Icons.search, color: grayColor),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Long press map to set destination',
+                            style: TextStyle(color: grayColor),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -262,7 +263,6 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
 
-          // [EXISTING] Current location FAB
           Positioned(
             right: 16,
             bottom: _showRoute ? 200 : 120,
@@ -274,7 +274,6 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
 
-          // [NEW] "Follow Robot" FAB — animates camera to robot position
           if (_robotPosition != null)
             Positioned(
               right: 16,
@@ -293,15 +292,13 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
 
-          // [NEW] Live robot GPS chip at bottom-left
           if (_robotPosition != null)
             Positioned(
               left: 16,
               bottom: _showRoute ? 200 : 120,
-              child: _buildRobotPositionChip(),
+              child: _buildRobotPositionChip(theme, isDark),
             ),
 
-          // [EXISTING] Route info card
           if (_showRoute)
              Positioned(
                bottom: 110,
@@ -319,29 +316,37 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // [NEW] Small chip showing live robot coordinates
-  // ---------------------------------------------------------------------------
-  Widget _buildRobotPositionChip() {
+  Widget _buildRobotPositionChip(ThemeData theme, bool isDark) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
-        border: Border.all(color: primaryColor.withAlpha(60)),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
+            blurRadius: 8,
+          ),
+        ],
+        border: Border.all(color: primaryColor.withAlpha(isDark ? 120 : 60)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.smart_toy_rounded, color: primaryColor, size: 16),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Robot GPS',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.black54)),
+              Text(
+                'Robot GPS',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface.withAlpha(150),
+                ),
+              ),
               Text(
                 '${_robotPosition!.latitude.toStringAsFixed(4)}, '
                 '${_robotPosition!.longitude.toStringAsFixed(4)}',

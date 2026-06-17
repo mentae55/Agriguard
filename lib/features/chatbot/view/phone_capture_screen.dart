@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:agriguard_project/core/core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../view_model/chatbot_view_model.dart';
-import 'chat_screen.dart';
 import 'chatbot_main_screen.dart';
 
 class PhoneCaptureScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class PhoneCaptureScreen extends StatefulWidget {
 class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     with SingleTickerProviderStateMixin {
   File? _selectedImage;
-  String _selectedCrop = 'Tomato'; // Default
+  String _selectedCrop = 'Tomato';
   final ImagePicker _picker = ImagePicker();
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
@@ -36,7 +35,6 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     );
     _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
 
-    // Fetch previous chats list in the background
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -52,7 +50,6 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     super.dispose();
   }
 
-  // Camera image capture
   Future<void> _captureImage(ImageSource source) async {
     try {
       final pickedFile = await _picker.pickImage(
@@ -69,11 +66,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
         _selectedImage = File(pickedFile.path);
       });
 
-      // Clear any previous results
       context.read<ChatbotViewModel>().clearResult();
       _animController.reset();
-
-      // Trigger automatic classification
       _runClassification();
     } catch (e) {
       if (!mounted) return;
@@ -86,17 +80,11 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
   Future<void> _runClassification() async {
     if (_selectedImage == null) return;
 
-    setState(() {
-      _takingLongerThanUsual = false;
-    });
+    setState(() => _takingLongerThanUsual = false);
 
     _loadingWarningTimer?.cancel();
     _loadingWarningTimer = Timer(const Duration(seconds: 12), () {
-      if (mounted) {
-        setState(() {
-          _takingLongerThanUsual = true;
-        });
-      }
+      if (mounted) setState(() => _takingLongerThanUsual = true);
     });
 
     final success = await context.read<ChatbotViewModel>().classifyImage(
@@ -105,26 +93,25 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
         );
 
     _loadingWarningTimer?.cancel();
-
-    if (success && mounted) {
-      _animController.forward();
-    }
+    if (success && mounted) _animController.forward();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final chatbotVm = context.watch<ChatbotViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6FAF5), // Ultra light, organic greenish-white
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Plant Diagnosis',
           style: TextStyle(
             color: primaryColor,
@@ -135,9 +122,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
         ),
         centerTitle: true,
         actions: [
-          // Navigates to Chat History Screen
           IconButton(
-            icon: Icon(Icons.history_edu_rounded, color: primaryColor, size: 28),
+            icon: const Icon(Icons.history_edu_rounded, color: primaryColor, size: 28),
             onPressed: () {
               Navigator.push(
                 context,
@@ -145,42 +131,33 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               );
             },
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
         ],
       ),
       body: Stack(
         children: [
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. Crop Selector
-                _buildCropSelector(),
-                SizedBox(height: 24),
-
-                // 2. Image Display or Picker Options
-                _buildImageSection(chatbotVm),
-                SizedBox(height: 24),
-
-                // 3. Status/Results Section
-                _buildResultsSection(chatbotVm),
-
-                SizedBox(height: 100), // Bottom spacer
+                _buildCropSelector(colorScheme),
+                const SizedBox(height: 24),
+                _buildImageSection(chatbotVm, colorScheme, theme),
+                const SizedBox(height: 24),
+                _buildResultsSection(chatbotVm, colorScheme, theme),
+                const SizedBox(height: 100),
               ],
             ),
           ),
-
-          // Loading overlay during classification
-          if (chatbotVm.isClassifying) _buildLoadingOverlay(),
+          if (chatbotVm.isClassifying) _buildLoadingOverlay(colorScheme, theme),
         ],
       ),
     );
   }
 
-  // Sliding crop selector
-  Widget _buildCropSelector() {
+  Widget _buildCropSelector(ColorScheme colorScheme) {
     return Container(
       height: 52,
       decoration: BoxDecoration(
@@ -188,60 +165,39 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
-        children: [
-          Expanded(
+        children: ['Tomato', 'Wheat'].map((crop) {
+          final isSelected = _selectedCrop == crop;
+          return Expanded(
             child: GestureDetector(
               onTap: () {
-                setState(() => _selectedCrop = 'Tomato');
+                setState(() => _selectedCrop = crop);
                 if (_selectedImage != null) _runClassification();
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: _selectedCrop == 'Tomato' ? primaryColor : Colors.transparent,
+                  color: isSelected ? primaryColor : Colors.transparent,
                   borderRadius: BorderRadius.circular(25),
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Tomato',
+                  crop,
                   style: TextStyle(
-                    color: _selectedCrop == 'Tomato' ? Colors.white : primaryColor,
+                    color: isSelected ? colorScheme.onPrimary : primaryColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedCrop = 'Wheat');
-                if (_selectedImage != null) _runClassification();
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: _selectedCrop == 'Wheat' ? primaryColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'Wheat',
-                  style: TextStyle(
-                    color: _selectedCrop == 'Wheat' ? Colors.white : primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+          );
+        }).toList(),
       ),
     );
   }
 
-  // Image section holding current image or showing glassmorphic capture buttons
-  Widget _buildImageSection(ChatbotViewModel chatbotVm) {
+  Widget _buildImageSection(ChatbotViewModel chatbotVm, ColorScheme colorScheme, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
+
     if (_selectedImage != null) {
       return Container(
         height: 260,
@@ -249,7 +205,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withAlpha(30),
+              color: primaryColor.withAlpha(isDark ? 40 : 30),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -261,7 +217,6 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             fit: StackFit.expand,
             children: [
               Image.file(_selectedImage!, fit: BoxFit.cover),
-              // Gradient Overlay
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -273,14 +228,13 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                   ),
                 ),
               ),
-              // Change Image Floating Action Button
               Positioned(
                 top: 16,
                 right: 16,
                 child: FloatingActionButton.small(
-                  backgroundColor: Colors.white,
-                  onPressed: () => _showCaptureOptionsBottomSheet(),
-                  child: Icon(Icons.flip_camera_ios_rounded, color: primaryColor),
+                  backgroundColor: colorScheme.surface,
+                  onPressed: _showCaptureOptionsBottomSheet,
+                  child: const Icon(Icons.flip_camera_ios_rounded, color: primaryColor),
                 ),
               ),
             ],
@@ -289,7 +243,6 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
       );
     }
 
-    // Capture Trigger Buttons (when no image is picked)
     return Column(
       children: [
         GestureDetector(
@@ -305,7 +258,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withAlpha(80),
+                  color: primaryColor.withAlpha(isDark ? 50 : 80),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -315,14 +268,14 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white.withAlpha(40),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 36),
+                  child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 36),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,16 +283,16 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                     Text(
                       'Scan Plant Leaf',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'AbhayaLibre',
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       'Point camera at diseased leaf',
-                      style: TextStyle(color: Colors.white.withAlpha(178), fontSize: 12),
+                      style: TextStyle(color: colorScheme.onPrimary.withAlpha(178), fontSize: 12),
                     ),
                   ],
                 ),
@@ -347,18 +300,18 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             ),
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         GestureDetector(
           onTap: () => _captureImage(ImageSource.gallery),
           child: Container(
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: primaryColor.withAlpha(40), width: 1.5),
+              border: Border.all(color: primaryColor.withAlpha(isDark ? 80 : 40), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(10),
+                  color: Colors.black.withAlpha(isDark ? 40 : 10),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -367,9 +320,9 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.photo_library_rounded, color: primaryColor, size: 28),
-                SizedBox(width: 14),
-                Text(
+                const Icon(Icons.photo_library_rounded, color: primaryColor, size: 28),
+                const SizedBox(width: 14),
+                const Text(
                   'Upload from Gallery',
                   style: TextStyle(
                     color: primaryColor,
@@ -386,22 +339,23 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     );
   }
 
-  // Options bottom sheet for picking
   void _showCaptureOptionsBottomSheet() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (context) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                const Text(
                   'Choose Photo Option',
                   style: TextStyle(
                     fontSize: 18,
@@ -410,19 +364,25 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                     color: primaryColor,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ListTile(
-                  leading: Icon(Icons.camera_alt_rounded, color: primaryColor),
-                  title: Text('Capture with Camera', style: TextStyle(fontWeight: FontWeight.bold)),
+                  leading: const Icon(Icons.camera_alt_rounded, color: primaryColor),
+                  title: Text(
+                    'Capture with Camera',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                  ),
                   onTap: () {
                     Navigator.pop(context);
                     _captureImage(ImageSource.camera);
                   },
                 ),
-                const Divider(),
+                Divider(color: theme.dividerColor),
                 ListTile(
-                  leading: Icon(Icons.photo_library_rounded, color: primaryColor),
-                  title: Text('Select from Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
+                  leading: const Icon(Icons.photo_library_rounded, color: primaryColor),
+                  title: Text(
+                    'Select from Gallery',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                  ),
                   onTap: () {
                     Navigator.pop(context);
                     _captureImage(ImageSource.gallery);
@@ -436,32 +396,36 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     );
   }
 
-  // Results Section (Diagnosis Card)
-  Widget _buildResultsSection(ChatbotViewModel chatbotVm) {
+  Widget _buildResultsSection(ChatbotViewModel chatbotVm, ColorScheme colorScheme, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
+
     if (chatbotVm.classificationError != null) {
       return Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.red.withAlpha(20),
+          color: redColor.withAlpha(isDark ? 35 : 20),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.red.withAlpha(80)),
+          border: Border.all(color: redColor.withAlpha(isDark ? 100 : 80)),
         ),
         child: Row(
           children: [
-            Icon(Icons.error_outline_rounded, color: Colors.red, size: 32),
-            SizedBox(width: 16),
+            const Icon(Icons.error_outline_rounded, color: redColor, size: 32),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Diagnosis Failed',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(color: redColor, fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     chatbotVm.classificationError!,
-                    style: TextStyle(color: Colors.red.shade900, fontSize: 13),
+                    style: TextStyle(
+                      color: isDark ? Colors.red.shade300 : Colors.red.shade900,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -474,36 +438,41 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     final result = chatbotVm.latestResult;
     if (result == null) return const SizedBox.shrink();
 
-    // IMAGE VALIDATION RULE:
-    // If the confidence level is extremely low (e.g., < 0.35) or result contains no meaningful agricultural class
     final bool isPlantInvalid = result.confidence < 0.35 || result.prediction.isEmpty;
 
     if (isPlantInvalid) {
       return Container(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF7ED), // Warm light orange
+          color: isDark ? const Color(0xFF2E2010) : const Color(0xFFFFF7ED),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFFED7AA), width: 1.5),
+          border: Border.all(
+            color: isDark ? Colors.orange.withAlpha(80) : const Color(0xFFFED7AA),
+            width: 1.5,
+          ),
         ),
         child: Column(
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 48),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Plant could not be detected',
               style: TextStyle(
-                color: Colors.orange.shade900,
+                color: isDark ? Colors.orange.shade300 : Colors.orange.shade900,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'AbhayaLibre',
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Please upload a clear plant image. Ensure the leaf is well-lit, centered, and belongs to a Tomato or Wheat crop.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black54, fontSize: 13, height: 1.5),
+              style: TextStyle(
+                color: colorScheme.onSurface.withAlpha(160),
+                fontSize: 13,
+                height: 1.5,
+              ),
             ),
           ],
         ),
@@ -516,13 +485,13 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     return FadeTransition(
       opacity: _fadeAnim,
       child: Container(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(5),
+              color: Colors.black.withAlpha(isDark ? 40 : 5),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -534,18 +503,22 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: isHealthy ? Colors.green.withAlpha(30) : Colors.red.withAlpha(30),
+                    color: isHealthy
+                        ? Colors.green.withAlpha(isDark ? 40 : 30)
+                        : redColor.withAlpha(isDark ? 40 : 30),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     isHealthy ? Icons.check_circle_rounded : Icons.coronavirus_rounded,
-                    color: isHealthy ? Colors.green.shade700 : Colors.red.shade700,
+                    color: isHealthy
+                        ? (isDark ? Colors.green.shade300 : Colors.green.shade700)
+                        : (isDark ? Colors.red.shade300 : Colors.red.shade700),
                     size: 26,
                   ),
                 ),
-                SizedBox(width: 14),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,7 +526,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                       Text(
                         'DIAGNOSIS COMPLETE',
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: colorScheme.onSurface.withAlpha(130),
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.5,
@@ -564,21 +537,21 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          color: Colors.black87,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withAlpha(30),
+                    color: primaryColor.withAlpha(isDark ? 40 : 30),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Text(
                     '${(result.confidence * 100).toStringAsFixed(1)}% Conf.',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: primaryColor,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -587,25 +560,28 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                 ),
               ],
             ),
-            const Divider(height: 32),
+            Divider(height: 32, color: theme.dividerColor),
             Text(
               'Result:',
-              style: TextStyle(color: Colors.black38, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: colorScheme.onSurface.withAlpha(130),
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               cleanDisease,
               style: TextStyle(
-                color: isHealthy ? Colors.green.shade800 : Colors.red.shade900,
+                color: isHealthy
+                    ? (isDark ? Colors.green.shade300 : Colors.green.shade800)
+                    : (isDark ? Colors.red.shade300 : Colors.red.shade900),
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'AbhayaLibre',
               ),
             ),
-            SizedBox(height: 24),
-
-            // VERY IMPORTANT:
-            // "Ask AgriGuard AI" Button appears ONLY after successful classification!
+            const SizedBox(height: 24),
             GestureDetector(
               onTap: () => _navigateToChat(chatbotVm),
               child: Container(
@@ -619,7 +595,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryColor.withAlpha(80),
+                      color: primaryColor.withAlpha(isDark ? 50 : 80),
                       blurRadius: 15,
                       offset: const Offset(0, 6),
                     ),
@@ -628,19 +604,19 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.auto_awesome_rounded, color: Colors.white.withAlpha(220), size: 20),
-                    SizedBox(width: 8),
+                    Icon(Icons.auto_awesome_rounded, color: colorScheme.onPrimary.withAlpha(220), size: 20),
+                    const SizedBox(width: 8),
                     Text(
                       'Ask about it more',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
                       ),
                     ),
-                    SizedBox(width: 6),
-                    Icon(Icons.arrow_forward_rounded, color: Colors.white.withAlpha(178), size: 18),
+                    const SizedBox(width: 6),
+                    Icon(Icons.arrow_forward_rounded, color: colorScheme.onPrimary.withAlpha(178), size: 18),
                   ],
                 ),
               ),
@@ -651,7 +627,6 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     );
   }
 
-  // Navigate to Chat screen safely
   Future<void> _navigateToChat(ChatbotViewModel chatbotVm) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -661,11 +636,10 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
       return;
     }
 
-    // Initialize session in Firebase
     await chatbotVm.startChatSession(
       userId: user.uid,
       cropType: _selectedCrop,
-      imageUrl: '', // optional url of image if stored in cloud storage
+      imageUrl: '',
     );
 
     if (mounted) {
@@ -676,16 +650,16 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     }
   }
 
-  // Scanner Loading Overlay
-  Widget _buildLoadingOverlay() {
+  Widget _buildLoadingOverlay(ColorScheme colorScheme, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      color: Colors.black.withAlpha(120),
+      color: Colors.black.withAlpha(isDark ? 160 : 120),
       child: Center(
         child: Container(
-          width: 240, // slightly wider to accommodate warning text nicely
-          padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          width: 240,
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             boxShadow: const [
               BoxShadow(color: Colors.black26, blurRadius: 20, spreadRadius: 2),
@@ -694,28 +668,28 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(color: primaryColor, strokeWidth: 3),
-              SizedBox(height: 24),
+              const CircularProgressIndicator(color: primaryColor, strokeWidth: 3),
+              const SizedBox(height: 24),
               Text(
                 'Analyzing plant leaf...',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
-              SizedBox(height: 6),
-              Text(
+              const SizedBox(height: 6),
+              const Text(
                 'Running neural model',
-                style: TextStyle(color: Colors.grey, fontSize: 11),
+                style: TextStyle(color: grayColor, fontSize: 11),
               ),
               if (_takingLongerThanUsual) ...[
-                SizedBox(height: 16),
-                const Divider(),
-                SizedBox(height: 8),
+                const SizedBox(height: 16),
+                Divider(color: theme.dividerColor),
+                const SizedBox(height: 8),
                 Row(
-                  children: [
+                  children: const [
                     Icon(Icons.wifi_off_rounded, color: orangeColor, size: 20),
                     SizedBox(width: 8),
                     Expanded(

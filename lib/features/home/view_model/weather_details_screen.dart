@@ -402,10 +402,12 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Scaffold(
-      backgroundColor: secondaryColor,
+      backgroundColor: colorScheme.secondary,
       appBar: AppBar(
-        backgroundColor: secondaryColor,
+        backgroundColor: colorScheme.secondary,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.keyboard_return_rounded, color: primaryColor),
@@ -414,7 +416,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
         title: Text(
           'Weather Details',
           style: TextStyle(
-            color: Colors.black87,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
             fontSize: 24,
@@ -428,7 +430,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
               onPressed: _fetchWeather,
             ),
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 16.0),
             child: Icon(Icons.wb_cloudy_rounded, color: primaryColor, size: 28),
           ),
         ],
@@ -443,7 +445,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
               child: Image.asset(
                 'assets/app_images/images/plant.png',
                 height: 160,
-                errorBuilder: (_, _, _) => SizedBox(),
+                errorBuilder: (_, _, _) => const SizedBox(),
               ),
             ),
           ),
@@ -463,7 +465,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: const [
           CircularProgressIndicator(color: primaryColor, strokeWidth: 3),
           SizedBox(height: 20),
           Text(
@@ -481,37 +483,40 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildError() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFEBEE),
+                color: isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: redColor.withAlpha(60)),
               ),
               child: Column(
                 children: [
-                  Icon(Icons.cloud_off_rounded, color: redColor, size: 48),
-                  SizedBox(height: 12),
+                  const Icon(Icons.cloud_off_rounded, color: redColor, size: 48),
+                  const SizedBox(height: 12),
                   Text(
                     'Weather fetch failed',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontFamily: 'AbhayaLibre',
                       fontSize: 18,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     _errorMessage,
-                    style: TextStyle(color: grayColor, fontSize: 12),
+                    style: const TextStyle(color: grayColor, fontSize: 12),
                     textAlign: TextAlign.center,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
@@ -519,11 +524,11 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             GestureDetector(
               onTap: _fetchWeather,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                 decoration: BoxDecoration(
                   color: primaryColor,
                   borderRadius: BorderRadius.circular(16),
@@ -538,12 +543,12 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
+                    Icon(Icons.refresh_rounded, color: colorScheme.onPrimary, size: 20),
+                    const SizedBox(width: 8),
                     Text(
                       'Retry',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'AbhayaLibre',
                         fontSize: 16,
@@ -569,34 +574,34 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
         onRefresh: _fetchWeather,
         color: primaryColor,
         child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20, 16, 20, 40),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // City Selector Dropdown / Row
               _buildCitySelector(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Current Weather Card
               _buildCurrentWeatherCard(data, wmo),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Hourly Forecast section
               _buildSectionHeader('Hourly Forecast', Icons.hourglass_top_rounded),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               _buildHourlyForecast(data),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // 7-Day Forecast section
               _buildSectionHeader('7-Day Forecast', Icons.calendar_month_rounded),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               _buildDailyForecast(data),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Detailed metrics section
               _buildSectionHeader('Weather Metrics', Icons.grid_view_rounded),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               _buildMetricsGrid(data),
             ],
           ),
@@ -606,24 +611,26 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildSectionHeader(String title, IconData icon) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(7),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
             color: primaryColor.withAlpha(25),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: primaryColor, size: 18),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Text(
           title,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w900,
             fontFamily: 'AbhayaLibre',
-            color: Colors.black87,
+            color: colorScheme.onSurface,
           ),
         ),
       ],
@@ -631,15 +638,18 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildCitySelector() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 10,
             offset: const Offset(0, 3),
           ),
         ],
@@ -650,7 +660,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
           icon: Icon(Icons.arrow_drop_down_rounded, color: primaryColor, size: 30),
           isExpanded: true,
           style: TextStyle(
-            color: Colors.black87,
+            color: colorScheme.onSurface,
             fontFamily: 'AbhayaLibre',
             fontWeight: FontWeight.w900,
             fontSize: 18,
@@ -662,7 +672,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
               child: Row(
                 children: [
                   Icon(Icons.location_on_outlined, color: primaryColor, size: 20),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(city.name),
                 ],
               ),
@@ -682,12 +692,17 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildCurrentWeatherCard(WeatherData data, Map<String, dynamic> wmo) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     // Determine gradient depending on whether it is daytime
-    final gradientColors = data.isDay == 1
-        ? [const Color(0xFFD0E0CC), const Color(0xFFE2F0E7)]
-        : [const Color(0xFF2E3E34), const Color(0xFF1E2822)];
-    final textColor = data.isDay == 1 ? Colors.black87 : Colors.white;
-    final subtitleColor = data.isDay == 1 ? Colors.black54 : Colors.white70;
+    final gradientColors = isDark
+        ? [const Color(0xFF1A2A20), const Color(0xFF121A16)]
+        : (data.isDay == 1
+            ? [const Color(0xFFD0E0CC), const Color(0xFFE2F0E7)]
+            : [const Color(0xFF2E3E34), const Color(0xFF1E2822)]);
+    final textColor = (isDark || data.isDay == 0) ? Colors.white : Colors.black87;
+    final subtitleColor = (isDark || data.isDay == 0) ? Colors.white70 : Colors.black54;
 
     // Daily High/Low for today
     double maxToday = data.temp;
@@ -698,7 +713,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
     }
 
     return Container(
-      padding: EdgeInsets.all(22),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -708,7 +723,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withAlpha(20),
+            color: primaryColor.withAlpha(isDark ? 35 : 20),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -734,7 +749,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                         color: textColor,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
                       '${wmo['desc']}',
                       style: TextStyle(
@@ -744,7 +759,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                         color: subtitleColor,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
                       'H: ${maxToday.toStringAsFixed(0)}°  L: ${minToday.toStringAsFixed(0)}°',
                       style: TextStyle(
@@ -764,7 +779,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -795,6 +810,9 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildHourlyForecast(WeatherData data) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return SizedBox(
       height: 110,
       child: ListView.builder(
@@ -807,15 +825,15 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
 
           return Container(
             width: 76,
-            margin: EdgeInsets.only(right: 12),
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(4),
-                  blurRadius: 8,
+                  color: Colors.black.withAlpha(isDark ? 40 : 4),
+                  blurRadius: isDark ? 6 : 8,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -825,10 +843,10 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
               children: [
                 Text(
                   _formatHour(hour.time),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: Colors.grey.shade600,
+                    color: grayColor,
                   ),
                 ),
                 Icon(
@@ -842,7 +860,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'AbhayaLibre',
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -854,15 +872,18 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildDailyForecast(WeatherData data) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(isDark ? 40 : 5),
+            blurRadius: isDark ? 8 : 10,
             offset: const Offset(0, 3),
           ),
         ],
@@ -871,13 +892,13 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: data.daily.length,
-        separatorBuilder: (_, _) => const Divider(height: 1),
+        separatorBuilder: (_, _) => Divider(height: 1, color: theme.dividerColor),
         itemBuilder: (context, i) {
           final day = data.daily[i];
           final wmo = _getWmoDetails(day.weatherCode, 1);
 
           return Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               children: [
                 Expanded(
@@ -888,7 +909,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       fontFamily: 'AbhayaLibre',
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -900,7 +921,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                     size: 24,
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   flex: 4,
                   child: Row(
@@ -911,10 +932,10 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade500,
+                          color: colorScheme.onSurface.withAlpha(140),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       // Temperature progress line representation
                       Expanded(
                         child: Container(
@@ -922,18 +943,18 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(2),
                             gradient: LinearGradient(
-                              colors: [Colors.grey.shade300, primaryColor],
+                              colors: [isDark ? Colors.grey.shade700 : Colors.grey.shade300, primaryColor],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         '${day.tempMax.toStringAsFixed(0)}°',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
-                          color: Colors.black87,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -948,8 +969,11 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
   }
 
   Widget _buildMetricsGrid(WeatherData data) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final uvDetails = _getUvDetails(data.uvIndex);
-    final dewPoint = _calculateDewPoint(data.temp, data.humidity);
+    final dewPoint = _calculateCurveDewPoint(data.temp, data.humidity);
 
     // Compute sunrise and sunset times progress
     double dayProgress = 0.0;
@@ -990,9 +1014,9 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                 children: [
                   Text(
                     data.uvIndex.toStringAsFixed(1),
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.black87),
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: colorScheme.onSurface),
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
                     uvDetails['desc'] as String,
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: uvDetails['color'] as Color),
@@ -1003,14 +1027,14 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                 borderRadius: BorderRadius.circular(3),
                 child: LinearProgressIndicator(
                   value: (data.uvIndex / 12).clamp(0.0, 1.0),
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: isDark ? Colors.white12 : Colors.grey.shade200,
                   color: uvDetails['color'] as Color,
                   minHeight: 6,
                 ),
               ),
               Text(
                 'Max for today is ${data.uvIndex.toStringAsFixed(1)}.',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 10, color: colorScheme.onSurface.withAlpha(160), fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -1025,20 +1049,20 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
             children: [
               Text(
                 _formatTimeOnly(data.sunrise),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.black87),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: colorScheme.onSurface),
               ),
               const Spacer(),
               // Sine wave painter
               SizedBox(
                 height: 30,
                 child: CustomPaint(
-                  painter: _SunriseSunsetPainter(dayProgress, isDaytime),
+                  painter: _SunriseSunsetPainter(dayProgress, isDaytime, isDark: isDark),
                 ),
               ),
               const Spacer(),
               Text(
                 'Sunset: ${_formatTimeOnly(data.sunset)}',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 10, color: colorScheme.onSurface.withAlpha(160), fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -1057,22 +1081,22 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                   children: [
                     Text(
                       data.windSpeed.toStringAsFixed(1),
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.black87),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: colorScheme.onSurface),
                     ),
                     Text(
                       'km/h',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black54),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface.withAlpha(160)),
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               // Compass widget
               SizedBox(
                 width: 64,
                 height: 64,
                 child: CustomPaint(
-                  painter: _CompassPainter(data.windDir),
+                  painter: _CompassPainter(data.windDir, isDark: isDark, surfaceColor: colorScheme.surface),
                 ),
               ),
             ],
@@ -1089,12 +1113,12 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
             children: [
               Text(
                 '${data.humidity}%',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.black87),
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: colorScheme.onSurface),
               ),
               const Spacer(),
               Text(
                 'The dew point is\n${dewPoint.toStringAsFixed(1)}°C right now.',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600, height: 1.3),
+                style: TextStyle(fontSize: 10, color: colorScheme.onSurface.withAlpha(160), fontWeight: FontWeight.w600, height: 1.3),
               ),
             ],
           ),
@@ -1110,7 +1134,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
             children: [
               Text(
                 '${data.feelsLike.toStringAsFixed(0)}°C',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.black87),
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: colorScheme.onSurface),
               ),
               const Spacer(),
               Text(
@@ -1119,7 +1143,7 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
                     : data.feelsLike > data.temp
                         ? 'Feels warmer than actual.'
                         : 'Feels cooler than actual.',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600, height: 1.3),
+                style: TextStyle(fontSize: 10, color: colorScheme.onSurface.withAlpha(160), fontWeight: FontWeight.w600, height: 1.3),
               ),
             ],
           ),
@@ -1135,16 +1159,16 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
             children: [
               Text(
                 '${data.precipitation.toStringAsFixed(1)} mm',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.black87),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: colorScheme.onSurface),
               ),
               Text(
                 'current volume',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black54),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: colorScheme.onSurface.withAlpha(160)),
               ),
               const Spacer(),
               Text(
                 data.precipitation > 0 ? 'Light to moderate rain is falling.' : 'No rain expected in next 2h.',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600, height: 1.3),
+                style: TextStyle(fontSize: 10, color: colorScheme.onSurface.withAlpha(160), fontWeight: FontWeight.w600, height: 1.3),
               ),
             ],
           ),
@@ -1158,15 +1182,18 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
     required IconData icon,
     required Widget child,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
-            blurRadius: 8,
+            color: Colors.black.withAlpha(isDark ? 40 : 4),
+            blurRadius: isDark ? 6 : 8,
             offset: const Offset(0, 3),
           ),
         ],
@@ -1177,10 +1204,10 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
           Row(
             children: [
               Icon(icon, size: 14, color: grayColor),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   color: grayColor,
@@ -1189,11 +1216,16 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Expanded(child: child),
         ],
       ),
     );
+  }
+
+  // Renamed internal helper function to avoid shadow conflicts
+  double _calculateCurveDewPoint(double t, int h) {
+    return _calculateDewPoint(t, h);
   }
 }
 
@@ -1204,8 +1236,9 @@ class _WeatherDetailsScreenState extends State<WeatherDetailsScreen>
 class _SunriseSunsetPainter extends CustomPainter {
   final double dayProgress;
   final bool isDaytime;
+  final bool isDark;
 
-  _SunriseSunsetPainter(this.dayProgress, this.isDaytime);
+  _SunriseSunsetPainter(this.dayProgress, this.isDaytime, {this.isDark = false});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1213,7 +1246,7 @@ class _SunriseSunsetPainter extends CustomPainter {
 
     // Draw horizon line
     final horizonPaint = Paint()
-      ..color = Colors.grey.shade300
+      ..color = isDark ? Colors.white24 : Colors.grey.shade300
       ..strokeWidth = 1;
     canvas.drawLine(Offset(0, horizonY), Offset(size.width, horizonY), horizonPaint);
 
@@ -1248,12 +1281,15 @@ class _SunriseSunsetPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _SunriseSunsetPainter oldDelegate) =>
-      oldDelegate.dayProgress != dayProgress || oldDelegate.isDaytime != isDaytime;
+      oldDelegate.dayProgress != dayProgress || oldDelegate.isDaytime != isDaytime || oldDelegate.isDark != isDark;
 }
 
 class _CompassPainter extends CustomPainter {
   final double directionDegrees;
-  _CompassPainter(this.directionDegrees);
+  final bool isDark;
+  final Color surfaceColor;
+
+  _CompassPainter(this.directionDegrees, {this.isDark = false, required this.surfaceColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1262,13 +1298,17 @@ class _CompassPainter extends CustomPainter {
 
     // Draw outer circle
     final circlePaint = Paint()
-      ..color = Colors.grey.shade300
+      ..color = isDark ? Colors.white24 : Colors.grey.shade300
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.drawCircle(center, radius, circlePaint);
 
     // Draw cardinal direction texts N, S, E, W
-    const textStyle = TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.black45);
+    final textStyle = TextStyle(
+      fontSize: 8,
+      fontWeight: FontWeight.bold,
+      color: isDark ? Colors.white38 : Colors.black45,
+    );
 
     void drawText(String text, Offset pos) {
       final textPainter = TextPainter(
@@ -1307,11 +1347,11 @@ class _CompassPainter extends CustomPainter {
     canvas.drawPath(needlePath, needlePaint);
 
     // Draw pivot
-    canvas.drawCircle(center, 3, Paint()..color = Colors.white);
+    canvas.drawCircle(center, 3, Paint()..color = surfaceColor);
     canvas.drawCircle(center, 1.5, Paint()..color = const Color(0xFF66785F));
   }
 
   @override
   bool shouldRepaint(covariant _CompassPainter oldDelegate) =>
-      oldDelegate.directionDegrees != directionDegrees;
+      oldDelegate.directionDegrees != directionDegrees || oldDelegate.isDark != isDark || oldDelegate.surfaceColor != surfaceColor;
 }

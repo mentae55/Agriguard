@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:agriguard_project/core/core.dart';
 import 'package:agriguard_project/core/localization/app_localizations.dart';
 import 'package:agriguard_project/core/localization/language_provider.dart';
 import 'package:agriguard_project/core/theme/theme_provider.dart';
@@ -19,13 +18,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Load profile on init
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProfileProvider>().loadProfile();
     });
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -34,11 +35,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       pageBuilder: (context, animation, secondaryAnimation) {
         return Center(
           child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 40),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withAlpha(220),
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.onSurface.withAlpha(isDark ? 30 : 15),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Material(
               color: Colors.transparent,
@@ -49,29 +57,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     alignment: Alignment.topRight,
                     child: GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(Icons.close, color: Colors.black87, size: 24),
+                      child: Icon(Icons.close, color: theme.colorScheme.onSurface, size: 24),
                     ),
                   ),
                   Container(
                     width: 60,
                     height: 60,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                        color: Colors.red,
                        shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.priority_high_rounded, color: Colors.white, size: 40),
+                    child: const Icon(Icons.priority_high_rounded, color: Colors.white, size: 40),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   Text(
                     AppLocalizations.tr(context, 'logout_message'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -83,11 +91,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                              Navigator.pop(context);
                              // Perform actual logout logic
                           }),
-                      SizedBox(width: 24),
+                      const SizedBox(width: 24),
                       _buildDialogButton(
                           label: AppLocalizations.tr(context, 'no'),
-                          bgColor: const Color(0xFFE2E8E4),
-                          textColor: Colors.black87,
+                          bgColor: isDark ? theme.colorScheme.tertiary : const Color(0xFFE2E8E4),
+                          textColor: theme.colorScheme.onSurface,
                           onTap: () {
                              Navigator.pop(context);
                           }),
@@ -106,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(20),
@@ -129,6 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final themeProvider = context.watch<ThemeProvider>();
     final profileProvider = context.watch<ProfileProvider>();
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -139,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             // Header
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
                 color: theme.colorScheme.secondary,
               ),
@@ -163,12 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: RefreshIndicator(
                 onRefresh: () => profileProvider.loadProfile(),
                 child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                   children: [
-                    // Profile Header Info
                     if (profileProvider.isLoading && profileProvider.userProfile == null)
-                      Center(child: CircularProgressIndicator())
+                      const Center(child: CircularProgressIndicator())
                     else if (profileProvider.userProfile != null)
                       Row(
                         children: [
@@ -181,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: theme.colorScheme.secondary,
-                                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                                  border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300, width: 2),
                                   image: profileProvider.userProfile!.profileImageUrl.isNotEmpty
                                       ? DecorationImage(
                                           image: profileProvider.userProfile!.profileImageUrl.startsWith('http')
@@ -190,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           fit: BoxFit.cover,
                                         )
                                       : const DecorationImage(
-                                          image: AssetImage('assets/app_images/images/1.png'), // placeholder
+                                          image: AssetImage('assets/app_images/images/1.png'),
                                           fit: BoxFit.cover,
                                         ),
                                 ),
@@ -200,10 +208,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 right: languageProvider.isArabic ? null : 0,
                                 left: languageProvider.isArabic ? 0 : null,
                                 child: Container(
-                                  padding: EdgeInsets.all(6),
+                                  padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.surface,
-                                    border: Border.all(color: Colors.grey.shade300),
+                                    border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(Icons.camera_alt_outlined, size: 16, color: theme.colorScheme.onSurface),
@@ -211,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(width: 20),
+                          const SizedBox(width: 20),
                           // Text Info
                           Expanded(
                             child: Column(
@@ -221,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   '${profileProvider.userProfile!.firstName} ${profileProvider.userProfile!.lastName}',
                                   style: theme.textTheme.displayMedium?.copyWith(fontSize: 24),
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Text(
                                   profileProvider.userProfile!.email,
                                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -229,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                SizedBox(height: 12),
+                                const SizedBox(height: 12),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -250,15 +258,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     );
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: theme.primaryColor.withAlpha(180),
+                                      color: theme.primaryColor,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       AppLocalizations.tr(context, 'edit_profile'),
                                       style: TextStyle(
-                                        color: Colors.black87,
+                                        color: theme.colorScheme.onPrimary,
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -270,17 +278,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
 
                     // Menu Items
                     _buildMenuItem(
                       context,
                       icon: Icons.access_time_rounded,
                       title: AppLocalizations.tr(context, 'history'),
-                      trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade600),
+                      trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                       onTap: () {},
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     
                     _buildMenuItem(
                       context,
@@ -289,21 +297,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       trailing: Switch(
                         value: themeProvider.isDarkMode,
                         onChanged: (val) => themeProvider.toggleTheme(),
-                        activeColor: Colors.white,
+                        activeThumbColor: Colors.white,
                         activeTrackColor: theme.primaryColor,
-                        inactiveTrackColor: Colors.grey.shade300,
+                        inactiveTrackColor: isDark ? Colors.white24 : Colors.grey.shade300,
                         inactiveThumbColor: Colors.white,
                       ),
                       onTap: () => themeProvider.toggleTheme(),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     _buildMenuItem(
                       context,
                       icon: Icons.language_rounded,
                       title: AppLocalizations.tr(context, 'languages'),
                       trailing: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: theme.primaryColor.withAlpha(30),
                           borderRadius: BorderRadius.circular(8),
@@ -318,17 +326,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       onTap: () => languageProvider.toggleLanguage(),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     _buildMenuItem(
                       context,
                       icon: Icons.logout_rounded,
                       title: AppLocalizations.tr(context, 'log_out'),
-                      trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade600),
+                      trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                       onTap: () => _showLogoutDialog(context),
                     ),
                     
-                    SizedBox(height: 120), // Bottom padding for navigation bar overlap
+                    const SizedBox(height: 120),
                   ],
                 ),
               ),
@@ -341,17 +349,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildMenuItem(BuildContext context, {required IconData icon, required String title, required Widget trailing, required VoidCallback onTap}) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFFDCFCE7).withAlpha(150), // Pale green
+          color: isDark ? theme.colorScheme.tertiary : const Color(0xFFDCFCE7).withAlpha(100),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.green.withAlpha(20)),
+          border: Border.all(color: isDark ? Colors.white10 : Colors.green.withAlpha(20)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(5),
+              color: theme.colorScheme.onSurface.withAlpha(isDark ? 10 : 5),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
@@ -360,7 +370,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           children: [
             Icon(icon, color: theme.colorScheme.onSurface.withAlpha(180), size: 22),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,

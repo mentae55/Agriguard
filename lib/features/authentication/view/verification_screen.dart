@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:agriguard_project/core/core.dart';
 import '../view_model/user_view_model.dart';
@@ -54,9 +53,12 @@ class _VerificationScreenState extends State<VerificationScreen>
   Widget build(BuildContext context) {
     final authViewModel = context.watch<AuthViewModel>();
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8F3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           Positioned(
@@ -67,7 +69,7 @@ class _VerificationScreenState extends State<VerificationScreen>
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withOpacity(0.07),
+                color: primaryColor.withAlpha(isDark ? 20 : 15),
               ),
             ),
           ),
@@ -79,7 +81,7 @@ class _VerificationScreenState extends State<VerificationScreen>
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withOpacity(0.04),
+                color: primaryColor.withAlpha(isDark ? 12 : 8),
               ),
             ),
           ),
@@ -87,10 +89,13 @@ class _VerificationScreenState extends State<VerificationScreen>
             bottom: 0,
             left: 0,
             right: 0,
-            child: Image.asset(
-              'assets/app_images/images/plant.png',
-              fit: BoxFit.cover,
-              height: size.height * 0.22,
+            child: Opacity(
+              opacity: isDark ? 0.3 : 0.8,
+              child: Image.asset(
+                'assets/app_images/images/plant.png',
+                fit: BoxFit.cover,
+                height: size.height * 0.22,
+              ),
             ),
           ),
 
@@ -113,9 +118,15 @@ class _VerificationScreenState extends State<VerificationScreen>
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(14),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 8, offset: const Offset(0, 2))],
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor, size: 18),
                         ),
@@ -132,10 +143,10 @@ class _VerificationScreenState extends State<VerificationScreen>
                         height: 120,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: primaryColor.withOpacity(0.1),
+                          color: primaryColor.withAlpha(25),
                           boxShadow: [
                             BoxShadow(
-                              color: primaryColor.withOpacity(0.15),
+                              color: primaryColor.withAlpha(40),
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
@@ -153,7 +164,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                         fontSize: 30,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'AbhayaLibre',
-                        color: blackColor,
+                        color: colorScheme.onSurface,
                       ),
                     ),
 
@@ -176,18 +187,24 @@ class _VerificationScreenState extends State<VerificationScreen>
                       width: double.infinity,
                       padding: EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(28),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 20, offset: const Offset(0, 6))],
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.onSurface.withAlpha(isDark ? 15 : 10),
+                            blurRadius: 20,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
                       child: Column(
                         children: [
                           // Step indicators
-                          _buildStep(Icons.email_outlined, 'Open your email app'),
+                          _buildStep(Icons.email_outlined, 'Open your email app', colorScheme),
                           SizedBox(height: 12),
-                          _buildStep(Icons.link_rounded, 'Tap the reset link'),
+                          _buildStep(Icons.link_rounded, 'Tap the reset link', colorScheme),
                           SizedBox(height: 12),
-                          _buildStep(Icons.lock_open_outlined, 'Create a new password'),
+                          _buildStep(Icons.lock_open_outlined, 'Create a new password', colorScheme),
 
                           SizedBox(height: 24),
 
@@ -200,12 +217,12 @@ class _VerificationScreenState extends State<VerificationScreen>
                               decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [BoxShadow(color: primaryColor.withOpacity(0.35), blurRadius: 14, offset: const Offset(0, 5))],
+                                boxShadow: [BoxShadow(color: primaryColor.withAlpha(90), blurRadius: 14, offset: const Offset(0, 5))],
                               ),
                               child: Center(
                                 child: Text(
                                   'Done',
-                                  style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
+                                  style: TextStyle(color: colorScheme.onPrimary, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
                                 ),
                               ),
                             ),
@@ -266,22 +283,22 @@ class _VerificationScreenState extends State<VerificationScreen>
 
           if (authViewModel.isLoading)
             Container(
-              color: Colors.black.withOpacity(0.25),
-              child: Center(child: CircularProgressIndicator()),
+              color: colorScheme.onSurface.withAlpha(64),
+              child: Center(child: CircularProgressIndicator(color: primaryColor)),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildStep(IconData icon, String label) {
+  Widget _buildStep(IconData icon, String label, ColorScheme colorScheme) {
     return Row(
       children: [
         Container(
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
+            color: primaryColor.withAlpha(25),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: primaryColor, size: 20),
@@ -293,7 +310,7 @@ class _VerificationScreenState extends State<VerificationScreen>
             fontSize: 15,
             fontFamily: 'AbhayaLibre',
             fontWeight: FontWeight.w700,
-            color: blackColor.withOpacity(0.75),
+            color: colorScheme.onSurface.withAlpha(190),
           ),
         ),
       ],

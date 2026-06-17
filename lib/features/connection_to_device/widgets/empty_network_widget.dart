@@ -9,21 +9,24 @@ class EmptyNetworkWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size.height;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       children: [
         SizedBox(height: size * 0.2),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Container(
             width: double.infinity,
             height: size * 0.25,
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: theme.colorScheme.onSurface.withAlpha(isDark ? 12 : 8),
                   blurRadius: 12,
                   offset: const Offset(0, 3),
                 ),
@@ -36,26 +39,26 @@ class EmptyNetworkWidget extends StatelessWidget {
                   color: grayColor.withOpacity(0.4),
                   size: 42,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   'No networks found',
                   style: TextStyle(
-                    color: grayColor,
+                    color: theme.colorScheme.onSurface.withAlpha(180),
                     fontSize: 15,
                     fontFamily: 'AbhayaLibre',
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
                 GestureDetector(
                   onTap: () => context.read<ConnectionViewModel>().loadWifiNetworks(),
                   child: Container(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withAlpha(25),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -66,7 +69,7 @@ class EmptyNetworkWidget extends StatelessWidget {
                           color: primaryColor,
                           size: 16,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
                           'Try Again',
                           style: TextStyle(
@@ -88,4 +91,3 @@ class EmptyNetworkWidget extends StatelessWidget {
     );
   }
 }
-

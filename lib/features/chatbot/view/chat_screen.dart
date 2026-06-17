@@ -65,9 +65,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _showMsgActions(BuildContext context, ChatMessage message, String userId, String sessionId) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -78,19 +81,19 @@ class _ChatScreenState extends State<ChatScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
                 child: Container(
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDark ? Colors.white24 : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.copy_rounded, color: Colors.black87),
-                title: Text('Copy Text'),
+                leading: Icon(Icons.copy_rounded, color: colorScheme.onSurface),
+                title: Text('Copy Text', style: TextStyle(color: colorScheme.onSurface)),
                 onTap: () {
                   Navigator.pop(context);
                   Clipboard.setData(ClipboardData(text: message.text));
@@ -105,9 +108,12 @@ class _ChatScreenState extends State<ChatScreen> {
               ListTile(
                 leading: Icon(
                   isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
-                  color: isFavorite ? Colors.orange : Colors.black87,
+                  color: isFavorite ? Colors.orange : colorScheme.onSurface,
                 ),
-                title: Text(isFavorite ? 'Remove from Favorites' : 'Add to Favorites'),
+                title: Text(
+                  isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+                  style: TextStyle(color: colorScheme.onSurface),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   context.read<ChatbotViewModel>().toggleMessageFavorite(
@@ -133,22 +139,26 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     final chatbotVm = context.watch<ChatbotViewModel>();
     final session = chatbotVm.currentSession;
     final user = FirebaseAuth.instance.currentUser;
 
     if (session == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFFF8FBF8),
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: Center(
           child: Padding(
-            padding: EdgeInsets.all(32.0),
+            padding: const EdgeInsets.all(32.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.chat_bubble_outline_rounded, size: 64, color: Colors.grey.shade300),
-                SizedBox(height: 20),
-                Text(
+                Icon(Icons.chat_bubble_outline_rounded, size: 64, color: isDark ? Colors.white24 : Colors.grey.shade300),
+                const SizedBox(height: 20),
+                const Text(
                   'No Active Chat',
                   style: TextStyle(
                     fontSize: 20,
@@ -157,11 +167,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: primaryColor,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: 8),
+                const Text(
                   'Select a previous scan from the History tab, or go back to diagnose a new leaf.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
+                  style: TextStyle(color: grayColor, fontSize: 13, height: 1.5),
                 ),
               ],
             ),
@@ -173,20 +183,20 @@ class _ChatScreenState extends State<ChatScreen> {
     final cleanDisease = session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBF8),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             // Sub-header showing current context context
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: Colors.grey.withAlpha(10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: isDark ? Colors.white10 : Colors.black.withAlpha(10),
               width: double.infinity,
               child: Text(
                 'Active Session: ${session.cropType} — $cleanDisease',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
+                style: const TextStyle(
+                  color: grayColor,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -197,7 +207,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: ListView.builder(
                 controller: _scrollController,
                 physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 itemCount: session.messages.length + (chatbotVm.isSendingMessage ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == session.messages.length) {
@@ -238,10 +248,24 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Message Bubble builder
   Widget _buildMessageBubble(ChatMessage message, String userId, String sessionId, ChatbotViewModel chatbotVm) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     final bool isUser = message.senderType == 'user';
     final formatTime = "${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}";
     final isSelectionMode = chatbotVm.isSelectionMode;
     final isSelected = chatbotVm.selectedMessageIds.contains(message.id);
+
+    final bubbleBg = isUser 
+        ? colorScheme.primary 
+        : (isDark ? colorScheme.tertiary : const Color(0xFFEFECE7));
+    final bubbleTextColor = isUser 
+        ? colorScheme.onPrimary 
+        : (isDark ? colorScheme.onTertiary : Colors.black87);
+    final bubbleTimeColor = isUser 
+        ? colorScheme.onPrimary.withAlpha(160) 
+        : (isDark ? colorScheme.onTertiary.withAlpha(120) : Colors.black38);
 
     return GestureDetector(
       onLongPress: () {
@@ -255,8 +279,8 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       },
       child: Container(
-        color: isSelected ? primaryColor.withAlpha(20) : Colors.transparent,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        color: isSelected ? colorScheme.primary.withAlpha(isDark ? 35 : 20) : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(
           mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -267,23 +291,23 @@ class _ChatScreenState extends State<ChatScreen> {
                 activeColor: primaryColor,
                 onChanged: (_) => chatbotVm.toggleMessageSelection(message.id),
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
             ],
             
             if (!isUser) ...[
               CircleAvatar(
-                backgroundColor: primaryColor.withAlpha(30),
+                backgroundColor: colorScheme.primary.withAlpha(isDark ? 35 : 20),
                 radius: 16,
-                child: Icon(Icons.smart_toy_rounded, size: 20, color: primaryColor),
+                child: const Icon(Icons.smart_toy_rounded, size: 20, color: primaryColor),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
             ],
 
             Flexible(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isUser ? primaryColor : const Color(0xFFEFECE7), // Forest green vs. Warm gray
+                  color: bubbleBg,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(20),
                     topRight: const Radius.circular(20),
@@ -292,7 +316,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(3),
+                      color: Colors.black.withAlpha(isDark ? 40 : 3),
                       blurRadius: 5,
                       offset: const Offset(0, 2),
                     ),
@@ -304,26 +328,26 @@ class _ChatScreenState extends State<ChatScreen> {
                     Text(
                       message.text,
                       style: TextStyle(
-                        color: isUser ? Colors.white : Colors.black87,
+                        color: bubbleTextColor,
                         fontSize: 14,
                         height: 1.45,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           formatTime,
                           style: TextStyle(
-                            color: isUser ? Colors.white60 : Colors.black38,
+                            color: bubbleTimeColor,
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         if (message.isFavorite) ...[
-                          SizedBox(width: 6),
-                          Icon(Icons.star_rounded, color: Colors.orange, size: 12),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.star_rounded, color: Colors.orange, size: 12),
                         ],
                       ],
                     ),
@@ -333,11 +357,11 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             
             if (isUser) ...[
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               CircleAvatar(
-                backgroundColor: primaryColor.withAlpha(30),
+                backgroundColor: colorScheme.primary.withAlpha(isDark ? 35 : 20),
                 radius: 16,
-                child: Icon(Icons.person_rounded, size: 20, color: primaryColor),
+                child: const Icon(Icons.person_rounded, size: 20, color: primaryColor),
               ),
             ],
           ],
@@ -348,23 +372,30 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Pure text typing indicator with AI avatar
   Widget _buildTypingIndicatorBubble() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final bubbleBg = isDark ? colorScheme.tertiary : const Color(0xFFEFECE7);
+    final bubbleTextColor = isDark ? colorScheme.onTertiary.withAlpha(160) : Colors.black54;
+
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.0, left: 16, right: 16),
+      padding: const EdgeInsets.only(bottom: 16.0, left: 16, right: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           CircleAvatar(
-            backgroundColor: primaryColor.withAlpha(30),
+            backgroundColor: colorScheme.primary.withAlpha(isDark ? 35 : 20),
             radius: 16,
-            child: Icon(Icons.smart_toy_rounded, size: 20, color: primaryColor),
+            child: const Icon(Icons.smart_toy_rounded, size: 20, color: primaryColor),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
-              color: Color(0xFFEFECE7),
-              borderRadius: BorderRadius.only(
+              color: bubbleBg,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
                 bottomLeft: Radius.zero,
@@ -374,7 +405,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Text(
               'AgriGuard AI is typing...',
               style: TextStyle(
-                color: Colors.black54,
+                color: bubbleTextColor,
                 fontSize: 13,
                 fontStyle: FontStyle.italic,
               ),
@@ -387,6 +418,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Suggestion Quick Chips
   Widget _buildSuggestionChips(String cropType, String cleanDisease) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final chips = [
       'Organic treatments?',
       'Chemical control?',
@@ -396,23 +430,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Container(
       height: 44,
-      margin: EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 8),
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: chips.length,
         itemBuilder: (context, index) {
           final text = chips[index];
           return Padding(
-            padding: EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.only(right: 8.0),
             child: ActionChip(
-              backgroundColor: Colors.white,
-              surfaceTintColor: Colors.white,
-              side: BorderSide(color: primaryColor.withAlpha(60), width: 1),
+              backgroundColor: colorScheme.surface,
+              surfaceTintColor: Colors.transparent,
+              side: BorderSide(color: primaryColor.withAlpha(isDark ? 100 : 60), width: 1),
               label: Text(
                 text,
-                style: TextStyle(
+                style: const TextStyle(
                   color: primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
@@ -428,34 +462,39 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Message Input Bar builder
   Widget _buildInputBar(ChatbotViewModel chatbotVm) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.withAlpha(30), width: 1)),
+        color: colorScheme.surface,
+        border: Border(top: BorderSide(color: isDark ? Colors.white12 : Colors.grey.withAlpha(30), width: 1)),
       ),
       child: Row(
         children: [
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F2),
+                color: isDark ? colorScheme.tertiary : const Color(0xFFF1F5F2),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: TextField(
                 controller: _messageController,
                 textInputAction: TextInputAction.send,
                 onSubmitted: (val) => _sendMessage(val),
-                decoration: InputDecoration(
+                style: TextStyle(color: colorScheme.onSurface, fontSize: 14),
+                decoration: const InputDecoration(
                   hintText: 'Ask AgriGuard AI...',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  hintStyle: TextStyle(color: grayColor, fontSize: 14),
                   border: InputBorder.none,
+                  filled: false, // Override inputDecorationTheme filled state
                   contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
               ),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () => _sendMessage(_messageController.text),
             child: Container(
@@ -466,14 +505,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: primaryColor.withAlpha(60),
+                    color: primaryColor.withAlpha(isDark ? 30 : 60),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Center(
-                child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                child: Icon(Icons.send_rounded, color: colorScheme.onPrimary, size: 20),
               ),
             ),
           ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:agriguard_project/core/core.dart';
 import 'package:flutter_svg/svg.dart';
-import 'robot_control_screen.dart'; // [NEW] Robot controller UI
+import 'robot_control_screen.dart';
 
 class DeviceSettingsScreen extends StatefulWidget {
   final String serial;
@@ -23,6 +23,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
     }
 
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -32,9 +33,9 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
           children: [
             // Header
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface, // theme-aware background
+                color: theme.colorScheme.surface,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -45,7 +46,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'AbhayaLibre',
-                      color: theme.textTheme.displayMedium?.color ?? Colors.black87,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   SvgPicture.asset('assets/app_images/icons/logo.svg',
@@ -59,7 +60,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
             // Body
             Expanded(
               child: ListView(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 physics: const BouncingScrollPhysics(),
                 children: [
                   // Device Title & Weather
@@ -73,7 +74,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                           fontWeight: FontWeight.w900,
                           fontFamily: 'AbhayaLibre',
                           letterSpacing: 0.5,
-                          color: Colors.grey.shade400,
+                          color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
                         ),
                       ),
                       Row(
@@ -83,72 +84,81 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                             color: Colors.yellow.shade600,
                             size: 28,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             '24 °C',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'AbhayaLibre',
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                  // [NEW] Robot Control Action Card
-                  _buildRobotControlCard(),
-                  SizedBox(height: 24),
+                  _buildRobotControlCard(theme),
+                  const SizedBox(height: 24),
 
                   // General Info Panel
                   _buildSettingsPanel(
+                    theme: theme,
+                    isDark: isDark,
                     title: 'General Info',
                     children: [
                       _buildSettingRow(
-                        'Device Name',
-                        'Device#122',
+                        theme: theme,
+                        label: 'Device Name',
+                        value: 'Device#122',
                         hasEdit: true,
                       ),
-                      const Divider(height: 1),
-                      _buildSettingRow('Serial Number', 'SN: 12345-ABC'),
+                      Divider(height: 1, color: theme.dividerColor),
+                      _buildSettingRow(theme: theme, label: 'Serial Number', value: 'SN: 12345-ABC'),
                     ],
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Analysis Schedule Panel
                   _buildSettingsPanel(
+                    theme: theme,
+                    isDark: isDark,
                     title: 'Analysis Schedule',
                     children: [
-                      _buildSettingRow('Sampling Interval', 'Every 10 Min'),
-                      const Divider(height: 1),
-                      _buildSettingRow('Daily Start Time', '6:00 AM'),
+                      _buildSettingRow(theme: theme, label: 'Sampling Interval', value: 'Every 10 Min'),
+                      Divider(height: 1, color: theme.dividerColor),
+                      _buildSettingRow(theme: theme, label: 'Daily Start Time', value: '6:00 AM'),
                     ],
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Power & Maintenance Panel
                   _buildSettingsPanel(
+                    theme: theme,
+                    isDark: isDark,
                     title: 'Power & Maintenance',
                     children: [
                       _buildToggleRow(
-                        'Battery Saver Mode',
-                        isBatterySaverEnabled,
-                        (val) {
+                        theme: theme,
+                        isDark: isDark,
+                        label: 'Battery Saver Mode',
+                        value: isBatterySaverEnabled,
+                        onChanged: (val) {
                           setState(() => isBatterySaverEnabled = val);
                         },
                       ),
-                      const Divider(height: 1),
+                      Divider(height: 1, color: theme.dividerColor),
                       _buildSettingRow(
-                        'Firmware',
-                        'Version 2.1.4 (Up to Date)',
+                        theme: theme,
+                        label: 'Firmware',
+                        value: 'Version 2.1.4 (Up to Date)',
                       ),
                     ],
                   ),
 
-                  SizedBox(height: 120),
-                  // Bottom padding for nav bar overlap
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
@@ -158,8 +168,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
     );
   }
 
-
-  Widget _buildRobotControlCard() {
+  Widget _buildRobotControlCard(ThemeData theme) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -168,7 +177,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [primaryColor, primaryColor.withAlpha(180)],
@@ -186,7 +195,6 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
         ),
         child: Row(
           children: [
-            // Icon container
             Container(
               width: 56,
               height: 56,
@@ -194,19 +202,18 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                 color: Colors.white.withAlpha(30),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.videogame_asset_rounded,
                 color: Colors.white,
                 size: 30,
               ),
             ),
-            SizedBox(width: 16),
-            // Text
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Robot Controller',
                     style: TextStyle(
                       color: Colors.white,
@@ -215,7 +222,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                       fontFamily: 'AbhayaLibre',
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'Control movement in real time',
                     style: TextStyle(
@@ -227,9 +234,9 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_forward_ios_rounded,
-              color: Colors.white.withAlpha(178),
+              color: Colors.white,
               size: 18,
             ),
           ],
@@ -239,16 +246,18 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
   }
 
   Widget _buildSettingsPanel({
+    required ThemeData theme,
+    required bool isDark,
     required String title,
     required List<Widget> children,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFE2F0E7), // very pale green interior
+        color: isDark ? theme.colorScheme.surface : const Color(0xFFE2F0E7),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: theme.colorScheme.onSurface.withAlpha(isDark ? 10 : 5),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -257,11 +266,10 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
-              color: primaryColor.withAlpha(160), // Darkish Olive Green
+              color: isDark ? theme.colorScheme.tertiary : primaryColor.withAlpha(160),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -270,16 +278,15 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
             child: Text(
               title,
               style: TextStyle(
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'AbhayaLibre',
               ),
             ),
           ),
-          // Body items
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(children: children),
           ),
         ],
@@ -287,9 +294,14 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
     );
   }
 
-  Widget _buildSettingRow(String label, String value, {bool hasEdit = false}) {
+  Widget _buildSettingRow({
+    required ThemeData theme,
+    required String label,
+    required String value,
+    bool hasEdit = false,
+  }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -298,11 +310,11 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
             style: TextStyle(
               fontWeight: FontWeight.w900,
               fontSize: 14,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface,
               fontFamily: 'AbhayaLibre',
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -314,23 +326,23 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: Colors.grey.shade500,
+                      color: theme.colorScheme.onSurface.withAlpha(150),
                       fontFamily: 'AbhayaLibre',
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (hasEdit) ...[
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Container(
-                    padding: EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: primaryColor.withAlpha(140),
+                      color: primaryColor,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.edit,
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                       size: 12,
                     ),
                   ),
@@ -343,13 +355,15 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
     );
   }
 
-  Widget _buildToggleRow(
-    String label,
-    bool value,
-    ValueChanged<bool> onChanged,
-  ) {
+  Widget _buildToggleRow({
+    required ThemeData theme,
+    required bool isDark,
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -358,7 +372,7 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
             style: TextStyle(
               fontWeight: FontWeight.w900,
               fontSize: 14,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface,
               fontFamily: 'AbhayaLibre',
             ),
           ),
@@ -366,9 +380,8 @@ class _DeviceSettingsScreenState extends State<DeviceSettingsScreen> {
             value: value,
             onChanged: onChanged,
             activeThumbColor: Colors.white,
-            // [fixed] was deprecated activeColor
             activeTrackColor: primaryColor,
-            inactiveTrackColor: Colors.grey.shade300,
+            inactiveTrackColor: isDark ? Colors.white24 : Colors.grey.shade300,
             inactiveThumbColor: Colors.white,
           ),
         ],

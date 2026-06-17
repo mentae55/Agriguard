@@ -17,22 +17,29 @@ class ChatHistoryScreen extends StatelessWidget {
   }
 
   void _showRenameDialog(BuildContext context, ChatSession session, ChatbotViewModel chatbotVm, String userId) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final textController = TextEditingController(text: session.title);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Rename Chat Session'),
+          backgroundColor: colorScheme.surface,
+          title: Text('Rename Chat Session', style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold)),
           content: TextField(
             controller: textController,
+            style: TextStyle(color: colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: 'Enter new session name...',
+              hintStyle: const TextStyle(color: grayColor),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: colorScheme.onSurface.withAlpha(60))),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: primaryColor)),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: grayColor, fontWeight: FontWeight.bold)),
             ),
             TextButton(
               onPressed: () {
@@ -45,7 +52,7 @@ class ChatHistoryScreen extends StatelessWidget {
                 }
                 Navigator.pop(context);
               },
-              child: Text('Save'),
+              child: const Text('Save', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -55,21 +62,28 @@ class ChatHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final chatbotVm = context.watch<ChatbotViewModel>();
     final user = FirebaseAuth.instance.currentUser;
     final List<ChatSession> sessions = chatbotVm.pastSessions;
 
     if (user == null) {
-      return Center(child: Text('Please log in to view chat history.'));
+      return Center(
+        child: Text(
+          'Please log in to view chat history.',
+          style: TextStyle(color: colorScheme.onSurface, fontSize: 16),
+        ),
+      );
     }
 
     if (sessions.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20.0),
       itemCount: sessions.length,
       itemBuilder: (context, index) {
         final session = sessions[index];
@@ -78,23 +92,26 @@ class ChatHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: primaryColor.withAlpha(20),
+                color: primaryColor.withAlpha(isDark ? 35 : 20),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.history_edu_rounded, size: 64, color: primaryColor),
+              child: const Icon(Icons.history_edu_rounded, size: 64, color: primaryColor),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'No diagnostic history',
               style: TextStyle(
                 fontSize: 20,
@@ -103,11 +120,11 @@ class ChatHistoryScreen extends StatelessWidget {
                 color: primaryColor,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Your completed plant scan diagnoses and AI chat sessions will be stored here.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
+              style: TextStyle(color: colorScheme.onSurface.withAlpha(160), fontSize: 13, height: 1.5),
             ),
           ],
         ),
@@ -121,6 +138,10 @@ class ChatHistoryScreen extends StatelessWidget {
     ChatbotViewModel chatbotVm,
     String userId,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     final cleanDisease = session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
     final bool isHealthy = cleanDisease.toLowerCase().contains('healthy');
     final String lastMessage = session.messages.isNotEmpty 
@@ -130,7 +151,7 @@ class ChatHistoryScreen extends StatelessWidget {
     final bool isTomato = session.cropType.toLowerCase() == 'tomato';
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: Dismissible(
         key: Key(session.id),
         direction: DismissDirection.endToStart,
@@ -142,12 +163,12 @@ class ChatHistoryScreen extends StatelessWidget {
         },
         background: Container(
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: Colors.red.shade800,
+            color: redColor,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 28),
+          child: Icon(Icons.delete_sweep_rounded, color: colorScheme.onPrimary, size: 28),
         ),
         child: GestureDetector(
           onTap: () {
@@ -158,39 +179,43 @@ class ChatHistoryScreen extends StatelessWidget {
             tabController.animateTo(0);
           },
           child: Container(
-            padding: EdgeInsets.all(18),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(4),
-                  blurRadius: 10,
+                  color: Colors.black.withAlpha(isDark ? 40 : 4),
+                  blurRadius: isDark ? 8 : 10,
                   offset: const Offset(0, 4),
                 ),
               ],
-              border: Border.all(color: Colors.grey.withAlpha(20), width: 1),
+              border: Border.all(color: isDark ? Colors.white10 : Colors.grey.withAlpha(20), width: 1),
             ),
             child: Row(
               children: [
                 // Clean Text-Based Crop Chip instead of icons/images
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isTomato ? Colors.red.withAlpha(20) : Colors.amber.withAlpha(20),
+                    color: isTomato 
+                        ? Colors.red.withAlpha(isDark ? 35 : 20) 
+                        : Colors.amber.withAlpha(isDark ? 35 : 20),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     session.cropType.toUpperCase(),
                     style: TextStyle(
-                      color: isTomato ? Colors.red.shade800 : Colors.amber.shade900,
+                      color: isTomato 
+                          ? (isDark ? Colors.red.shade300 : Colors.red.shade800) 
+                          : (isDark ? Colors.amber.shade300 : Colors.amber.shade900),
                       fontWeight: FontWeight.bold,
                       fontSize: 9,
                       letterSpacing: 0.5,
                     ),
                   ),
                 ),
-                SizedBox(width: 14),
+                const SizedBox(width: 14),
                 // Texts details
                 Expanded(
                   child: Column(
@@ -206,7 +231,7 @@ class ChatHistoryScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: colorScheme.onSurface,
                                 fontSize: 13,
                               ),
                             ),
@@ -214,29 +239,31 @@ class ChatHistoryScreen extends StatelessWidget {
                           Text(
                             _formatDate(session.timestamp),
                             style: TextStyle(
-                              color: Colors.grey.shade400,
+                              color: colorScheme.onSurface.withAlpha(120),
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 3),
+                      const SizedBox(height: 3),
                       Text(
                         cleanDisease,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'AbhayaLibre',
-                          color: isHealthy ? Colors.green.shade800 : Colors.black87,
+                          color: isHealthy 
+                              ? (isDark ? Colors.green.shade300 : Colors.green.shade800) 
+                              : colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                         lastMessage,
                         style: TextStyle(
-                          color: Colors.grey.shade500,
+                          color: colorScheme.onSurface.withAlpha(160),
                           fontSize: 12,
                         ),
                         maxLines: 1,
@@ -245,10 +272,10 @@ class ChatHistoryScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 // Edit/Rename Trigger Button
                 IconButton(
-                  icon: Icon(Icons.edit_note_rounded, color: Colors.grey, size: 22),
+                  icon: const Icon(Icons.edit_note_rounded, color: grayColor, size: 22),
                   onPressed: () => _showRenameDialog(context, session, chatbotVm, userId),
                 ),
               ],
