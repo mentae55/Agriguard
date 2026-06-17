@@ -191,10 +191,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     AppLocalizations.tr(context, 'my_profile'),
                     style: theme.textTheme.displayMedium,
                   ),
-                  Icon(
-                    Icons.smart_toy_rounded,
-                    size: 50,
-                    color: theme.primaryColor,
+                  SvgPicture.asset(
+                    'assets/app_images/icons/logo.svg',
+                    height: 50,
+                    width: 50,
                   ),
                 ],
               ),

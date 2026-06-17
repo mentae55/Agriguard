@@ -114,7 +114,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.smart_toy_rounded, color: theme.primaryColor, size: 36),
+            child: SvgPicture.asset(
+              'assets/app_images/icons/logo.svg',
+              height: 36,
+              width: 36,
+            ),
           ),
         ],
       ),

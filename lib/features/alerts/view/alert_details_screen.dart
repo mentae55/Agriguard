@@ -3,6 +3,7 @@ import '../models/alert_model.dart';
 import 'package:agriguard_project/core/core.dart';
 
 import '../utils/utils.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AlertDetailsScreen extends StatelessWidget {
   final GeneratedAlert alert;
@@ -39,7 +40,11 @@ class AlertDetailsScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.smart_toy_rounded, color: primaryColor, size: 30),
+            child: SvgPicture.asset(
+              'assets/app_images/icons/logo.svg',
+              height: 30,
+              width: 30,
+            ),
           ),
         ],
       ),

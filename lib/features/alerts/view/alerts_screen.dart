@@ -6,6 +6,7 @@ import '../models/alert_model.dart';
 import '../utils/utils.dart';
 import '../viewmodels/alerts_view_model.dart';
 import 'alert_details_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -105,7 +106,11 @@ class _AlertsScreenState extends State<AlertsScreen>
                   ],
                 ],
               ),
-              Icon(Icons.smart_toy_rounded, size: 54, color: primaryColor),
+              SvgPicture.asset(
+                'assets/app_images/icons/logo.svg',
+                height: 54,
+                width: 54,
+              ),
             ],
           ),
         );
