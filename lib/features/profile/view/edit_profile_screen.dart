@@ -6,6 +6,7 @@ import 'package:agriguard_project/core/core.dart';
 import 'package:agriguard_project/core/localization/app_localizations.dart';
 import '../controllers/profile_provider.dart';
 import '../widgets/profile_text_field.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -156,22 +157,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               shape: BoxShape.circle,
                               color: theme.colorScheme.secondary,
                               border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade200, width: 2),
-                              image: _selectedImage != null
-                                  ? DecorationImage(
-                                      image: FileImage(_selectedImage!),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : user.profileImageUrl.isNotEmpty
-                                      ? DecorationImage(
-                                          image: user.profileImageUrl.startsWith('http')
-                                              ? NetworkImage(user.profileImageUrl) as ImageProvider
-                                              : FileImage(File(user.profileImageUrl)),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const DecorationImage(
-                                          image: AssetImage('assets/app_images/images/1.png'),
-                                          fit: BoxFit.cover,
-                                        ),
+                            ),
+                            child: ClipOval(
+                              child: _selectedImage != null
+                                  ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                                  : _buildAvatarImage(user.profileImageUrl),
                             ),
                           ),
                           Positioned(
@@ -248,7 +238,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: theme.primaryColor.withOpacity(0.35),
+                                  color: theme.primaryColor.withValues(alpha: 0.35),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -274,5 +264,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildAvatarImage(String path) {
+    if (path == 'assets/app_images/icons/logo.svg') {
+      return SvgPicture.asset(
+        path,
+        fit: BoxFit.cover,
+      );
+    } else if (path.startsWith('http')) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Image.asset(
+          'assets/app_images/images/1.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (path.isNotEmpty) {
+      return Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Image.asset(
+          'assets/app_images/images/1.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      return Image.asset(
+        'assets/app_images/images/1.png',
+        fit: BoxFit.cover,
+      );
+    }
   }
 }

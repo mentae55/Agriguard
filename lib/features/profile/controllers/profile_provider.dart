@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_profile_model.dart';
 import '../services/profile_service.dart';
 
@@ -27,30 +28,44 @@ class ProfileProvider with ChangeNotifier {
       final user = FirebaseAuth.instance.currentUser;
       
       if (user == null) {
-        // Mock user when not logged in
-        _userProfile ??= UserProfile(
-            uid: 'mock_uid_123',
-            firstName: 'Sabrina',
-            lastName: 'Aryan',
-            username: '@Sabrina',
-            email: 'SabrinaAry208@gmail.com',
-            phone: '+234 123 4567',
-            profileImageUrl: '', // Empty uses placeholder
-          );
+        // Fallback Mode: Do not break UI, set safe defaults
+        _userProfile = UserProfile(
+          uid: 'fallback_uid',
+          firstName: 'User',
+          lastName: '',
+          username: '@user',
+          email: 'user@example.com',
+          phone: '',
+          profileImageUrl: 'assets/app_images/icons/logo.svg',
+        );
       } else {
         _userProfile = await _profileService.getUserProfile(user.uid);
-        // If profile doesn't exist in Firestore, create default
+        // If profile doesn't exist in Firestore, create default using Firebase Auth data
         if (_userProfile == null) {
+          final displayName = user.displayName ?? '';
+          final nameParts = displayName.trim().split(' ');
+          final firstName = nameParts.isNotEmpty ? nameParts.first : 'New';
+          final lastName = nameParts.length > 1 ? nameParts.skip(1).join(' ') : 'User';
+
           _userProfile = UserProfile(
             uid: user.uid,
-            firstName: user.displayName?.split(' ').first ?? 'New',
-            lastName: user.displayName?.split(' ').skip(1).join(' ') ?? 'User',
+            firstName: firstName,
+            lastName: lastName,
             username: '@user_${user.uid.substring(0, 5)}',
             email: user.email ?? '',
             phone: user.phoneNumber ?? '',
-            profileImageUrl: user.photoURL ?? '',
+            profileImageUrl: 'assets/app_images/icons/logo.svg',
           );
           await _profileService.updateUserProfile(_userProfile!);
+        }
+      }
+
+      // Load profile picture path from SharedPreferences (persisting across restarts)
+      if (_userProfile != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final localImagePath = prefs.getString('profile_image_${_userProfile!.uid}');
+        if (localImagePath != null && localImagePath.isNotEmpty) {
+          _userProfile = _userProfile!.copyWith(profileImageUrl: localImagePath);
         }
       }
     } catch (e) {
@@ -78,12 +93,10 @@ class ProfileProvider with ChangeNotifier {
       String imageUrl = _userProfile!.profileImageUrl;
 
       if (newImage != null) {
-        if (_userProfile!.uid == 'mock_uid_123') {
-           // For mock user, just use local file path as string (mock behavior)
-           imageUrl = newImage.path;
-        } else {
-           imageUrl = await _profileService.uploadProfileImage(_userProfile!.uid, newImage);
-        }
+        // Save selected local image path to SharedPreferences instead of uploading to Firebase Storage
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('profile_image_${_userProfile!.uid}', newImage.path);
+        imageUrl = newImage.path;
       }
 
       final updatedProfile = _userProfile!.copyWith(
@@ -94,9 +107,11 @@ class ProfileProvider with ChangeNotifier {
         profileImageUrl: imageUrl,
       );
 
-      if (_userProfile!.uid != 'mock_uid_123') {
+      // Successfully write and update Firestore using the authenticated user's real UID
+      if (_userProfile!.uid != 'fallback_uid') {
         await _profileService.updateUserProfile(updatedProfile);
       }
+      
       _userProfile = updatedProfile;
     } catch (e) {
       _errorMessage = e.toString();

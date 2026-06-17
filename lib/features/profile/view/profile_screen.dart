@@ -6,6 +6,8 @@ import 'package:agriguard_project/core/localization/language_provider.dart';
 import 'package:agriguard_project/core/theme/theme_provider.dart';
 import '../controllers/profile_provider.dart';
 import 'edit_profile_screen.dart';
+import 'package:agriguard_project/features/home/view/soil_analysis_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -190,17 +192,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   shape: BoxShape.circle,
                                   color: theme.colorScheme.secondary,
                                   border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300, width: 2),
-                                  image: profileProvider.userProfile!.profileImageUrl.isNotEmpty
-                                      ? DecorationImage(
-                                          image: profileProvider.userProfile!.profileImageUrl.startsWith('http')
-                                              ? NetworkImage(profileProvider.userProfile!.profileImageUrl) as ImageProvider
-                                              : FileImage(File(profileProvider.userProfile!.profileImageUrl)),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const DecorationImage(
-                                          image: AssetImage('assets/app_images/images/1.png'),
-                                          fit: BoxFit.cover,
-                                        ),
+                                ),
+                                child: ClipOval(
+                                  child: _buildAvatarImage(profileProvider.userProfile!.profileImageUrl),
                                 ),
                               ),
                               Positioned(
@@ -286,7 +280,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icons.access_time_rounded,
                       title: AppLocalizations.tr(context, 'history'),
                       trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SoilAnalysisScreen(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     
@@ -303,28 +304,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         inactiveThumbColor: Colors.white,
                       ),
                       onTap: () => themeProvider.toggleTheme(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    _buildMenuItem(
-                      context,
-                      icon: Icons.language_rounded,
-                      title: AppLocalizations.tr(context, 'languages'),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor.withAlpha(30),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          languageProvider.isArabic ? 'العربية' : 'English',
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      onTap: () => languageProvider.toggleLanguage(),
                     ),
                     const SizedBox(height: 16),
 
@@ -382,5 +361,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildAvatarImage(String path) {
+    if (path == 'assets/app_images/icons/logo.svg') {
+      return SvgPicture.asset(
+        path,
+        fit: BoxFit.cover,
+      );
+    } else if (path.startsWith('http')) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Image.asset(
+          'assets/app_images/images/1.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (path.isNotEmpty) {
+      return Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Image.asset(
+          'assets/app_images/images/1.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      return Image.asset(
+        'assets/app_images/images/1.png',
+        fit: BoxFit.cover,
+      );
+    }
   }
 }
