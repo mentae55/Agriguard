@@ -92,12 +92,12 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 9),
               decoration: BoxDecoration(
                 color: Colors.red.shade500,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
+              child: Text(
                 'Remove',
                 style: TextStyle(
                   color: Colors.white,
@@ -108,7 +108,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: 4),
         ],
       ),
     );
@@ -179,13 +179,13 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                           Expanded(
                             child: Center(
                               child: SingleChildScrollView(
-                                padding: const EdgeInsets.symmetric(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: 24,
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const SizedBox(height: 30),
+                                    SizedBox(height: 30),
                                     if (deviceProvider.hasDevice)
                                       _buildDeviceFoundState(
                                         context,
@@ -224,7 +224,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
         // Device Card
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(22),
+          padding: EdgeInsets.all(22),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
@@ -249,7 +249,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                       shape: BoxShape.circle,
                       color: primaryColor.withOpacity(0.1),
                     ),
-                    padding: const EdgeInsets.all(18),
+                    padding: EdgeInsets.all(18),
                     child: SvgPicture.asset(
                       'assets/app_images/images/agri.svg',
                     ),
@@ -271,7 +271,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 ],
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               Text(
                 'AgriGuard',
@@ -283,11 +283,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 ),
               ),
 
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               // MAC Address chip
               Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 5,
                 ),
@@ -307,11 +307,11 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 ),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
 
               // Online / Offline status
               Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 6,
                 ),
@@ -332,7 +332,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       isOnline
                           ? 'Online — Ready'
@@ -351,7 +351,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // ===== Online → Go to Dashboard =====
         if (isOnline)
@@ -373,7 +373,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
         else ...[
           // Info banner
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.orange.withOpacity(0.08),
               borderRadius: BorderRadius.circular(14),
@@ -386,7 +386,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   color: Colors.orange.shade700,
                   size: 18,
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Your device is offline. Connect via Bluetooth to use it.',
@@ -403,7 +403,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             ),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           GestureDetector(
             onTap: () => Navigator.push(
@@ -417,7 +417,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           // Refresh button
         ],
@@ -427,7 +427,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
           onTap: () => _showRemoveDialog(context, deviceProvider),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 13),
+            padding: EdgeInsets.symmetric(vertical: 13),
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(16),
@@ -444,7 +444,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   color: Colors.red.shade400,
                   size: 18,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'Remove Device',
                   style: TextStyle(
@@ -471,7 +471,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(18),
@@ -487,10 +487,10 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: Colors.white, size: 20),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 17,
               fontWeight: FontWeight.w900,
@@ -512,10 +512,10 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             shape: BoxShape.circle,
             color: primaryColor.withOpacity(0.08),
           ),
-          padding: const EdgeInsets.all(28),
+          padding: EdgeInsets.all(28),
           child: SvgPicture.asset('assets/app_images/images/selectdevice.svg'),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         Text(
           'No Devices Yet',
           style: TextStyle(
@@ -525,7 +525,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             color: blackColor,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           'Add your AgriGuard device to start\nmonitoring your farm',
           textAlign: TextAlign.center,
@@ -537,17 +537,17 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 28),
+        SizedBox(height: 28),
         Row(
           children: [
             _buildFeatureChip(Icons.water_drop_outlined, 'Monitor'),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             _buildFeatureChip(Icons.thermostat_outlined, 'Control'),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             _buildFeatureChip(Icons.notifications_outlined, 'Alerts'),
           ],
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         GestureDetector(
           onTap: () => Navigator.push(
             context,
@@ -567,7 +567,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
   Widget _buildHeader(String name) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+      padding: EdgeInsets.fromLTRB(24, 20, 24, 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -597,7 +597,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                     color: blackColor,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   'Manage your AgriGuard devices',
                   style: TextStyle(
@@ -617,7 +617,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               color: primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(14),
             ),
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             child: SvgPicture.asset('assets/app_images/icons/logo.svg'),
           ),
         ],
@@ -628,7 +628,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
   Widget _buildFeatureChip(IconData icon, String label) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -643,7 +643,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
         child: Column(
           children: [
             Icon(icon, color: primaryColor, size: 22),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               label,
               style: TextStyle(
@@ -672,14 +672,14 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               color: primaryColor.withOpacity(0.1),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
                 color: primaryColor,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             'Checking for saved devices...',
             style: TextStyle(
@@ -697,7 +697,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
   Widget _buildErrorState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -708,13 +708,13 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 shape: BoxShape.circle,
                 color: Colors.red.withOpacity(0.1),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.wifi_off_rounded,
                 color: Colors.red,
                 size: 36,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'Something went wrong',
               style: TextStyle(
@@ -724,7 +724,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 color: blackColor,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               'Could not load your devices.\nPlease try again.',
               textAlign: TextAlign.center,
@@ -734,7 +734,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             GestureDetector(
               onTap: () {
                 final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -743,7 +743,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                 }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 28,
                   vertical: 13,
                 ),
@@ -758,7 +758,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.refresh_rounded, color: Colors.white, size: 18),

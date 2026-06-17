@@ -29,7 +29,7 @@ class StatusCardWidget extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(14),
@@ -54,7 +54,7 @@ class StatusCardWidget extends StatelessWidget {
               color: textColor,
               size: 18,
             ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               _statusMessage,

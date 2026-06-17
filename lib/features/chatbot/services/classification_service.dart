@@ -29,8 +29,19 @@ class ClassificationResult {
 }
 
 class ClassificationService {
-  static const String baseUrl = 'https://robot-api-production.up.railway.app';
-  static const Duration timeoutDuration = Duration(seconds: 30);
+  final String baseUrl;
+  final Duration timeoutDuration;
+  final int maxRetries;
+  final Duration initialBackoff;
+
+  http.Client? _activeClient;
+
+  ClassificationService({
+    this.baseUrl = 'https://robot-api-production.up.railway.app',
+    this.timeoutDuration = const Duration(seconds: 90), // production-safe timeout
+    this.maxRetries = 3,
+    this.initialBackoff = const Duration(seconds: 2),
+  });
 
   /// Send image to classification API based on crop type
   /// cropType: 'wheat', 'tomato', or 'both'
@@ -38,6 +49,12 @@ class ClassificationService {
     required File imageFile,
     required String cropType,
   }) async {
+    // Cancel previous active request client to abort duplicate requests
+    _activeClient?.close();
+
+    final client = http.Client();
+    _activeClient = client;
+
     try {
       String endpoint;
       if (cropType.toLowerCase() == 'wheat') {
@@ -60,32 +77,73 @@ class ClassificationService {
         return ClassificationResult.withError('The selected image file is empty.');
       }
 
-      // Create multipart request
-      final request = http.MultipartRequest('POST', uri);
-      
-      // Determine content type
-      String extension = imageFile.path.split('.').last.toLowerCase();
-      String mimeType = 'image/jpeg';
-      if (extension == 'png') {
-        mimeType = 'image/png';
-      } else if (extension == 'webp') {
-        mimeType = 'image/webp';
+      int attempt = 0;
+      http.Response? response;
+      String? lastErrorMessage;
+
+      while (attempt < maxRetries) {
+        attempt++;
+        try {
+          debugPrint('[ClassificationService] Attempt $attempt of $maxRetries...');
+
+          // Re-create MultipartRequest for each attempt
+          final request = http.MultipartRequest('POST', uri);
+          
+          // Determine content type
+          String extension = imageFile.path.split('.').last.toLowerCase();
+          String mimeType = 'image/jpeg';
+          if (extension == 'png') {
+            mimeType = 'image/png';
+          } else if (extension == 'webp') {
+            mimeType = 'image/webp';
+          }
+
+          // Add image file to request
+          final stream = http.ByteStream(imageFile.openRead());
+          final multipartFile = http.MultipartFile(
+            'file',
+            stream,
+            size,
+            filename: imageFile.path.split(Platform.pathSeparator).last,
+            contentType: MediaType.parse(mimeType),
+          );
+          request.files.add(multipartFile);
+
+          // Send request with configured timeout duration
+          final streamedResponse = await client.send(request).timeout(timeoutDuration);
+          response = await http.Response.fromStream(streamedResponse);
+          
+          // Request succeeded, break from retry loop
+          break;
+        } on SocketException catch (e) {
+          debugPrint('[ClassificationService] SocketException on attempt $attempt: $e');
+          lastErrorMessage = 'No internet connection. Please verify your network.';
+        } on TimeoutException catch (e) {
+          debugPrint('[ClassificationService] TimeoutException on attempt $attempt: $e');
+          lastErrorMessage = 'Classification request timed out. Please try again.';
+        } on http.ClientException catch (e) {
+          debugPrint('[ClassificationService] ClientException on attempt $attempt: $e');
+          lastErrorMessage = 'Connection aborted or closed.';
+          // If the client was closed manually (cancelled), don't retry!
+          if (e.message.toLowerCase().contains('closed') || e.message.toLowerCase().contains('abort')) {
+            return ClassificationResult.withError('Classification request cancelled.');
+          }
+        } catch (e) {
+          debugPrint('[ClassificationService] Unexpected error on attempt $attempt: $e');
+          lastErrorMessage = 'Network error: $e';
+        }
+
+        // Wait with exponential backoff delay before retrying
+        if (attempt < maxRetries) {
+          final backoffDelay = initialBackoff * (1 << (attempt - 1));
+          debugPrint('[ClassificationService] Waiting ${backoffDelay.inSeconds}s before next retry...');
+          await Future.delayed(backoffDelay);
+        }
       }
 
-      // Add image file to request
-      final stream = http.ByteStream(imageFile.openRead());
-      final multipartFile = http.MultipartFile(
-        'file',
-        stream,
-        size,
-        filename: imageFile.path.split(Platform.pathSeparator).last,
-        contentType: MediaType.parse(mimeType),
-      );
-      request.files.add(multipartFile);
-
-      // Send request with timeout
-      final streamedResponse = await request.send().timeout(timeoutDuration);
-      final response = await http.Response.fromStream(streamedResponse);
+      if (response == null) {
+        return ClassificationResult.withError(lastErrorMessage ?? 'Request failed after $maxRetries attempts.');
+      }
 
       debugPrint('[ClassificationService] Status code: ${response.statusCode}');
       debugPrint('[ClassificationService] Response body: ${response.body}');
@@ -112,12 +170,8 @@ class ClassificationService {
 
       // If we called classify both, the response structure is a map of results:
       // e.g. {"task1": {"prediction": "...", "confidence": ...}, "task2": {"prediction": "...", "confidence": ...}}
-      // Or if task1/task2 directly: {"prediction": "...", "confidence": 0.85, ...}
       if (cropType.toLowerCase() == 'both') {
-        // Return a combined or primary prediction safely
-        // Let's check if the API returns task1 and task2
         if (parsed.containsKey('task1') || parsed.containsKey('task2')) {
-          // If we requested 'both', we will take the one with higher confidence
           final t1 = parsed['task1'] as Map?;
           final t2 = parsed['task2'] as Map?;
           
@@ -155,15 +209,11 @@ class ClassificationService {
         allScores: allScores,
       );
 
-    } on SocketException catch (e) {
-      debugPrint('[ClassificationService] SocketException: $e');
-      return ClassificationResult.withError('No internet connection. Please verify your network.');
-    } on TimeoutException catch (e) {
-      debugPrint('[ClassificationService] TimeoutException: $e');
-      return ClassificationResult.withError('Classification request timed out. Please try again.');
-    } catch (e) {
-      debugPrint('[ClassificationService] Error: $e');
-      return ClassificationResult.withError('An unexpected error occurred during classification: $e');
+    } finally {
+      client.close();
+      if (_activeClient == client) {
+        _activeClient = null;
+      }
     }
   }
 }

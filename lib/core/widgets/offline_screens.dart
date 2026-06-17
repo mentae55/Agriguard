@@ -11,14 +11,14 @@ class NoWifiScreen extends StatelessWidget {
       backgroundColor: primaryColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(Icons.wifi_off_rounded, size: 100, color: Colors.white),
-              const SizedBox(height: 32),
-              const Text(
+              Icon(Icons.wifi_off_rounded, size: 100, color: Colors.white),
+              SizedBox(height: 32),
+              Text(
                 'No Internet Connection',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -28,16 +28,16 @@ class NoWifiScreen extends StatelessWidget {
                   fontFamily: 'AbhayaLibre',
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Please turn on your Wi-Fi or mobile data to continue using AgriGuard.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: Colors.white.withAlpha(178),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               const CircularProgressIndicator(color: Colors.white), // Visual cue it's waiting
             ],
           ),
@@ -58,14 +58,14 @@ class DeviceOfflineScreen extends StatelessWidget {
       backgroundColor: secondaryColor, // Soft cream background
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Icon(Icons.device_unknown_rounded, size: 100, color: Colors.red.shade400),
-              const SizedBox(height: 32),
-              const Text(
+              SizedBox(height: 32),
+              Text(
                 'Device Disconnected',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -75,8 +75,8 @@ class DeviceOfflineScreen extends StatelessWidget {
                   fontFamily: 'AbhayaLibre',
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'The ESP32 firmware is offline. Please turn on your device, check its power supply, and ensure it has internet access.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -84,12 +84,12 @@ class DeviceOfflineScreen extends StatelessWidget {
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 48),
+              SizedBox(height: 48),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -102,7 +102,7 @@ class DeviceOfflineScreen extends StatelessWidget {
                     (route) => false,
                   );
                 },
-                child: const Text('Go to Connect Page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: Text('Go to Connect Page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ],
           ),

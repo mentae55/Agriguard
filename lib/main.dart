@@ -11,6 +11,12 @@ import 'core/widgets/global_connection_monitor.dart'; // [Added] global monitor
 import 'features/chatbot/view_model/chatbot_view_model.dart';
 import 'features/home/view/home_screen.dart';
 import 'firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/localization/language_provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
+import 'features/profile/controllers/profile_provider.dart';
+import 'features/alerts/viewmodels/alerts_view_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +29,10 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => DeviceProvider()),
         ChangeNotifierProvider(create: (_) => ConnectionViewModel()),
         ChangeNotifierProvider(create: (_) => ChatbotViewModel()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => AlertsViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -41,18 +51,34 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          navigatorKey: navigatorKey,
-          builder: (context, child) {
+        return Consumer2<LanguageProvider, ThemeProvider>(
+          builder: (context, languageProvider, themeProvider, _) {
+            return MaterialApp(
+              navigatorKey: navigatorKey,
+              builder: (context, child) {
              return GlobalConnectionMonitor(
                navigatorKey: navigatorKey,
                child: child!,
              );
           },
-          theme: ThemeData(primaryColor: primaryColor),
-          debugShowCheckedModeBanner: false,
-          title: 'AgriGuard',
-          home: const HomeScreen(serial: '',),
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeProvider.themeMode,
+              locale: languageProvider.currentLocale,
+              supportedLocales: const [
+                Locale('en'),
+                Locale('ar'),
+              ],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              debugShowCheckedModeBanner: false,
+              title: 'AgriGuard',
+              home: const HomeScreen(serial: ''),
+            );
+          }
         );
       },
     );

@@ -25,7 +25,7 @@ class ChatFavoritesScreen extends StatelessWidget {
     final List<Map<String, dynamic>> favorites = chatbotVm.favoriteMessages;
 
     if (user == null) {
-      return const Center(child: Text('Please log in to view favorites.'));
+      return Center(child: Text('Please log in to view favorites.'));
     }
 
     if (favorites.isEmpty) {
@@ -34,7 +34,7 @@ class ChatFavoritesScreen extends StatelessWidget {
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(20.0),
       itemCount: favorites.length,
       itemBuilder: (context, index) {
         final item = favorites[index];
@@ -49,19 +49,19 @@ class ChatFavoritesScreen extends StatelessWidget {
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: primaryColor.withAlpha(20),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.star_outline_rounded, size: 64, color: primaryColor),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text(
               'No saved messages',
               style: TextStyle(
@@ -71,8 +71,8 @@ class ChatFavoritesScreen extends StatelessWidget {
                 color: primaryColor,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Star important answers in your chat to save them here for quick access.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
@@ -94,7 +94,7 @@ class ChatFavoritesScreen extends StatelessWidget {
     final bool isUser = message.senderType == 'user';
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: EdgeInsets.only(bottom: 16.0),
       child: GestureDetector(
         onTap: () {
           // 1. Load the corresponding session
@@ -111,7 +111,7 @@ class ChatFavoritesScreen extends StatelessWidget {
           );
         },
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -146,7 +146,7 @@ class ChatFavoritesScreen extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.copy_rounded, color: Colors.grey, size: 18),
+                        icon: Icon(Icons.copy_rounded, color: Colors.grey, size: 18),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: message.text));
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -158,7 +158,7 @@ class ChatFavoritesScreen extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.star_rounded, color: Colors.orange, size: 22),
+                        icon: Icon(Icons.star_rounded, color: Colors.orange, size: 22),
                         onPressed: () {
                           chatbotVm.toggleMessageFavorite(userId, session.id, message.id, message.isFavorite);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -173,17 +173,17 @@ class ChatFavoritesScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               // Message content
               Text(
                 message.text,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.black87,
                   fontSize: 14,
                   height: 1.45,
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               // Footer: Timestamp and Sender type tag
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -197,7 +197,7 @@ class ChatFavoritesScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isUser ? primaryColor.withAlpha(20) : Colors.grey.withAlpha(30),
                       borderRadius: BorderRadius.circular(10),

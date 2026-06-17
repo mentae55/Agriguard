@@ -124,11 +124,11 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
               color: Colors.white,
               size: 18,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'AbhayaLibre',
                   fontWeight: FontWeight.w700,
                 ),
@@ -139,7 +139,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
         backgroundColor: isError ? redColor : primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.all(16),
       ),
     );
   }
@@ -176,11 +176,11 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                       key: formKey,
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20),
                             _buildSectionHeader(
                               icon: Icons.wifi_rounded,
                               title: 'Select WiFi Network',
@@ -196,7 +196,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                   : GestureDetector(
                                       onTap: viewModel.loadWifiNetworks,
                                       child: Container(
-                                        padding: const EdgeInsets.all(6),
+                                        padding: EdgeInsets.all(6),
                                         decoration: BoxDecoration(
                                           color: primaryColor.withOpacity(0.1),
                                           borderRadius: BorderRadius.circular(8),
@@ -209,7 +209,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                       ),
                                     ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12),
                             if (viewModel.isLoadingNetworks)
                               LoadingCardWidget()
                             else if (viewModel.wifiNetworks.isEmpty)
@@ -218,7 +218,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                               NetworkListWidget(
                                 hiddenSSIDController: _hiddenSSIDController,
                               ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             if (viewModel.selectedSSID != null || viewModel.isHiddenNetwork) ...[
                               _buildSectionHeader(
                                 icon: Icons.lock_outline_rounded,
@@ -226,11 +226,11 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                     ? 'Password for hidden network'
                                     : 'Password for "${viewModel.selectedSSID}"',
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12),
                               PasswordFieldWidgets(
                                 controller: passwordController,
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
                             ],
                             if (viewModel.statusMessage.isNotEmpty) ...[
                               StatusCardWidget(
@@ -238,14 +238,14 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                 viewModel.isSuccess,
                                 viewModel.isSending,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                             ],
                             if (viewModel.selectedSSID != null || viewModel.isHiddenNetwork) ...[
                               ConnectButtonWidget(
                                 isSending: viewModel.isSending,
                                 onPressed: () => _handleConnect(viewModel),
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12),
                             ],
                             if (viewModel.isSuccess) ...[
                               DashboardButton(
@@ -259,7 +259,7 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
                                   );
                                 },
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12),
                             ],
                             SizedBox(height: size.height * 0.05),
                           ],
@@ -284,14 +284,14 @@ class _PasswordWifeScreenState extends State<PasswordWifeScreen>
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(7),
+          padding: EdgeInsets.all(7),
           decoration: BoxDecoration(
             color: primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: primaryColor, size: 16),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Text(
             title,

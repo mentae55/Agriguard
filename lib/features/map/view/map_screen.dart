@@ -234,19 +234,19 @@ class _MapScreenState extends State<MapScreen> {
 
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // [EXISTING] Simulated search / hint bar
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(Icons.search, color: Colors.grey),
                         SizedBox(width: 12),
@@ -324,7 +324,7 @@ class _MapScreenState extends State<MapScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildRobotPositionChip() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -335,12 +335,12 @@ class _MapScreenState extends State<MapScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.smart_toy_rounded, color: primaryColor, size: 16),
-          const SizedBox(width: 6),
+          SizedBox(width: 6),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Robot GPS',
+              Text('Robot GPS',
                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.black54)),
               Text(
                 '${_robotPosition!.latitude.toStringAsFixed(4)}, '

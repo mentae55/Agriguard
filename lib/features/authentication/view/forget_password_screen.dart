@@ -83,13 +83,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                   position: _slideAnim,
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: EdgeInsets.symmetric(horizontal: 24),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
             
                           // Back button
                           Align(
@@ -115,7 +115,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                             ),
                           ),
             
-                          const SizedBox(height: 30),
+                          SizedBox(height: 30),
             
                           // Icon
                           Container(
@@ -128,7 +128,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                             child: Icon(Icons.lock_reset_rounded, color: primaryColor, size: 46),
                           ),
             
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
             
                           Text(
                             'Reset Password',
@@ -139,7 +139,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                               color: blackColor,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             "We'll send a reset link to your email",
                             textAlign: TextAlign.center,
@@ -151,11 +151,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                             ),
                           ),
             
-                          const SizedBox(height: 32),
+                          SizedBox(height: 32),
             
                           // Card
                           Container(
-                            padding: const EdgeInsets.all(24),
+                            padding: EdgeInsets.all(24),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(28),
@@ -179,7 +179,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     color: blackColor.withOpacity(0.7),
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                SizedBox(height: 6),
                                 TextFormField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
@@ -202,11 +202,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: primaryColor, width: 1.5)),
                                     errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: redColor, width: 1.5)),
                                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: redColor, width: 1.5)),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                   ),
                                 ),
             
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
             
                                 GestureDetector(
                                   onTap: authViewModel.isLoading
@@ -219,21 +219,21 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                       if (authViewModel.errorMessage != null) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text(authViewModel.errorMessage!, style: const TextStyle(fontFamily: 'AbhayaLibre')),
+                                            content: Text(authViewModel.errorMessage!, style: TextStyle(fontFamily: 'AbhayaLibre')),
                                             backgroundColor: redColor,
                                             behavior: SnackBarBehavior.floating,
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                            margin: const EdgeInsets.all(16),
+                                            margin: EdgeInsets.all(16),
                                           ),
                                         );
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: const Text('Reset link sent! Check your inbox.', style: TextStyle(fontFamily: 'AbhayaLibre')),
+                                            content: Text('Reset link sent! Check your inbox.', style: TextStyle(fontFamily: 'AbhayaLibre')),
                                             backgroundColor: primaryColor,
                                             behavior: SnackBarBehavior.floating,
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                            margin: const EdgeInsets.all(16),
+                                            margin: EdgeInsets.all(16),
                                           ),
                                         );
                                         Navigator.pushReplacement(
@@ -250,7 +250,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: EdgeInsets.symmetric(vertical: 16),
                                     decoration: BoxDecoration(
                                       color: authViewModel.isLoading ? primaryColor.withOpacity(0.6) : primaryColor,
                                       borderRadius: BorderRadius.circular(16),
@@ -261,7 +261,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     child: Center(
                                       child: Text(
                                         authViewModel.isLoading ? 'Sending...' : 'Send Reset Link',
-                                        style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
+                                        style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
                                       ),
                                     ),
                                   ),
@@ -270,7 +270,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                             ),
                           ),
             
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
             
                           TextButton(
                             onPressed: () => Navigator.pop(context),
@@ -285,7 +285,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                             ),
                           ),
             
-                          const SizedBox(height: 100),
+                          SizedBox(height: 100),
                         ],
                       ),
                     ),
@@ -298,7 +298,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
           if (authViewModel.isLoading)
             Container(
               color: Colors.black.withOpacity(0.25),
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(child: CircularProgressIndicator()),
             ),
         ],
       ),

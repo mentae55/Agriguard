@@ -22,17 +22,17 @@ class ChatHistoryScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Rename Chat Session'),
+          title: Text('Rename Chat Session'),
           content: TextField(
             controller: textController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Enter new session name...',
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -45,7 +45,7 @@ class ChatHistoryScreen extends StatelessWidget {
                 }
                 Navigator.pop(context);
               },
-              child: const Text('Save'),
+              child: Text('Save'),
             ),
           ],
         );
@@ -60,7 +60,7 @@ class ChatHistoryScreen extends StatelessWidget {
     final List<ChatSession> sessions = chatbotVm.pastSessions;
 
     if (user == null) {
-      return const Center(child: Text('Please log in to view chat history.'));
+      return Center(child: Text('Please log in to view chat history.'));
     }
 
     if (sessions.isEmpty) {
@@ -69,7 +69,7 @@ class ChatHistoryScreen extends StatelessWidget {
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(20.0),
       itemCount: sessions.length,
       itemBuilder: (context, index) {
         final session = sessions[index];
@@ -81,19 +81,19 @@ class ChatHistoryScreen extends StatelessWidget {
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: primaryColor.withAlpha(20),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.history_edu_rounded, size: 64, color: primaryColor),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text(
               'No diagnostic history',
               style: TextStyle(
@@ -103,8 +103,8 @@ class ChatHistoryScreen extends StatelessWidget {
                 color: primaryColor,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Your completed plant scan diagnoses and AI chat sessions will be stored here.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
@@ -130,7 +130,7 @@ class ChatHistoryScreen extends StatelessWidget {
     final bool isTomato = session.cropType.toLowerCase() == 'tomato';
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: EdgeInsets.only(bottom: 16.0),
       child: Dismissible(
         key: Key(session.id),
         direction: DismissDirection.endToStart,
@@ -142,12 +142,12 @@ class ChatHistoryScreen extends StatelessWidget {
         },
         background: Container(
           alignment: Alignment.centerRight,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             color: Colors.red.shade800,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 28),
+          child: Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 28),
         ),
         child: GestureDetector(
           onTap: () {
@@ -158,7 +158,7 @@ class ChatHistoryScreen extends StatelessWidget {
             tabController.animateTo(0);
           },
           child: Container(
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
@@ -175,7 +175,7 @@ class ChatHistoryScreen extends StatelessWidget {
               children: [
                 // Clean Text-Based Crop Chip instead of icons/images
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     color: isTomato ? Colors.red.withAlpha(20) : Colors.amber.withAlpha(20),
                     borderRadius: BorderRadius.circular(10),
@@ -190,7 +190,7 @@ class ChatHistoryScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 // Texts details
                 Expanded(
                   child: Column(
@@ -204,7 +204,7 @@ class ChatHistoryScreen extends StatelessWidget {
                               session.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                                 fontSize: 13,
@@ -221,7 +221,7 @@ class ChatHistoryScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3),
                       Text(
                         cleanDisease,
                         style: TextStyle(
@@ -232,7 +232,7 @@ class ChatHistoryScreen extends StatelessWidget {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 5),
+                      SizedBox(height: 5),
                       Text(
                         lastMessage,
                         style: TextStyle(
@@ -245,10 +245,10 @@ class ChatHistoryScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 // Edit/Rename Trigger Button
                 IconButton(
-                  icon: const Icon(Icons.edit_note_rounded, color: Colors.grey, size: 22),
+                  icon: Icon(Icons.edit_note_rounded, color: Colors.grey, size: 22),
                   onPressed: () => _showRenameDialog(context, session, chatbotVm, userId),
                 ),
               ],

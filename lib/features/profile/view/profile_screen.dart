@@ -1,5 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:agriguard_project/core/core.dart';
+import 'package:agriguard_project/core/localization/app_localizations.dart';
+import 'package:agriguard_project/core/localization/language_provider.dart';
+import 'package:agriguard_project/core/theme/theme_provider.dart';
+import '../controllers/profile_provider.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -10,7 +16,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool isDarkMode = false;
+  @override
+  void initState() {
+    super.initState();
+    // Load profile on init
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProfileProvider>().loadProfile();
+    });
+  }
 
   void _showLogoutDialog(BuildContext context) {
     showGeneralDialog(
@@ -21,10 +34,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       pageBuilder: (context, animation, secondaryAnimation) {
         return Center(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 40),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            margin: EdgeInsets.symmetric(horizontal: 40),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             decoration: BoxDecoration(
-              color: primaryColor.withAlpha(220), // Dark olive green matching screenshot
+              color: Theme.of(context).primaryColor.withAlpha(220),
               borderRadius: BorderRadius.circular(24),
             ),
             child: Material(
@@ -32,51 +45,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Close Icon
                   Align(
                     alignment: Alignment.topRight,
                     child: GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.close, color: Colors.black87, size: 24),
+                      child: Icon(Icons.close, color: Colors.black87, size: 24),
                     ),
                   ),
-                  // Exclamation
                   Container(
                     width: 60,
                     height: 60,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                        color: Colors.red,
                        shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.priority_high_rounded, color: Colors.white, size: 40),
+                    child: Icon(Icons.priority_high_rounded, color: Colors.white, size: 40),
                   ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Are you sure you want\nto log out?',
+                  SizedBox(height: 24),
+                  Text(
+                    AppLocalizations.tr(context, 'logout_message'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'AbhayaLibre',
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  // Buttons
+                  SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildDialogButton(
-                          label: 'Yes',
+                          label: AppLocalizations.tr(context, 'yes'),
                           bgColor: Colors.red.shade700,
                           textColor: Colors.white,
                           onTap: () {
                              Navigator.pop(context);
                              // Perform actual logout logic
                           }),
-                      const SizedBox(width: 24),
+                      SizedBox(width: 24),
                       _buildDialogButton(
-                          label: 'No',
+                          label: AppLocalizations.tr(context, 'no'),
                           bgColor: const Color(0xFFE2E8E4),
                           textColor: Colors.black87,
                           onTap: () {
@@ -97,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(20),
@@ -108,7 +117,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: textColor,
             fontSize: 18,
             fontWeight: FontWeight.w900,
-            fontFamily: 'AbhayaLibre',
           ),
         ),
       ),
@@ -117,8 +125,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = context.watch<LanguageProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final profileProvider = context.watch<ProfileProvider>();
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -126,163 +139,198 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
-                color: secondaryColor, // Soft beige/cream
+                color: theme.colorScheme.secondary,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   const Text(
-                    'My Profile',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'AbhayaLibre',
-                      color: Colors.black87,
-                    ),
+                   Text(
+                    AppLocalizations.tr(context, 'my_profile'),
+                    style: theme.textTheme.displayMedium,
                   ),
                   Icon(
                     Icons.smart_toy_rounded,
                     size: 50,
-                    color: primaryColor,
+                    color: theme.primaryColor,
                   ),
                 ],
               ),
             ),
 
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  // Profile Header Info
-                  Row(
-                    children: [
-                      // Avatar
-                      Stack(
+              child: RefreshIndicator(
+                onRefresh: () => profileProvider.loadProfile(),
+                child: ListView(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                  children: [
+                    // Profile Header Info
+                    if (profileProvider.isLoading && profileProvider.userProfile == null)
+                      Center(child: CircularProgressIndicator())
+                    else if (profileProvider.userProfile != null)
+                      Row(
                         children: [
-                          Container(
-                            width: 90,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: secondaryColor,
-                              border: Border.all(color: Colors.grey.shade300, width: 2),
-                              image: const DecorationImage(
-                                image: AssetImage('assets/app_images/images/1.png'), // placeholder
-                                fit: BoxFit.cover,
+                          // Avatar
+                          Stack(
+                            children: [
+                              Container(
+                                width: 90,
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: theme.colorScheme.secondary,
+                                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                                  image: profileProvider.userProfile!.profileImageUrl.isNotEmpty
+                                      ? DecorationImage(
+                                          image: profileProvider.userProfile!.profileImageUrl.startsWith('http')
+                                              ? NetworkImage(profileProvider.userProfile!.profileImageUrl) as ImageProvider
+                                              : FileImage(File(profileProvider.userProfile!.profileImageUrl)),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const DecorationImage(
+                                          image: AssetImage('assets/app_images/images/1.png'), // placeholder
+                                          fit: BoxFit.cover,
+                                        ),
+                                ),
                               ),
-                            ),
+                              Positioned(
+                                bottom: 0,
+                                right: languageProvider.isArabic ? null : 0,
+                                left: languageProvider.isArabic ? 0 : null,
+                                child: Container(
+                                  padding: EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surface,
+                                    border: Border.all(color: Colors.grey.shade300),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.camera_alt_outlined, size: 16, color: theme.colorScheme.onSurface),
+                                ),
+                              ),
+                            ],
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Colors.grey.shade300),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.camera_alt_outlined, size: 16, color: Colors.black87),
+                          SizedBox(width: 20),
+                          // Text Info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${profileProvider.userProfile!.firstName} ${profileProvider.userProfile!.lastName}',
+                                  style: theme.textTheme.displayMedium?.copyWith(fontSize: 24),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  profileProvider.userProfile!.email,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.textTheme.bodyMedium?.color?.withAlpha(200),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) => const EditProfileScreen(),
+                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                          const begin = Offset(1.0, 0.0);
+                                          const end = Offset.zero;
+                                          const curve = Curves.ease;
+                                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                          return SlideTransition(
+                                            position: animation.drive(tween),
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: theme.primaryColor.withAlpha(180),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      AppLocalizations.tr(context, 'edit_profile'),
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(width: 20),
-                      // Text Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Sabrina Aryan',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: 'AbhayaLibre',
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'SabrinaAry208@gmail.com',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87.withAlpha(200),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            GestureDetector(
-                              onTap: () {
-                                 Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: primaryColor.withAlpha(180),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Text(
-                                  'Edit Profile',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                    SizedBox(height: 40),
+
+                    // Menu Items
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.access_time_rounded,
+                      title: AppLocalizations.tr(context, 'history'),
+                      trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade600),
+                      onTap: () {},
+                    ),
+                    SizedBox(height: 16),
+                    
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.nightlight_round,
+                      title: AppLocalizations.tr(context, 'dark_mode'),
+                      trailing: Switch(
+                        value: themeProvider.isDarkMode,
+                        onChanged: (val) => themeProvider.toggleTheme(),
+                        activeColor: Colors.white,
+                        activeTrackColor: theme.primaryColor,
+                        inactiveTrackColor: Colors.grey.shade300,
+                        inactiveThumbColor: Colors.white,
+                      ),
+                      onTap: () => themeProvider.toggleTheme(),
+                    ),
+                    SizedBox(height: 16),
+
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.language_rounded,
+                      title: AppLocalizations.tr(context, 'languages'),
+                      trailing: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withAlpha(30),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          languageProvider.isArabic ? 'العربية' : 'English',
+                          style: TextStyle(
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Menu Items
-                  _buildMenuItem(
-                    icon: Icons.access_time_rounded,
-                    title: 'History',
-                    trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade600),
-                    onTap: () {},
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  _buildMenuItem(
-                    icon: Icons.nightlight_round,
-                    title: 'Dark Mode',
-                    trailing: Switch(
-                      value: isDarkMode,
-                      onChanged: (val) => setState(() => isDarkMode = val),
-                      activeColor: Colors.white,
-                      activeTrackColor: primaryColor,
-                      inactiveTrackColor: Colors.grey.shade300,
-                      inactiveThumbColor: Colors.white,
+                      onTap: () => languageProvider.toggleLanguage(),
                     ),
-                    onTap: () {},
-                  ),
-                  const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
-                  _buildMenuItem(
-                    icon: Icons.language_rounded,
-                    title: 'Languages',
-                    trailing: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey.shade600),
-                    onTap: () {},
-                  ),
-                  const SizedBox(height: 16),
-
-                  _buildMenuItem(
-                    icon: Icons.logout_rounded,
-                    title: 'Log out',
-                    trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade600),
-                    onTap: () => _showLogoutDialog(context),
-                  ),
-                  
-                  const SizedBox(height: 120), // Bottom padding for navigation bar overlap
-                ],
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.logout_rounded,
+                      title: AppLocalizations.tr(context, 'log_out'),
+                      trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade600),
+                      onTap: () => _showLogoutDialog(context),
+                    ),
+                    
+                    SizedBox(height: 120), // Bottom padding for navigation bar overlap
+                  ],
+                ),
               ),
             ),
           ],
@@ -291,11 +339,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildMenuItem({required IconData icon, required String title, required Widget trailing, required VoidCallback onTap}) {
+  Widget _buildMenuItem(BuildContext context, {required IconData icon, required String title, required Widget trailing, required VoidCallback onTap}) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color: const Color(0xFFDCFCE7).withAlpha(150), // Pale green
           borderRadius: BorderRadius.circular(16),
@@ -310,17 +359,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.black87.withAlpha(180), size: 22),
-            const SizedBox(width: 16),
+            Icon(icon, color: theme.colorScheme.onSurface.withAlpha(180), size: 22),
+            SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'AbhayaLibre',
-                  color: Colors.black87,
-                ),
+                style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w900),
               ),
             ),
             trailing,

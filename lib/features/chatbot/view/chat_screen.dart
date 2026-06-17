@@ -78,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                padding: EdgeInsets.symmetric(vertical: 12.0),
                 child: Container(
                   width: 40,
                   height: 4,
@@ -89,8 +89,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.copy_rounded, color: Colors.black87),
-                title: const Text('Copy Text'),
+                leading: Icon(Icons.copy_rounded, color: Colors.black87),
+                title: Text('Copy Text'),
                 onTap: () {
                   Navigator.pop(context);
                   Clipboard.setData(ClipboardData(text: message.text));
@@ -142,12 +142,12 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: const Color(0xFFF8FBF8),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(32.0),
+            padding: EdgeInsets.all(32.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.chat_bubble_outline_rounded, size: 64, color: Colors.grey.shade300),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Text(
                   'No Active Chat',
                   style: TextStyle(
@@ -157,8 +157,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: primaryColor,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: 8),
+                Text(
                   'Select a previous scan from the History tab, or go back to diagnose a new leaf.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
@@ -179,13 +179,13 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             // Sub-header showing current context context
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               color: Colors.grey.withAlpha(10),
               width: double.infinity,
               child: Text(
                 'Active Session: ${session.cropType} — $cleanDisease',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.grey,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -197,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: ListView.builder(
                 controller: _scrollController,
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16),
                 itemCount: session.messages.length + (chatbotVm.isSendingMessage ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == session.messages.length) {
@@ -256,7 +256,7 @@ class _ChatScreenState extends State<ChatScreen> {
       },
       child: Container(
         color: isSelected ? primaryColor.withAlpha(20) : Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(
           mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -267,7 +267,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 activeColor: primaryColor,
                 onChanged: (_) => chatbotVm.toggleMessageSelection(message.id),
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
             ],
             
             if (!isUser) ...[
@@ -276,12 +276,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 radius: 16,
                 child: Icon(Icons.smart_toy_rounded, size: 20, color: primaryColor),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
             ],
 
             Flexible(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isUser ? primaryColor : const Color(0xFFEFECE7), // Forest green vs. Warm gray
                   borderRadius: BorderRadius.only(
@@ -309,7 +309,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         height: 1.45,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -322,8 +322,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         ),
                         if (message.isFavorite) ...[
-                          const SizedBox(width: 6),
-                          const Icon(Icons.star_rounded, color: Colors.orange, size: 12),
+                          SizedBox(width: 6),
+                          Icon(Icons.star_rounded, color: Colors.orange, size: 12),
                         ],
                       ],
                     ),
@@ -333,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             
             if (isUser) ...[
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               CircleAvatar(
                 backgroundColor: primaryColor.withAlpha(30),
                 radius: 16,
@@ -349,7 +349,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // Pure text typing indicator with AI avatar
   Widget _buildTypingIndicatorBubble() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0, left: 16, right: 16),
+      padding: EdgeInsets.only(bottom: 16.0, left: 16, right: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -359,10 +359,10 @@ class _ChatScreenState extends State<ChatScreen> {
             radius: 16,
             child: Icon(Icons.smart_toy_rounded, size: 20, color: primaryColor),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            decoration: const BoxDecoration(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            decoration: BoxDecoration(
               color: Color(0xFFEFECE7),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
@@ -371,7 +371,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 bottomRight: Radius.circular(20),
               ),
             ),
-            child: const Text(
+            child: Text(
               'AgriGuard AI is typing...',
               style: TextStyle(
                 color: Colors.black54,
@@ -396,16 +396,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Container(
       height: 44,
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: 8),
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         itemCount: chips.length,
         itemBuilder: (context, index) {
           final text = chips[index];
           return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: EdgeInsets.only(right: 8.0),
             child: ActionChip(
               backgroundColor: Colors.white,
               surfaceTintColor: Colors.white,
@@ -429,7 +429,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // Message Input Bar builder
   Widget _buildInputBar(ChatbotViewModel chatbotVm) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.withAlpha(30), width: 1)),
@@ -446,7 +446,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 controller: _messageController,
                 textInputAction: TextInputAction.send,
                 onSubmitted: (val) => _sendMessage(val),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Ask AgriGuard AI...',
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   border: InputBorder.none,
@@ -455,7 +455,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           GestureDetector(
             onTap: () => _sendMessage(_messageController.text),
             child: Container(
@@ -472,7 +472,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-              child: const Center(
+              child: Center(
                 child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
               ),
             ),

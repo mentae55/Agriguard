@@ -18,7 +18,7 @@ class ConnectButtonWidget extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSending ? primaryColor.withOpacity(0.5) : primaryColor,
           borderRadius: BorderRadius.circular(16),
@@ -36,7 +36,7 @@ class ConnectButtonWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isSending) ...[
-              const SizedBox(
+              SizedBox(
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
@@ -44,14 +44,14 @@ class ConnectButtonWidget extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
             ] else ...[
-              const Icon(Icons.wifi_rounded, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
+              Icon(Icons.wifi_rounded, color: Colors.white, size: 20),
+              SizedBox(width: 8),
             ],
             Text(
               isSending ? 'Connecting...' : 'Connect',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,

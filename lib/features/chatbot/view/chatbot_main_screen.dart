@@ -33,13 +33,13 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('Delete Messages?', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text('This action cannot be undone. Selected messages will be permanently removed.'),
+          title: Text('Delete Messages?', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text('This action cannot be undone. Selected messages will be permanently removed.'),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              child: Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -55,7 +55,7 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                 }
                 Navigator.pop(ctx);
               },
-              child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -79,20 +79,20 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                 backgroundColor: primaryColor.withAlpha(20),
                 elevation: 0,
                 leading: IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.black87),
+                  icon: Icon(Icons.close_rounded, color: Colors.black87),
                   onPressed: () => chatbotVm.unselectAllMessages(),
                 ),
                 title: Text(
                   '$selectedCount Selected',
-                  style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 actions: [
                   IconButton(
-                    icon: const Icon(Icons.select_all_rounded, color: Colors.black87),
+                    icon: Icon(Icons.select_all_rounded, color: Colors.black87),
                     onPressed: () => chatbotVm.selectAllMessages(),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+                    icon: Icon(Icons.delete_outline_rounded, color: Colors.red),
                     onPressed: () => _confirmDelete(context, chatbotVm),
                   ),
                 ],
@@ -124,7 +124,7 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                   unselectedLabelColor: Colors.grey,
                   indicatorColor: primaryColor,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   tabs: const [
                     Tab(
                       icon: Icon(Icons.chat_bubble_outline_rounded, size: 20),

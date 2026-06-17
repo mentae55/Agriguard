@@ -45,7 +45,7 @@ class MapWidgets {
       right: 0,
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(14),
@@ -67,7 +67,7 @@ class MapWidgets {
                   valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Text(
                 'Finding route...',
                 style: theme.textTheme.titleMedium,
@@ -82,8 +82,8 @@ class MapWidgets {
   static Widget buildSearchLoadingIndicator(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(top: 8),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(10),
@@ -114,7 +114,7 @@ class MapWidgets {
       }) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: EdgeInsets.only(top: 8),
       constraints: const BoxConstraints(maxHeight: 400),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
@@ -137,7 +137,7 @@ class MapWidgets {
         itemBuilder: (context, index) {
           final result = searchResults[index];
           return ListTile(
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding: EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 8,
             ),
@@ -176,7 +176,7 @@ class MapWidgets {
     final durationInMinutes = (duration / 60).ceil();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor.withAlpha(240),
         borderRadius: BorderRadius.circular(16),
@@ -197,11 +197,11 @@ class MapWidgets {
             ],
           ),
           if (onClose != null) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             InkWell(
               onTap: onClose,
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: EdgeInsets.symmetric(vertical: 8),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: primaryColor.withAlpha(30),
@@ -228,7 +228,7 @@ class MapWidgets {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: primaryColor, size: 40),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           value,
           style: theme.textTheme.titleMedium?.copyWith(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,9 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
 
+  bool _takingLongerThanUsual = false;
+  Timer? _loadingWarningTimer;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +47,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
 
   @override
   void dispose() {
+    _loadingWarningTimer?.cancel();
     _animController.dispose();
     super.dispose();
   }
@@ -81,10 +86,25 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
   Future<void> _runClassification() async {
     if (_selectedImage == null) return;
 
+    setState(() {
+      _takingLongerThanUsual = false;
+    });
+
+    _loadingWarningTimer?.cancel();
+    _loadingWarningTimer = Timer(const Duration(seconds: 12), () {
+      if (mounted) {
+        setState(() {
+          _takingLongerThanUsual = true;
+        });
+      }
+    });
+
     final success = await context.read<ChatbotViewModel>().classifyImage(
           imageFile: _selectedImage!,
           cropType: _selectedCrop,
         );
+
+    _loadingWarningTimer?.cancel();
 
     if (success && mounted) {
       _animController.forward();
@@ -125,29 +145,29 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               );
             },
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
         ],
       ),
       body: Stack(
         children: [
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.all(24.0),
+            padding: EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // 1. Crop Selector
                 _buildCropSelector(),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // 2. Image Display or Picker Options
                 _buildImageSection(chatbotVm),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // 3. Status/Results Section
                 _buildResultsSection(chatbotVm),
 
-                const SizedBox(height: 100), // Bottom spacer
+                SizedBox(height: 100), // Bottom spacer
               ],
             ),
           ),
@@ -295,15 +315,15 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white.withAlpha(40),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 36),
+                  child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 36),
                 ),
-                const SizedBox(width: 20),
-                const Column(
+                SizedBox(width: 20),
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -319,7 +339,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                     SizedBox(height: 4),
                     Text(
                       'Point camera at diseased leaf',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                      style: TextStyle(color: Colors.white.withAlpha(178), fontSize: 12),
                     ),
                   ],
                 ),
@@ -327,7 +347,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         GestureDetector(
           onTap: () => _captureImage(ImageSource.gallery),
           child: Container(
@@ -348,7 +368,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.photo_library_rounded, color: primaryColor, size: 28),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Text(
                   'Upload from Gallery',
                   style: TextStyle(
@@ -377,7 +397,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
       builder: (context) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -390,10 +410,10 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                     color: primaryColor,
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 ListTile(
                   leading: Icon(Icons.camera_alt_rounded, color: primaryColor),
-                  title: const Text('Capture with Camera', style: TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text('Capture with Camera', style: TextStyle(fontWeight: FontWeight.bold)),
                   onTap: () {
                     Navigator.pop(context);
                     _captureImage(ImageSource.camera);
@@ -402,7 +422,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                 const Divider(),
                 ListTile(
                   leading: Icon(Icons.photo_library_rounded, color: primaryColor),
-                  title: const Text('Select from Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text('Select from Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
                   onTap: () {
                     Navigator.pop(context);
                     _captureImage(ImageSource.gallery);
@@ -420,7 +440,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
   Widget _buildResultsSection(ChatbotViewModel chatbotVm) {
     if (chatbotVm.classificationError != null) {
       return Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.red.withAlpha(20),
           borderRadius: BorderRadius.circular(20),
@@ -428,17 +448,17 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
         ),
         child: Row(
           children: [
-            const Icon(Icons.error_outline_rounded, color: Colors.red, size: 32),
-            const SizedBox(width: 16),
+            Icon(Icons.error_outline_rounded, color: Colors.red, size: 32),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Diagnosis Failed',
                     style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     chatbotVm.classificationError!,
                     style: TextStyle(color: Colors.red.shade900, fontSize: 13),
@@ -460,7 +480,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
 
     if (isPlantInvalid) {
       return Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF7ED), // Warm light orange
           borderRadius: BorderRadius.circular(24),
@@ -469,7 +489,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
         child: Column(
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 48),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text(
               'Plant could not be detected',
               style: TextStyle(
@@ -479,8 +499,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                 fontFamily: 'AbhayaLibre',
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Please upload a clear plant image. Ensure the leaf is well-lit, centered, and belongs to a Tomato or Wheat crop.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black54, fontSize: 13, height: 1.5),
@@ -496,7 +516,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
     return FadeTransition(
       opacity: _fadeAnim,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
@@ -514,7 +534,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isHealthy ? Colors.green.withAlpha(30) : Colors.red.withAlpha(30),
                     shape: BoxShape.circle,
@@ -525,12 +545,12 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                     size: 26,
                   ),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'DIAGNOSIS COMPLETE',
                         style: TextStyle(
                           color: Colors.grey,
@@ -541,7 +561,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                       ),
                       Text(
                         _selectedCrop,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           color: Colors.black87,
@@ -551,7 +571,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: primaryColor.withAlpha(30),
                     borderRadius: BorderRadius.circular(15),
@@ -568,11 +588,11 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
               ],
             ),
             const Divider(height: 32),
-            const Text(
+            Text(
               'Result:',
               style: TextStyle(color: Colors.black38, fontSize: 13, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               cleanDisease,
               style: TextStyle(
@@ -582,7 +602,7 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                 fontFamily: 'AbhayaLibre',
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // VERY IMPORTANT:
             // "Ask AgriGuard AI" Button appears ONLY after successful classification!
@@ -609,8 +629,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.auto_awesome_rounded, color: Colors.white.withAlpha(220), size: 20),
-                    const SizedBox(width: 8),
-                    const Text(
+                    SizedBox(width: 8),
+                    Text(
                       'Ask about it more',
                       style: TextStyle(
                         color: Colors.white,
@@ -619,8 +639,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                         letterSpacing: 0.5,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.arrow_forward_rounded, color: Colors.white70, size: 18),
+                    SizedBox(width: 6),
+                    Icon(Icons.arrow_forward_rounded, color: Colors.white.withAlpha(178), size: 18),
                   ],
                 ),
               ),
@@ -662,8 +682,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
       color: Colors.black.withAlpha(120),
       child: Center(
         child: Container(
-          width: 220,
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          width: 240, // slightly wider to accommodate warning text nicely
+          padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
@@ -675,8 +695,8 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               CircularProgressIndicator(color: primaryColor, strokeWidth: 3),
-              const SizedBox(height: 24),
-              const Text(
+              SizedBox(height: 24),
+              Text(
                 'Analyzing plant leaf...',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -685,11 +705,32 @@ class _PhoneCaptureScreenState extends State<PhoneCaptureScreen>
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 6),
-              const Text(
+              SizedBox(height: 6),
+              Text(
                 'Running neural model',
                 style: TextStyle(color: Colors.grey, fontSize: 11),
               ),
+              if (_takingLongerThanUsual) ...[
+                SizedBox(height: 16),
+                const Divider(),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.wifi_off_rounded, color: orangeColor, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Slow network connection detected. Please wait...',
+                        style: TextStyle(
+                          color: orangeColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

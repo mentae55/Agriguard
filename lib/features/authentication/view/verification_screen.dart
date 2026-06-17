@@ -41,11 +41,11 @@ class _VerificationScreenState extends State<VerificationScreen>
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w700)),
+        content: Text(message, style: TextStyle(fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w700)),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.all(16),
       ),
     );
   }
@@ -98,11 +98,11 @@ class _VerificationScreenState extends State<VerificationScreen>
             child: FadeTransition(
               opacity: _fadeAnim,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     // Back
                     Align(
@@ -122,7 +122,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40),
 
                     // Animated email icon
                     ScaleTransition(
@@ -145,7 +145,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 28),
+                    SizedBox(height: 28),
 
                     Text(
                       'Check Your Email',
@@ -157,24 +157,24 @@ class _VerificationScreenState extends State<VerificationScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     Text(
                       'We sent a reset link to',
                       style: TextStyle(fontSize: 15, fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w600, color: grayColor),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       widget.email,
                       style: TextStyle(fontSize: 15, fontFamily: 'AbhayaLibre', fontWeight: FontWeight.w900, color: primaryColor),
                     ),
 
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
 
                     // Card
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(28),
@@ -184,25 +184,25 @@ class _VerificationScreenState extends State<VerificationScreen>
                         children: [
                           // Step indicators
                           _buildStep(Icons.email_outlined, 'Open your email app'),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           _buildStep(Icons.link_rounded, 'Tap the reset link'),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           _buildStep(Icons.lock_open_outlined, 'Create a new password'),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // Confirm button
                           GestureDetector(
                             onTap: () => Navigator.of(context).popUntil((route) => route.isFirst),
                             child: Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: EdgeInsets.symmetric(vertical: 16),
                               decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [BoxShadow(color: primaryColor.withOpacity(0.35), blurRadius: 14, offset: const Offset(0, 5))],
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'Done',
                                   style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'AbhayaLibre'),
@@ -211,7 +211,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           // Resend
                           Row(
@@ -232,7 +232,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                                     _showSnackBar('Email sent again!', primaryColor);
                                   }
                                 },
-                                style: TextButton.styleFrom(padding: const EdgeInsets.only(left: 4)),
+                                style: TextButton.styleFrom(padding: EdgeInsets.only(left: 4)),
                                 child: Text(
                                   authViewModel.isLoading ? 'Sending...' : 'Resend',
                                   style: TextStyle(
@@ -249,7 +249,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -267,7 +267,7 @@ class _VerificationScreenState extends State<VerificationScreen>
           if (authViewModel.isLoading)
             Container(
               color: Colors.black.withOpacity(0.25),
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(child: CircularProgressIndicator()),
             ),
         ],
       ),
@@ -286,7 +286,7 @@ class _VerificationScreenState extends State<VerificationScreen>
           ),
           child: Icon(icon, color: primaryColor, size: 20),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: 14),
         Text(
           label,
           style: TextStyle(

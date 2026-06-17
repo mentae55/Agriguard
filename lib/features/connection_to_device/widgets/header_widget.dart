@@ -9,7 +9,7 @@ class HeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
       return Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 20, 16),
+        padding: EdgeInsets.fromLTRB(16, 16, 20, 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(
@@ -38,7 +38,7 @@ class HeaderWidget extends StatelessWidget {
                     color: primaryColor, size: 16),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +71,7 @@ class HeaderWidget extends StatelessWidget {
                 color: primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: const EdgeInsets.all(9),
+              padding: EdgeInsets.all(9),
               child: SvgPicture.asset('assets/app_images/icons/logo.svg'),
             ),
           ],

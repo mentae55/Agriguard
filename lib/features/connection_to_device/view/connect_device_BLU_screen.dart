@@ -77,11 +77,11 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
               color: Colors.white,
               size: 20,
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'AbhayaLibre',
                   fontWeight: FontWeight.w700,
                 ),
@@ -92,7 +92,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
         backgroundColor: isSuccess ? primaryColor : Colors.red.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.all(16),
       ),
     );
   }
@@ -121,18 +121,18 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 _buildHeroSection(viewModel),
-                const SizedBox(height: 28),
+                SizedBox(height: 28),
                 _buildStepsCard(),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 _buildScanButton(viewModel),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 _buildScanResults(viewModel),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
               ],
             ),
           ),
@@ -166,7 +166,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                       : [],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(28),
+                  padding: EdgeInsets.all(28),
                   child: SvgPicture.asset(
                     'assets/app_images/images/agri.svg',
                   ),
@@ -175,8 +175,8 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             );
           },
         ),
-        const SizedBox(height: 20),
-        const Text(
+        SizedBox(height: 20),
+        Text(
           'Connect Your AgriGuard',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -187,13 +187,13 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             height: 1.2,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           viewModel.isScanning
               ? 'Searching for nearby devices...'
               : 'Tap scan to find your device',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontFamily: 'AbhayaLibre',
             color: Colors.grey,
@@ -206,7 +206,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
 
   Widget _buildStepsCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -224,15 +224,15 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(Icons.info_outline, color: primaryColor, size: 18),
               ),
-              const SizedBox(width: 10),
-              const Text(
+              SizedBox(width: 10),
+              Text(
                 'Before you start',
                 style: TextStyle(
                   fontSize: 16,
@@ -243,9 +243,9 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           _buildStep(1, 'Power on your AgriGuard device', Icons.power_settings_new),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           _buildStep(2, 'Enable Bluetooth on your phone', Icons.bluetooth),
         ],
       ),
@@ -265,7 +265,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           child: Center(
             child: Text(
               '$number',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
@@ -274,9 +274,9 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             ),
           ),
         ),
-        const SizedBox(width: 12),
-        const Icon(Icons.info_outline, color: Colors.grey, size: 18),
-        const SizedBox(width: 8),
+        SizedBox(width: 12),
+        Icon(Icons.info_outline, color: Colors.grey, size: 18),
+        SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
@@ -298,7 +298,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
+        padding: EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
           color: viewModel.isScanning ? Colors.grey.withOpacity(0.2) : primaryColor,
           borderRadius: BorderRadius.circular(18),
@@ -325,8 +325,8 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                 ),
               )
             else
-              const Icon(Icons.bluetooth_searching, color: Colors.white, size: 22),
-            const SizedBox(width: 10),
+              Icon(Icons.bluetooth_searching, color: Colors.white, size: 22),
+            SizedBox(width: 10),
             Text(
               viewModel.isScanning ? 'Scanning...' : 'Scan for Devices',
               style: TextStyle(
@@ -347,8 +347,8 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
       return Column(
         children: [
           Icon(Icons.bluetooth_disabled, color: Colors.grey.withOpacity(0.4), size: 48),
-          const SizedBox(height: 10),
-          const Text(
+          SizedBox(height: 10),
+          Text(
             'No devices found yet',
             style: TextStyle(
               color: Colors.grey,
@@ -366,10 +366,10 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
       children: [
         if (viewModel.scanResults.isNotEmpty) ...[
           Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 12),
+            padding: EdgeInsets.only(left: 4, bottom: 12),
             child: Text(
               '${viewModel.scanResults.length} device${viewModel.scanResults.length > 1 ? 's' : ''} found',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.grey,
                 fontSize: 14,
                 fontFamily: 'AbhayaLibre',
@@ -382,7 +382,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: viewModel.scanResults.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          separatorBuilder: (_, __) => SizedBox(height: 10),
           itemBuilder: (context, index) {
             final result = viewModel.scanResults[index];
             final device = result.device;
@@ -399,7 +399,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
   Widget _buildDeviceCard(BuildContext context, BluetoothDevice device, bool isThisConnecting, bool isAnyConnecting) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isThisConnecting
             ? primaryColor.withOpacity(0.06)
@@ -436,7 +436,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
               size: 24,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,17 +445,17 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
                   device.platformName.isEmpty
                       ? 'Unknown Device'
                       : device.platformName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontFamily: 'AbhayaLibre',
                     fontSize: 16,
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 Text(
                   device.remoteId.toString(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.grey,
                     fontSize: 12,
                     fontFamily: 'AbhayaLibre',
@@ -478,7 +478,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
             GestureDetector(
               onTap: isAnyConnecting ? null : () => _connectToDevice(context, device),
               child: Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 9,
                 ),

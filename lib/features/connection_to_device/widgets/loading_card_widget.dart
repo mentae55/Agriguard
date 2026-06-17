@@ -17,7 +17,7 @@ class LoadingCardWidget extends StatelessWidget {
               child: Container(
                 width: double.infinity,
                 height: size*0.25,
-                padding: const EdgeInsets.all(35),
+                padding: EdgeInsets.all(35),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -33,7 +33,7 @@ class LoadingCardWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(color: primaryColor, strokeWidth: 2.5),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     Text(
                       'Scanning for WiFi networks...',
                       style: TextStyle(

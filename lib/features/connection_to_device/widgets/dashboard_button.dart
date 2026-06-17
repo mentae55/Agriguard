@@ -12,7 +12,7 @@ class DashboardButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: Colors.green,
           borderRadius: BorderRadius.circular(16),
@@ -24,7 +24,7 @@ class DashboardButton extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.dashboard_rounded, color: Colors.white, size: 20),

@@ -47,7 +47,7 @@ class NetworkListWidget extends StatelessWidget {
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,
                     ),
@@ -83,7 +83,7 @@ class NetworkListWidget extends StatelessWidget {
                             size: 20,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             network,
@@ -103,7 +103,7 @@ class NetworkListWidget extends StatelessWidget {
                               color: primaryColor,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.check_rounded,
                               color: Colors.white,
                               size: 14,
@@ -138,7 +138,7 @@ class NetworkListWidget extends StatelessWidget {
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: showHiddenNetworkSection
                     ? primaryColor.withOpacity(0.06)
@@ -167,7 +167,7 @@ class NetworkListWidget extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Add Hidden Network',
@@ -193,8 +193,8 @@ class NetworkListWidget extends StatelessWidget {
 
           if (showHiddenNetworkSection)
             Container(
-              margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              padding: const EdgeInsets.all(16),
+              margin: EdgeInsets.fromLTRB(12, 0, 12, 12),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFFF5F8F3),
                 borderRadius: BorderRadius.circular(14),
@@ -202,7 +202,7 @@ class NetworkListWidget extends StatelessWidget {
               child: Column(
                 children: [
                   if (isHiddenNetwork) ...[
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     TextFormField(
                       controller: hiddenSSIDController,
                       style: TextStyle(
@@ -231,7 +231,7 @@ class NetworkListWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: primaryColor, width: 1.5),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
+                        contentPadding: EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 12,
                         ),
