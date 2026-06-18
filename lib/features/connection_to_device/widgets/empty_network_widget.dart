@@ -36,7 +36,7 @@ class EmptyNetworkWidget extends StatelessWidget {
               children: [
                 Icon(
                   Icons.wifi_off_rounded,
-                  color: grayColor.withOpacity(0.4),
+                  color: grayColor.withValues(alpha: 0.4),
                   size: 42,
                 ),
                 const SizedBox(height: 10),

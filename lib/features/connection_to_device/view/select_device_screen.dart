@@ -1,9 +1,9 @@
-import 'package:agriguard_project/features/home/view/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:agriguard_project/core/core.dart';
+import '../../home/presentation/view/home_screen.dart';
 import '../services/device_provider.dart';
 import 'connect_device_BLU_screen.dart';
 
@@ -346,8 +346,8 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                     SizedBox(width: 6),
                     Text(
                       isOnline
-                          ? 'Online — Ready'
-                          : 'Offline — Needs connection',
+                          ? 'Online â€” Ready'
+                          : 'Offline â€” Needs connection',
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'AbhayaLibre',
@@ -364,7 +364,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
 
         SizedBox(height: 16),
 
-        // ===== Online → Go to Dashboard =====
+        // ===== Online â†’ Go to Dashboard =====
         if (isOnline)
           GestureDetector(
             onTap: () => Navigator.push(
@@ -381,7 +381,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               theme: theme,
             ),
           )
-        // ===== Offline → Connect Device =====
+        // ===== Offline â†’ Connect Device =====
         else ...[
           // Info banner
           Container(
@@ -489,7 +489,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.35),
+            color: color.withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -602,7 +602,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hello, ${name.isNotEmpty ? name.split(' ').first : 'Farmer'}! 👋',
+                  'Hello, ${name.isNotEmpty ? name.split(' ').first : 'Farmer'}! ðŸ‘‹',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
@@ -765,7 +765,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
+                      color: primaryColor.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),

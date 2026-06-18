@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:agriguard_project/core/localization/app_localizations.dart';
-import 'package:agriguard_project/core/localization/language_provider.dart';
 import 'package:agriguard_project/core/theme/theme_provider.dart';
 import '../controllers/profile_provider.dart';
+import '../../../core/core.dart';
 import 'edit_profile_screen.dart';
-import 'package:agriguard_project/features/home/view/soil_analysis_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../alerts/view/alert_history_screen.dart';
+import '../../spectral/views/screens/spectral_history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -305,25 +305,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 40),
-
-                    // Menu Items
+                    const SizedBox(height: 16),
                     _buildMenuItem(
                       context,
-                      icon: Icons.access_time_rounded,
-                      title: AppLocalizations.tr(context, 'history'),
+                      icon: Icons.history_toggle_off_rounded,
+                      title: AppLocalizations.tr(context, 'alert_history'),
                       trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SoilAnalysisScreen(),
+                            builder: (context) => const AlertHistoryScreen(),
                           ),
                         );
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.history_rounded,
+                      title: 'Spectral History',
+                      trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SpectralHistoryScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.logout_rounded,
+                      title: AppLocalizations.tr(context, 'log_out'),
+                      trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                      onTap: () => _showLogoutDialog(context),
+                    ),
+                    const SizedBox(height: 16),
                     _buildMenuItem(
                       context,
                       icon: Icons.nightlight_round,
@@ -338,17 +359,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       onTap: () => themeProvider.toggleTheme(),
                     ),
-                    const SizedBox(height: 16),
-
-                    _buildMenuItem(
-                      context,
-                      icon: Icons.logout_rounded,
-                      title: AppLocalizations.tr(context, 'log_out'),
-                      trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
-                      onTap: () => _showLogoutDialog(context),
-                    ),
-                    
-                    const SizedBox(height: 120),
                   ],
                 ),
               ),

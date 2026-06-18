@@ -54,7 +54,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
 
     if (mounted) {
       if (success) {
-        _showToast(context, '✅ Connected to ${device.platformName}', isSuccess: true);
+        _showToast(context, 'âœ… Connected to ${device.platformName}', isSuccess: true);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -62,7 +62,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           ),
         );
       } else {
-        _showToast(context, '❌ Connection Failed. Try again.', isSuccess: false);
+        _showToast(context, 'âŒ Connection Failed. Try again.', isSuccess: false);
       }
     }
   }
@@ -311,7 +311,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
               ? []
               : [
                   BoxShadow(
-                    color: primaryColor.withOpacity(0.35),
+                    color: primaryColor.withValues(alpha: 0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -351,7 +351,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
     if (!viewModel.isScanning && viewModel.scanResults.isEmpty) {
       return Column(
         children: [
-          Icon(Icons.bluetooth_disabled, color: Colors.grey.withOpacity(0.4), size: 48),
+          Icon(Icons.bluetooth_disabled, color: Colors.grey.withValues(alpha: 0.4), size: 48),
           const SizedBox(height: 10),
           const Text(
             'No devices found yet',

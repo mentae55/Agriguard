@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:agriguard_project/features/home/view/soil_analysis_screen.dart' show SoilSnapshot;
+
+import '../../home/data/model/soil_model.dart';
 
 class AlertsApiService {
-  static const String _baseUrl = 'https://robot-api-production.up.railway.app';
-  static const Duration _timeout = Duration(seconds: 15);
+  static const String _baseUrl = 'https://malakmohamed21-robot-api.hf.space';
+  static const Duration _timeout = Duration(hours: 1);
 
   Future<SoilSnapshot> fetchLatestSnapshot() async {
     final res = await http

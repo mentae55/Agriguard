@@ -257,11 +257,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                                     width: double.infinity,
                                     padding: EdgeInsets.symmetric(vertical: 16),
                                     decoration: BoxDecoration(
-                                      color: authViewModel.isLoading ? primaryColor.withOpacity(0.6) : primaryColor,
+                                      color: authViewModel.isLoading ? primaryColor.withValues(alpha: 0.6) : primaryColor,
                                       borderRadius: BorderRadius.circular(16),
                                       boxShadow: authViewModel.isLoading
                                           ? []
-                                          : [BoxShadow(color: primaryColor.withOpacity(0.35), blurRadius: 14, offset: const Offset(0, 5))],
+                                          : [BoxShadow(color: primaryColor.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 5))],
                                     ),
                                     child: Center(
                                       child: Text(

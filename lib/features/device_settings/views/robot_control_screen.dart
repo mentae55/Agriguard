@@ -12,6 +12,7 @@ import 'package:agriguard_project/core/core.dart';
 import 'package:agriguard_project/features/connection_to_device/services/device_provider.dart';
 import 'package:agriguard_project/features/connection_to_device/view/select_device_screen.dart';
 import '../services/robot_control_service.dart';
+import '../viewmodels/device_settings_view_model.dart';
 
 enum DeviceConnectionState {
   connecting,
@@ -246,6 +247,9 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
   @override
   Widget build(BuildContext context) {
     final deviceProvider = context.watch<DeviceProvider>();
+    final settings = context.watch<DeviceSettingsViewModel>().settings;
+    final String deviceName = settings?.deviceName ?? 'Robot Controller';
+
     final bool isOnline = _connectionState == DeviceConnectionState.online;
     final String? mac = _deviceMac;
 
@@ -258,13 +262,13 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
           children: [
             Column(
               children: [
-                _buildHeader(deviceProvider.isDeviceOnline, mac),
+                _buildHeader(deviceProvider.isDeviceOnline, mac, deviceName),
                 if (_errorMsg != null) _buildErrorBanner(),
                 
-                _buildConnectionStateBar(),
+                _buildConnectionStateBar(deviceName),
                 
                 _buildStatusPanel(),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // ── RUN / STOP persistent controls ──
                 _buildRunStopRow(isOnline),
@@ -272,7 +276,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                 const Divider(color: Colors.white12, height: 32),
 
                 // ── Label ──
-                Padding(
+                const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     children: [
@@ -290,19 +294,19 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
 
                 // ── D-pad (existing Move UI) ──
                 const Spacer(),
                 _buildDPad(isOnline),
                 const Spacer(),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
               ],
             ),
             
             // Elegant Offline Overlay / Disabled controls state
             if (showOverlay)
-              _buildOfflineOverlay(),
+              _buildOfflineOverlay(deviceName),
           ],
         ),
       ),
@@ -312,9 +316,9 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
   // ---------------------------------------------------------------------------
   // Header — back button, title, online toggle switch
   // ---------------------------------------------------------------------------
-  Widget _buildHeader(bool isOnline, String? mac) {
+  Widget _buildHeader(bool isOnline, String? mac, String deviceName) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
           GestureDetector(
@@ -330,25 +334,26 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                   color: Colors.white.withAlpha(178), size: 18),
             ),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Robot Controller',
-                  style: TextStyle(
+                  deviceName,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'AbhayaLibre',
                     letterSpacing: 0.5,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (mac != null)
                   Text(
                     mac,
-                    style: TextStyle(color: Colors.white38, fontSize: 11),
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
                     overflow: TextOverflow.ellipsis,
                   ),
               ],
@@ -366,7 +371,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
       children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: isOnline
                 ? const Color(0xFF1A3A25)
@@ -386,7 +391,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
             ),
           ),
         ),
-        SizedBox(width: 6),
+        const SizedBox(width: 6),
         Switch(
           value: isOnline,
           onChanged: (!isOnline || _connectionState == DeviceConnectionState.disconnecting)
@@ -401,7 +406,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
     );
   }
 
-  Widget _buildConnectionStateBar() {
+  Widget _buildConnectionStateBar(String deviceName) {
     Color barColor;
     String statusText;
     IconData icon;
@@ -409,30 +414,30 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
     switch (_connectionState) {
       case DeviceConnectionState.online:
         barColor = const Color(0xFF1A3A25);
-        statusText = 'AgriGuard Robot is Online & Ready';
+        statusText = '$deviceName is Online & Ready';
         icon = Icons.check_circle_outline_rounded;
         break;
       case DeviceConnectionState.connecting:
         barColor = const Color(0xFF1A2F3A);
-        statusText = 'Establishing connection to Robot...';
+        statusText = 'Establishing connection to $deviceName...';
         icon = Icons.wifi_protected_setup_rounded;
         break;
       case DeviceConnectionState.disconnecting:
         barColor = const Color(0xFF3A291A);
-        statusText = 'Disconnecting and stopping robot...';
+        statusText = 'Disconnecting and stopping $deviceName...';
         icon = Icons.stop_screen_share_rounded;
         break;
       case DeviceConnectionState.offline:
         barColor = const Color(0xFF3A1A1A);
-        statusText = 'Robot is Offline. Waiting for robot to connect...';
+        statusText = '$deviceName is Offline. Waiting for device to connect...';
         icon = Icons.wifi_off_rounded;
         break;
     }
     
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.fromLTRB(20, 12, 20, 0),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: barColor.withAlpha(128),
         borderRadius: BorderRadius.circular(10),
@@ -441,7 +446,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
       child: Row(
         children: [
           Icon(icon, color: Colors.white.withAlpha(178), size: 16),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               statusText,
@@ -457,17 +462,17 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
     );
   }
 
-  Widget _buildOfflineOverlay() {
+  Widget _buildOfflineOverlay(String deviceName) {
     String message = 'Controls Disabled';
     Widget actionWidget = const SizedBox.shrink();
     
     if (_connectionState == DeviceConnectionState.offline) {
-      message = 'Robot is Offline';
+      message = '$deviceName is Offline';
       actionWidget = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Waiting for AgriGuard Robot to become Online...\nPlease power on/turn on the physical robot to connect.',
+            'Waiting for $deviceName to become Online...\nPlease power on/turn on the physical device to connect.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withAlpha(137),
@@ -475,8 +480,8 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
               height: 1.5,
             ),
           ),
-          SizedBox(height: 24),
-          SizedBox(
+          const SizedBox(height: 24),
+          const SizedBox(
             width: 24,
             height: 24,
             child: CircularProgressIndicator(
@@ -501,7 +506,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
       bottom: 0,
       child: Container(
         color: const Color(0xFF0D1117).withAlpha(217),
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -513,7 +518,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                 color: Colors.white30,
                 size: 64,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 message,
                 style: TextStyle(
@@ -523,7 +528,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                   letterSpacing: 0.5,
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               actionWidget,
             ],
           ),
@@ -539,8 +544,8 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
     final bool isMoving = _currentCommand != RobotCommand.stop;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isMoving
@@ -566,7 +571,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
               size: 28,
             ),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -580,7 +585,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                     letterSpacing: 1,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
                   child: Text(
@@ -598,7 +603,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
             ),
           ),
           if (_isSending)
-            SizedBox(
+            const SizedBox(
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
@@ -623,8 +628,8 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
 
   Widget _buildErrorBanner() {
     return Container(
-      margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.red.withAlpha(25),
         borderRadius: BorderRadius.circular(10),
@@ -632,11 +637,11 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
-          SizedBox(width: 10),
+          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(_errorMsg ?? '',
-                style: TextStyle(color: Colors.redAccent, fontSize: 12)),
+                style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
           ),
         ],
       ),
@@ -648,7 +653,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildRunStopRow(bool isOnline) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
           // ── RUN button ──
@@ -698,7 +703,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                       color: isOnline ? Colors.white : Colors.white24,
                       size: 28,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       'RUN',
                       style: TextStyle(
@@ -714,7 +719,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
             ),
           ),
 
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
 
           // ── STOP button ──
           Expanded(
@@ -752,7 +757,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                       color: isOnline ? Colors.white : Colors.white24,
                       size: 26,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       'STOP',
                       style: TextStyle(
@@ -786,7 +791,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
           label: 'Forward',
           isEnabled: isOnline,
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         // Left | Center | Right
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -801,7 +806,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
             Container(
               width: 72,
               height: 72,
-              margin: EdgeInsets.symmetric(horizontal: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 color: _isRunning
                     ? primaryColor.withAlpha(30)
@@ -826,7 +831,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
             ),
           ],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         // Backward
         _buildDPadButton(
           command: RobotCommand.backward,
@@ -884,7 +889,7 @@ class _RobotControlScreenState extends State<RobotControlScreen> {
                   : Colors.white24,
               size: 38,
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(

@@ -1,0 +1,114 @@
+﻿Analyzing agriguard_project...                                  
+
+warning - Unused import: '../../features/home/presentation/view/home_screen.dart' - lib\core\widgets\agri_guard_nav_bar.dart:5:8 - unused_import
+  error - The method 'ScaleOnTap' isn't defined for the type '_NavItem' - lib\core\widgets\agri_guard_nav_bar.dart:89:12 - undefined_method
+  error - The method 'ScaleOnTap' isn't defined for the type '_FloatingHomeItem' - lib\core\widgets\agri_guard_nav_bar.dart:149:12 - undefined_method
+   info - Don't use 'BuildContext's across async gaps - lib\features\authentication\view\forget_password_screen.dart:225:62 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\authentication\view\forget_password_screen.dart:235:62 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\authentication\view\forget_password_screen.dart:245:43 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\authentication\view\forget_password_screen.dart:260:85 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\authentication\view\forget_password_screen.dart:264:76 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\features\authentication\view\register_screen.dart:125:60 - curly_braces_in_flow_control_structures
+warning - The value of the local variable 'colorScheme' isn't used - lib\features\chatbot\view\chat_screen.dart:143:11 - unused_local_variable
+   info - The constant name 'DEVICE_NAME' isn't a lowerCamelCase identifier - lib\features\connection_to_device\services\connection_service.dart:9:23 - constant_identifier_names
+   info - The constant name 'SERVICE_UUID' isn't a lowerCamelCase identifier - lib\features\connection_to_device\services\connection_service.dart:10:23 - constant_identifier_names
+   info - The constant name 'WIFI_CRED_CHAR_UUID' isn't a lowerCamelCase identifier - lib\features\connection_to_device\services\connection_service.dart:11:23 - constant_identifier_names
+   info - The constant name 'WIFI_LIST_CHAR_UUID' isn't a lowerCamelCase identifier - lib\features\connection_to_device\services\connection_service.dart:12:23 - constant_identifier_names
+   info - The constant name 'WIFI_CMD_CHAR_UUID' isn't a lowerCamelCase identifier - lib\features\connection_to_device\services\connection_service.dart:13:23 - constant_identifier_names
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:81:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:96:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:103:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:109:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:128:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:131:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:147:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:160:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:175:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:176:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:177:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:185:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:191:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:208:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:315:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\services\connection_service.dart:350:7 - avoid_print
+   info - The file name 'connect_device_BLU_screen.dart' isn't a lower_case_with_underscores identifier - lib\features\connection_to_device\view\connect_device_BLU_screen.dart:1:1 - file_names
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\connection_to_device\view\connect_device_BLU_screen.dart:57:20 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\connection_to_device\view\connect_device_BLU_screen.dart:59:11 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\connection_to_device\view\connect_device_BLU_screen.dart:65:20 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\view\connect_device_BLU_screen.dart:314:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\view\connect_device_BLU_screen.dart:354:61 - deprecated_member_use
+   info - The file name 'password_Wife_screen.dart' isn't a lower_case_with_underscores identifier - lib\features\connection_to_device\view\password_Wife_screen.dart:1:1 - file_names
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\view\select_device_screen.dart:492:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\view\select_device_screen.dart:768:43 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\view_model\connection_view_model.dart:137:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\view_model\connection_view_model.dart:138:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\view_model\connection_view_model.dart:139:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\connection_to_device\view_model\connection_view_model.dart:140:5 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\connect_button_widget.dart:24:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\dashboard_button.dart:24:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\empty_network_widget.dart:39:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\network_list_widget.dart:218:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\password_field_widgets.dart:45:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\status_card_widget.dart:22:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\status_card_widget.dart:23:72 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\status_card_widget.dart:26:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\status_card_widget.dart:27:72 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\status_card_widget.dart:30:72 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\connection_to_device\widgets\status_card_widget.dart:31:74 - deprecated_member_use
+   info - 'desiredAccuracy' is deprecated and shouldn't be used. use settings parameter with AndroidSettings, AppleSettings, WebSettings, or LocationSettings - lib\features\home\data\datasources\local\location_service.dart:19:7 - deprecated_member_use
+warning - Unused import: 'dart:convert' - lib\features\home\data\model\soil_model.dart:2:8 - unused_import
+warning - The value of the field '_latest' isn't used - lib\features\home\data\repositories\soil_repository.dart:16:17 - unused_field
+  error - A value of type 'Future<WeatherData> (where WeatherData is defined in D:\My Lang\Flutter\agriguard_project\lib\features\home\presentation\view_model\weather_details_screen.dart)' can't be returned from the method 'call' because it has a return type of 'Future<WeatherData> (where WeatherData is defined in D:\My Lang\Flutter\agriguard_project\lib\features\home\data\model\weather_model.dart)' - lib\features\home\domain\usecases\fetch_weather.dart:11:48 - return_of_invalid_type
+  error - The argument type 'CityConfig (where CityConfig is defined in D:\My Lang\Flutter\agriguard_project\lib\features\home\data\model\weather_model.dart)' can't be assigned to the parameter type 'CityConfig (where CityConfig is defined in D:\My Lang\Flutter\agriguard_project\lib\features\home\presentation\view_model\weather_details_screen.dart)'.  - lib\features\home\domain\usecases\fetch_weather.dart:11:73 - argument_type_not_assignable
+  error - The name 'MapScreen' is defined in the libraries 'package:agriguard_project/features/home/presentation/view/map_screen.dart' and 'package:agriguard_project/features/map/view/map_screen.dart' - lib\features\home\presentation\view\home_screen.dart:86:17 - ambiguous_import
+warning - Unused import: '../widgets/map/robot_position_chip.dart' - lib\features\home\presentation\view\map_screen.dart:11:8 - unused_import
+  error - The method 'RobotPositionChip' isn't defined for the type '_MapContentState' - lib\features\home\presentation\view\map_screen.dart:125:22 - undefined_method
+   info - Unnecessary use of multiple underscores - lib\features\home\presentation\view\soil_analysis_screen.dart:81:32 - unnecessary_underscores
+  error - The name 'SectionHeader' isn't a class - lib\features\home\presentation\view\soil_analysis_screen.dart:225:17 - creation_with_non_type
+  error - The method 'GaugesGrid' isn't defined for the type '_SoilAnalysisContentState' - lib\features\home\presentation\view\soil_analysis_screen.dart:227:11 - undefined_method
+  error - The name 'SectionHeader' isn't a class - lib\features\home\presentation\view\soil_analysis_screen.dart:229:17 - creation_with_non_type
+  error - The name 'SectionHeader' isn't a class - lib\features\home\presentation\view\soil_analysis_screen.dart:233:17 - creation_with_non_type
+  error - The method 'AlertsSection' isn't defined for the type '_SoilAnalysisContentState' - lib\features\home\presentation\view\soil_analysis_screen.dart:235:11 - undefined_method
+  error - The name 'SectionHeader' isn't a class - lib\features\home\presentation\view\soil_analysis_screen.dart:237:17 - creation_with_non_type
+  error - The method 'TrendsSection' isn't defined for the type '_SoilAnalysisContentState' - lib\features\home\presentation\view\soil_analysis_screen.dart:239:11 - undefined_method
+warning - The '!' will have no effect because the receiver can't be null - lib\features\home\presentation\view_model\map_viewmodel.dart:50:30 - unnecessary_non_null_assertion
+  error - Non-nullable instance field 'selectedCity' must be initialized - lib\features\home\presentation\view_model\weather_viewmodel.dart:10:3 - not_initialized_non_nullable_instance_field
+  error - The unnamed constructor is already defined - lib\features\home\presentation\view_model\weather_viewmodel.dart:27:3 - duplicate_constructor
+  error - The argument type 'SoilAlert' can't be assigned to the parameter type 'GeneratedAlert'.  - lib\features\home\presentation\widgets\home\alert_banner.dart:88:53 - argument_type_not_assignable
+   info - The import of '../../../../../core/constants/app_colors.dart' is unnecessary because all of the used elements are also provided by the import of 'package:agriguard_project/core/core.dart' - lib\features\home\presentation\widgets\map\floating_buttons.dart:5:8 - unnecessary_import
+   info - The import of '../../../../../core/constants/app_colors.dart' is unnecessary because all of the used elements are also provided by the import of 'package:agriguard_project/core/core.dart' - lib\features\home\presentation\widgets\weather\current_weather_card.dart:5:8 - unnecessary_import
+   info - Unnecessary use of multiple underscores - lib\features\home\presentation\widgets\weather\current_weather_card.dart:36:31 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\features\home\presentation\widgets\weather\daily_forecast.dart:36:31 - unnecessary_underscores
+   info - 'desiredAccuracy' is deprecated and shouldn't be used. use settings parameter with AndroidSettings, AppleSettings, WebSettings, or LocationSettings - lib\features\map\services\map_services.dart:129:9 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\onboarding\view\onboarding_screen.dart:122:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\onboarding\view\onboarding_screen.dart:123:36 - deprecated_member_use
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:56:15 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:69:18 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:88:36 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:95:36 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:96:34 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:110:11 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:191:28 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:193:70 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:198:28 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:200:70 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:205:28 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:207:70 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:212:28 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:219:28 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:223:62 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:224:50 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\edit_profile_screen.dart:252:33 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:103:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:116:34 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:125:34 - undefined_identifier
+  error - The name 'LanguageProvider' isn't a type, so it can't be used as a type argument - lib\features\profile\view\profile_screen.dart:165:44 - non_type_as_type_argument
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:188:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:291:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:311:30 - undefined_identifier
+  error - The name 'SoilAnalysisScreen' isn't a class - lib\features\profile\view\profile_screen.dart:317:57 - creation_with_non_type
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:327:30 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\view\profile_screen.dart:343:30 - undefined_identifier
+  error - The method 'Consumer1' isn't defined for the type 'MyApp' - lib\main.dart:50:16 - undefined_method
+warning - The dev dependency on flutter_lints is unnecessary because there is also a normal dependency on that package - pubspec.yaml:41:3 - unnecessary_dev_dependency
+

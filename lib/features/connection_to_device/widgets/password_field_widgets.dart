@@ -42,7 +42,7 @@ class _PasswordFieldWidgetsState extends State<PasswordFieldWidgets> {
         decoration: InputDecoration(
           hintText: 'Enter WiFi password',
           hintStyle: TextStyle(
-            color: grayColor.withOpacity(0.6),
+            color: grayColor.withValues(alpha: 0.6),
             fontFamily: 'AbhayaLibre',
           ),
           prefixIcon: Icon(

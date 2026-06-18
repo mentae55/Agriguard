@@ -7,5 +7,7 @@ export 'constants/app_sizes.dart';
 //widgets
 export 'widgets/custom_textfiled.dart';
 export 'widgets/custom_elevetedbutton.dart';
+export 'localization/app_localizations.dart';
+export 'localization/language_provider.dart';
 
 

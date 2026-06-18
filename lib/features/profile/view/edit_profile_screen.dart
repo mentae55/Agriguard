@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:agriguard_project/core/core.dart';
-import 'package:agriguard_project/core/localization/app_localizations.dart';
 import '../controllers/profile_provider.dart';
 import '../widgets/profile_text_field.dart';
 import 'package:flutter_svg/flutter_svg.dart';

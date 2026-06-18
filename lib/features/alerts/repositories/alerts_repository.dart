@@ -1,8 +1,8 @@
 
+import '../../home/data/model/soil_model.dart';
 import '../models/soil_alert_engine.dart';
 import '../models/alert_model.dart';
 import '../services/alerts_api_service.dart';
-import 'package:agriguard_project/features/home/view/soil_analysis_screen.dart' show SoilSnapshot;
 
 class AlertsRepository {
   final AlertsApiService _apiService;

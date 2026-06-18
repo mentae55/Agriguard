@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:agriguard_project/features/home/view/soil_analysis_screen.dart' show SoilSnapshot;
+import '../../home/data/model/soil_model.dart';
 import 'alert_model.dart';
 
 class SoilAlertEngine {

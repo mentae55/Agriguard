@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:agriguard_project/core/core.dart';
-import '../../home/view/home_screen.dart';
+import '../../home/presentation/view/home_screen.dart';
 import '../services/device_provider.dart';
 import '../widgets/loading_card_widget.dart';
 

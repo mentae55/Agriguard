@@ -37,7 +37,7 @@ class ClassificationService {
   http.Client? _activeClient;
 
   ClassificationService({
-    this.baseUrl = 'https://robot-api-production.up.railway.app',
+    this.baseUrl = 'https://malakmohamed21-robot-api.hf.space',
     this.timeoutDuration = const Duration(seconds: 90), // production-safe timeout
     this.maxRetries = 3,
     this.initialBackoff = const Duration(seconds: 2),

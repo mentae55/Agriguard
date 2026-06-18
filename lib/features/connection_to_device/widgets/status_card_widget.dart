@@ -19,16 +19,16 @@ class StatusCardWidget extends StatelessWidget {
     Color textColor;
 
     if (_isSuccess) {
-      cardColor = isDark ? Colors.green.withAlpha(25) : Colors.green.withOpacity(0.08);
-      borderColor = isDark ? Colors.green.withAlpha(60) : Colors.green.withOpacity(0.3);
+      cardColor = isDark ? Colors.green.withAlpha(25) : Colors.green.withValues(alpha: 0.08);
+      borderColor = isDark ? Colors.green.withAlpha(60) : Colors.green.withValues(alpha: 0.3);
       textColor = isDark ? Colors.green.shade400 : Colors.green.shade800;
     } else if (_isSending) {
-      cardColor = isDark ? primaryColor.withAlpha(25) : primaryColor.withOpacity(0.06);
-      borderColor = isDark ? primaryColor.withAlpha(60) : primaryColor.withOpacity(0.2);
+      cardColor = isDark ? primaryColor.withAlpha(25) : primaryColor.withValues(alpha: 0.06);
+      borderColor = isDark ? primaryColor.withAlpha(60) : primaryColor.withValues(alpha: 0.2);
       textColor = isDark ? Colors.green.shade300 : primaryColor;
     } else {
-      cardColor = isDark ? Colors.orange.withAlpha(25) : Colors.orange.withOpacity(0.08);
-      borderColor = isDark ? Colors.orange.withAlpha(60) : Colors.orange.withOpacity(0.3);
+      cardColor = isDark ? Colors.orange.withAlpha(25) : Colors.orange.withValues(alpha: 0.08);
+      borderColor = isDark ? Colors.orange.withAlpha(60) : Colors.orange.withValues(alpha: 0.3);
       textColor = isDark ? Colors.orange.shade400 : Colors.orange.shade800;
     }
 

@@ -21,7 +21,7 @@ class ConnectButtonWidget extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSending ? primaryColor.withOpacity(0.5) : primaryColor,
+          color: isSending ? primaryColor.withValues(alpha: 0.5) : primaryColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: isSending
               ? []
