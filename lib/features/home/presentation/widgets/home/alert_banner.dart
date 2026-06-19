@@ -76,7 +76,7 @@ class AlertBanner extends StatelessWidget {
       );
     }
 
-    final isCritical = top.severity == 'critical';
+    final isCritical = top.severity == AlertSeverity.critical;
     final color = isCritical ? redColor : orangeColor;
     final bg = isCritical
         ? (isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE))
@@ -89,10 +89,10 @@ class AlertBanner extends StatelessWidget {
           builder: (_) => AlertDetailsScreen(
             alert: GeneratedAlert(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
-              title: '${top.param} Alert',
-              description: top.status,
+              title: '${top.paramName} Alert',
+              description: top.description,
               severity: isCritical ? AlertSeverity.critical : AlertSeverity.warning,
-              paramName: top.param,
+              paramName: top.paramName,
               value: top.value,
               unit: top.unit,
               recommendation: top.recommendation,
@@ -166,7 +166,7 @@ class AlertBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    top.param,
+                    top.paramName,
                     style: TextStyle(
                       color: colorScheme.onSurface,
                       fontSize: 15,

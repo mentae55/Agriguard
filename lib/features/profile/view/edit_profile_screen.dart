@@ -148,42 +148,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Profile Avatar Edit
-                  Center(
-                    child: GestureDetector(
-                      onTap: _pickImage,
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: theme.colorScheme.secondary,
-                              border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade200, width: 2),
-                            ),
-                            child: ClipOval(
-                              child: _selectedImage != null
-                                  ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                                  : _buildAvatarImage(user.profileImageUrl),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: theme.primaryColor,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: theme.colorScheme.surface, width: 2),
-                              ),
-                              child: Icon(Icons.edit, size: 14, color: theme.colorScheme.onPrimary),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: GestureDetector(
+                  //     onTap: _pickImage,
+                  //     child: Stack(
+                  //       children: [
+                  //         Container(
+                  //           width: 100,
+                  //           height: 100,
+                  //           decoration: BoxDecoration(
+                  //             shape: BoxShape.circle,
+                  //             color: theme.colorScheme.secondary,
+                  //             border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade200, width: 2),
+                  //           ),
+                  //           child: ClipOval(
+                  //             child: _selectedImage != null
+                  //                 ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                  //                 : _buildAvatarImage(user.profileImageUrl),
+                  //           ),
+                  //         ),
+                  //         Positioned(
+                  //           bottom: 0,
+                  //           right: 0,
+                  //           child: Container(
+                  //             padding: const EdgeInsets.all(8),
+                  //             decoration: BoxDecoration(
+                  //               color: theme.primaryColor,
+                  //               shape: BoxShape.circle,
+                  //               border: Border.all(color: theme.colorScheme.surface, width: 2),
+                  //             ),
+                  //             child: Icon(Icons.edit, size: 14, color: theme.colorScheme.onPrimary),
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(height: 32),
 
                   // Form Fields

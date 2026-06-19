@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../model/chat_message.dart';
 import '../model/chat_session.dart';
 import '../services/classification_service.dart';
-import '../services/gemini_service.dart';
+import '../services/rag_api_service.dart';
 import '../services/chat_firebase_service.dart';
 
 class ChatbotViewModel extends ChangeNotifier {
   final ClassificationService _classificationService = ClassificationService();
-  final GeminiService _geminiService = GeminiService();
+  final RagApiService _ragApiService = RagApiService();
   final ChatFirebaseService _chatFirebaseService = ChatFirebaseService();
 
   // State flags
@@ -48,10 +49,7 @@ class ChatbotViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Manually update/set the Gemini API Key from Settings UI if needed
-  void updateApiKey(String apiKey) {
-    _geminiService.setApiKey(apiKey);
-  }
+
 
   /// Initialize real-time history sync stream from Firebase
   void initHistoryListener(String userId) {
@@ -70,6 +68,9 @@ class ChatbotViewModel extends ChangeNotifier {
           if (matched) {
             _currentSession = _pastSessions.firstWhere((s) => s.id == lastId);
           }
+        }
+        if (_currentSession == null && !_isClassifying) {
+          await startGeneralChatSession();
         }
       } else {
         // Sync the current session with the incoming stream data (new messages, favorites, etc.)
@@ -159,6 +160,39 @@ class ChatbotViewModel extends ChangeNotifier {
     await _chatFirebaseService.saveChatSession(userId, session);
   }
 
+  /// Create a fresh general chat session
+  Future<void> startGeneralChatSession() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final sessionId = 'session_${DateTime.now().millisecondsSinceEpoch}';
+    
+    final welcomeMessage = ChatMessage(
+      id: 'msg_welcome_${DateTime.now().millisecondsSinceEpoch}',
+      senderType: 'ai',
+      text: "Hello! I'm AgriGuard AI 🌿 Ask me anything about plant diseases, crop care, farming, or agriculture.",
+      timestamp: DateTime.now(),
+    );
+
+    final session = ChatSession(
+      id: sessionId,
+      title: 'General Chat',
+      cropType: '',
+      diagnosisResult: '',
+      confidence: 0.0,
+      imageUrl: '',
+      timestamp: DateTime.now(),
+      messages: [welcomeMessage],
+      isGeneralChat: true,
+    );
+
+    _currentSession = session;
+    notifyListeners();
+
+    await _chatFirebaseService.saveChatSession(user.uid, session);
+    await _chatFirebaseService.saveLastActiveSessionId(user.uid, session.id);
+  }
+
   /// Load a previously saved chat session into current active view
   void loadSession(ChatSession session, [String? userId]) {
     _currentSession = session;
@@ -199,7 +233,7 @@ class ChatbotViewModel extends ChangeNotifier {
     // Save this session as last active since the user just messaged
     await _chatFirebaseService.saveLastActiveSessionId(userId, session.id);
 
-    // 2. Prepare conversation history for the Gemini API call
+    // 2. Prepare conversation history for the RAG API call
     final List<Map<String, String>> historyForAi = [];
     // We pass the last 6 messages to provide conversational history while keeping context size small
     final historyMessages = session.messages.length > 6 
@@ -208,34 +242,39 @@ class ChatbotViewModel extends ChangeNotifier {
 
     for (var msg in historyMessages) {
       historyForAi.add({
-        'role': msg.senderType == 'user' ? 'user' : 'model',
-        'text': msg.text,
+        'role': msg.senderType == 'user' ? 'user' : 'assistant',
+        'content': msg.text,
       });
     }
 
-    // 3. Fetch the reply from Gemini API
-    final aiReplyText = await _geminiService.generateAgriculturalReply(
-      prompt: text,
-      crop: session.cropType,
-      disease: session.diagnosisResult,
-      history: historyForAi,
-    );
+    try {
+      // 3. Fetch the reply from RAG API
+      final aiReply = await _ragApiService.sendMessage(
+        message: text,
+        plant: session.isGeneralChat ? null : session.cropType,
+        disease: session.isGeneralChat ? null : session.diagnosisResult,
+        history: historyForAi,
+      );
 
-    // 4. Create and append the AI reply locally & in Firebase
-    final aiMessage = ChatMessage(
-      id: 'msg_ai_${DateTime.now().millisecondsSinceEpoch}',
-      senderType: 'ai',
-      text: aiReplyText,
-      timestamp: DateTime.now(),
-    );
+      // 4. Create and append the AI reply locally & in Firebase
+      final aiMessage = ChatMessage(
+        id: 'msg_ai_${DateTime.now().millisecondsSinceEpoch}',
+        senderType: 'ai',
+        text: aiReply.response,
+        timestamp: DateTime.now(),
+        sources: aiReply.sources,
+      );
 
-    final finalMessages = List<ChatMessage>.from(_currentSession!.messages)..add(aiMessage);
-    _currentSession = _currentSession!.copyWith(messages: finalMessages);
-    _isSendingMessage = false;
-    notifyListeners();
-
-    // Sync AI response to Firebase
-    await _chatFirebaseService.addMessageToSession(userId, session.id, aiMessage);
+      final finalMessages = List<ChatMessage>.from(_currentSession!.messages)..add(aiMessage);
+      _currentSession = _currentSession!.copyWith(messages: finalMessages);
+      await _chatFirebaseService.addMessageToSession(userId, session.id, aiMessage);
+    } catch (e) {
+      _chatError = 'Failed to fetch AI response. Please try again.';
+      debugPrint('[ChatbotViewModel] Error generating RAG response: $e');
+    } finally {
+      _isSendingMessage = false;
+      notifyListeners();
+    }
   }
 
   /// Delete a past chat session permanently

@@ -22,7 +22,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeViewModel(
-        fetchSoilData: context.read(),
         serial: serial,
       )..initialize(),
       child: const _HomeScreenContent(),

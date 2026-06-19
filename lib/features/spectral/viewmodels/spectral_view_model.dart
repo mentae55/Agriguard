@@ -2,39 +2,37 @@
 // spectral_view_model.dart — ChangeNotifier state management
 // ============================================================
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../data/models/spectral_prediction.dart';
-import '../data/models/spectral_history_entry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../data/models/spectral_reading.dart';
 import '../data/services/spectral_api_service.dart';
-import '../data/repositories/spectral_history_repository.dart';
-import '../data/services/spectral_notification_service.dart';
+
+const Duration kSpectralPollInterval = Duration(minutes: 30);
 
 enum SpectralState { idle, loading, loaded, error }
 
 class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
   final SpectralApiService _api;
-  final SpectralHistoryRepository _historyRepo;
 
   SpectralViewModel({
     SpectralApiService? api,
-    SpectralHistoryRepository? historyRepo,
-  })  : _api = api ?? SpectralApiService(),
-        _historyRepo = historyRepo ?? SpectralHistoryRepository();
+  }) : _api = api ?? SpectralApiService();
 
-  // ── State ─────────────────────────────────────────────────
   SpectralState _state = SpectralState.idle;
-  SpectralPrediction? _prediction;
+  SpectralReading? _reading;
   String _errorMessage = '';
   Timer? _pollingTimer;
   bool _disposed = false;
+  
+  List<SpectralReading> history = [];
 
   SpectralState get state => _state;
-  SpectralPrediction? get prediction => _prediction;
+  SpectralReading? get reading => _reading;
   String get errorMessage => _errorMessage;
   bool get isLoading => _state == SpectralState.loading;
-  bool get hasData => _prediction != null;
+  bool get hasData => _reading != null;
 
-  // ── Lifecycle ─────────────────────────────────────────────
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -45,27 +43,19 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  // ── Initialize ────────────────────────────────────────────
   Future<void> initialize() async {
     WidgetsBinding.instance.addObserver(this);
     _setState(SpectralState.loading);
 
-    // Start server stream (non-blocking)
+    await _loadHistory();
     await _api.startStream();
-
-    // Immediate first fetch
     await _fetchLatest();
-
-    // Start 30-minute polling
     _startPolling();
   }
 
   void _startPolling() {
     _stopPolling();
-    _pollingTimer = Timer.periodic(
-      const Duration(minutes: 30),
-      (_) => _fetchLatest(),
-    );
+    _pollingTimer = Timer.periodic(kSpectralPollInterval, (_) => _fetchLatest());
   }
 
   void _stopPolling() {
@@ -75,7 +65,6 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
 
   bool _isFetching = false;
 
-  // ── Fetch Latest ──────────────────────────────────────────
   Future<void> _fetchLatest() async {
     if (_disposed || _isFetching) return;
     _isFetching = true;
@@ -84,36 +73,22 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
       final result = await _api.fetchLatest();
       if (_disposed) return;
       
-      final bool wasStateChanged = _prediction?.timestamp != result.timestamp || _state != SpectralState.loaded;
-      _prediction = result;
-      if (wasStateChanged) {
-        _setState(SpectralState.loaded);
+      _reading = result;
+      
+      history.add(result);
+      if (history.length > 20) {
+        history.removeAt(0);
       }
+      await _saveHistory();
 
-      // Persist to history
-      final entry = SpectralHistoryEntry(
-        id: result.timestamp.millisecondsSinceEpoch.toString(),
-        plantId: result.plantId,
-        riskLevel: result.riskLevel,
-        riskProbability: result.riskProbability,
-        predictedGroup: result.predictedGroup,
-        likelyDisease: result.likelyDisease,
-        alertMessage: result.alertMessage,
-        timestamp: result.timestamp,
-      );
-      final bool isNewEntry = await _historyRepo.addEntry(entry);
-
-      // Trigger push notification only if HIGH or MEDIUM risk AND it's a new unique event
-      if (isNewEntry && (result.isHigh || result.isMedium)) {
-        SpectralNotificationService.showSpectralAlert(
-          title: 'Spectral Disease Alert',
-          body: result.alertMessage.isNotEmpty ? result.alertMessage : 'High or Medium risk detected.',
-        );
-      }
+      _errorMessage = '';
+      _setState(SpectralState.loaded);
     } catch (e) {
       if (_disposed) return;
-      if (_state != SpectralState.loaded) {
-        // Only show error if we have no data yet
+      if (_reading != null) {
+        // Keep showing last known data
+        _setState(SpectralState.loaded);
+      } else {
         _errorMessage = _friendlyError(e.toString());
         _setState(SpectralState.error);
       }
@@ -122,13 +97,35 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  /// Manual refresh (pull-to-refresh or retry button)
   Future<void> refresh() async {
     _setState(SpectralState.loading);
+    _stopPolling();
     await _fetchLatest();
+    _startPolling();
+  }
+  
+  Future<void> _loadHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? historyJson = prefs.getString('spectral_history');
+    if (historyJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(historyJson);
+        history = decoded.map((e) => SpectralReading.fromJson(e)).toList();
+        if (history.isNotEmpty) {
+          _reading = history.last;
+        }
+      } catch (e) {
+        // Ignore parse errors on load
+      }
+    }
   }
 
-  // ── Helpers ───────────────────────────────────────────────
+  Future<void> _saveHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final historyJson = jsonEncode(history.map((e) => e.toJson()).toList());
+    await prefs.setString('spectral_history', historyJson);
+  }
+
   void _setState(SpectralState s) {
     if (_disposed) return;
     _state = s;
@@ -140,17 +137,10 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
       return 'No internet connection. Please check your network.';
     }
     if (raw.contains('TimeoutException') || raw.contains('timed out')) {
-      return 'Request timed out. The server may be starting up — try again shortly.';
+      return 'Request timed out. Server may be starting up.';
     }
     if (raw.contains('404')) return 'No spectral data available yet.';
     return 'Unable to fetch data. Please try again.';
-  }
-
-  // ── Dispose ───────────────────────────────────────────────
-  Future<void> tearDown() async {
-    _stopPolling();
-    WidgetsBinding.instance.removeObserver(this);
-    await _api.stopStream();
   }
 
   @override

@@ -1,178 +1,158 @@
-// lib/presentation/widgets/soil/gauges_grid.dart
+// lib/features/home/presentation/widgets/soil/gauge_card.dart
+import 'dart:math';
 import 'package:flutter/material.dart';
-
-import '../../../../../core/constants/app_colors.dart';
-import '../../../data/model/soil_model.dart';
 import '../../view_model/soil_analysis_viewmodel.dart';
-
-class _GaugeData {
-  final String name;
-  final double value;
-  final String unit;
-  final double min;
-  final double max;
-  final String paramKey;
-  final IconData icon;
-
-  _GaugeData(this.name, this.value, this.unit, this.min, this.max,
-      this.paramKey, this.icon);
-}
+import 'package:agriguard_project/features/home/data/model/soil_analysis_model.dart';
 
 class GaugesGrid extends StatelessWidget {
   final SoilAnalysisViewModel vm;
-  final SoilSnapshot snap;
-  const GaugesGrid({super.key, required this.vm, required this.snap});
+
+  const GaugesGrid({super.key, required this.vm});
 
   @override
   Widget build(BuildContext context) {
-    final gauges = [
-      _GaugeData('Moisture', snap.reading.moisturePct, '%', 15, 50,
-          'moisture_pct', Icons.water_drop_outlined),
-      _GaugeData('pH', snap.reading.ph, '', 5.5, 7.8, 'ph',
-          Icons.science_outlined),
-      _GaugeData('Nitrogen', snap.reading.nitrogenPpm, 'ppm', 10, 70,
-          'nitrogen_ppm', Icons.grass_outlined),
-      _GaugeData('Phosphorus', snap.reading.phosphorusPpm, 'ppm', 5, 60,
-          'phosphorus_ppm', Icons.blur_circular_outlined),
-      _GaugeData('Potassium', snap.reading.potassiumPpm, 'ppm', 50, 300,
-          'potassium_ppm', Icons.local_florist_outlined),
-      _GaugeData('Temperature', snap.reading.temperatureC, '°C', 8, 38,
-          'temperature_c', Icons.thermostat_outlined),
-      _GaugeData('EC', snap.reading.ecDsM, 'dS/m', 0.3, 3.0, 'ec_ds_m',
-          Icons.electric_bolt_outlined),
-      _GaugeData('Organic Matter', snap.reading.organicMatter, '%', 1.0,
-          6.5, 'organic_matter', Icons.eco_outlined),
+    final params = [
+      'moisture', 'ph', 'nitrogen', 'phosphorus',
+      'potassium', 'temperature', 'ec', 'organic_matter'
     ];
 
     return GridView.builder(
-      shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.15,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
       ),
-      itemCount: gauges.length,
-      itemBuilder: (context, i) => _GaugeCard(vm: vm, g: gauges[i]),
+      itemCount: params.length,
+      itemBuilder: (context, index) {
+        return GaugeCard(param: params[index], vm: vm);
+      },
     );
   }
 }
 
-class _GaugeCard extends StatelessWidget {
+class GaugeCard extends StatelessWidget {
+  final String param;
   final SoilAnalysisViewModel vm;
-  final _GaugeData g;
 
-  const _GaugeCard({required this.vm, required this.g});
+  const GaugeCard({super.key, required this.param, required this.vm});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final alertColor = vm.alertColorForParam(g.paramKey);
-    final isAlert = alertColor != null;
-    final cardBorder = isAlert ? alertColor : Colors.transparent;
-    final progress = ((g.value - g.min) / (g.max - g.min)).clamp(0.0, 1.0);
-    final barColor = alertColor ?? primaryColor;
+    final latest = vm.latest;
+    double? value;
+    String unit = '';
+    
+    if (latest != null && latest.readings.containsKey(param)) {
+      value = latest.readings[param]!.value;
+      unit = latest.readings[param]!.unit;
+    }
 
+    final color = value != null ? vm.getGaugeColor(param, value) : Colors.grey;
+
+    String label = param.replaceAll('_', ' ').toUpperCase();
+    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: cardBorder.withAlpha(isAlert ? (isDark ? 160 : 100) : 0),
-            width: 1.5),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.5), width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 40 : 5),
-            blurRadius: isDark ? 8 : 10,
-            offset: const Offset(0, 3),
-          ),
+            color: color.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          )
         ],
       ),
+      padding: const EdgeInsets.all(12),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(g.icon, size: 14, color: grayColor),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        g.name,
-                        style: const TextStyle(
-                          color: grayColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 80,
+            width: 80,
+            child: CustomPaint(
+              painter: _ArcGaugePainter(color: color, value: value),
+              child: Center(
+                child: Text(
+                  value != null ? value.toStringAsFixed(1) : '--',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ),
-              if (isAlert)
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                      color: alertColor, shape: BoxShape.circle),
-                ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                g.value.toStringAsFixed(g.value < 10 ? 2 : 1),
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'AbhayaLibre',
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              if (g.unit.isNotEmpty) ...[
-                const SizedBox(width: 3),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(g.unit,
-                      style: const TextStyle(
-                          color: grayColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600)),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: barColor.withAlpha(isDark ? 45 : 30),
-              color: barColor,
-              minHeight: 5,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            '${g.min} – ${g.max} ${g.unit}',
-            style: const TextStyle(
-                color: grayColor, fontSize: 9, fontWeight: FontWeight.w600),
+            unit,
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),
     );
+  }
+}
+
+class _ArcGaugePainter extends CustomPainter {
+  final Color color;
+  final double? value;
+
+  _ArcGaugePainter({required this.color, this.value});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = min(size.width / 2, size.height / 2);
+    
+    final bgPaint = Paint()
+      ..color = Colors.grey.withOpacity(0.2)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.round;
+
+    final valuePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.round;
+
+    const startAngle = 3 * pi / 4;
+    const sweepAngle = 3 * pi / 2;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      bgPaint,
+    );
+
+    if (value != null) {
+      // Dummy visual fill proportion just for the UI
+      // In a real app we'd map value min-max to 0-1
+      final fillProportion = 0.6; // hardcoded for visual or map to 0.1-0.9 based on safe ranges
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        sweepAngle * fillProportion,
+        false,
+        valuePaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArcGaugePainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.value != value;
   }
 }

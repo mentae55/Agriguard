@@ -9,6 +9,7 @@ class ChatSession {
   final String imageUrl;
   final DateTime timestamp;
   final List<ChatMessage> messages;
+  final bool isGeneralChat;
 
   ChatSession({
     required this.id,
@@ -19,6 +20,7 @@ class ChatSession {
     required this.imageUrl,
     required this.timestamp,
     required this.messages,
+    this.isGeneralChat = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,6 +33,7 @@ class ChatSession {
       'imageUrl': imageUrl,
       'timestamp': timestamp.millisecondsSinceEpoch,
       'messages': messages.map((m) => m.toMap()).toList(),
+      'isGeneralChat': isGeneralChat,
     };
   }
 
@@ -70,6 +73,7 @@ class ChatSession {
             : int.tryParse(map['timestamp']?.toString() ?? '') ?? DateTime.now().millisecondsSinceEpoch,
       ),
       messages: parsedMessages,
+      isGeneralChat: map['isGeneralChat'] == true,
     );
   }
 
@@ -82,6 +86,7 @@ class ChatSession {
     String? imageUrl,
     DateTime? timestamp,
     List<ChatMessage>? messages,
+    bool? isGeneralChat,
   }) {
     return ChatSession(
       id: id ?? this.id,
@@ -92,6 +97,7 @@ class ChatSession {
       imageUrl: imageUrl ?? this.imageUrl,
       timestamp: timestamp ?? this.timestamp,
       messages: messages ?? this.messages,
+      isGeneralChat: isGeneralChat ?? this.isGeneralChat,
     );
   }
 }

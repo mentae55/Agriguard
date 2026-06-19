@@ -22,7 +22,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProfileProvider>().loadProfile();
+      final provider = context.read<ProfileProvider>();
+      if (provider.userProfile == null && !provider.isLoading) {
+        provider.loadProfile();
+      }
     });
   }
 
@@ -208,46 +211,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                   children: [
                     if (profileProvider.isLoading && profileProvider.userProfile == null)
-                      const Center(child: CircularProgressIndicator())
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 24.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
                     else if (profileProvider.userProfile != null)
                       Row(
                         children: [
                           // Avatar
-                          GestureDetector(
-                             onTap: _pickImage,
-                             child: Stack(
-                               children: [
-                                 Container(
-                                   width: 90,
-                                   height: 90,
-                                   decoration: BoxDecoration(
-                                     shape: BoxShape.circle,
-                                     color: theme.colorScheme.secondary,
-                                     border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300, width: 2),
-                                   ),
-                                   child: ClipOval(
-                                     child: _buildAvatarImage(profileProvider.userProfile!.profileImageUrl),
-                                   ),
-                                 ),
-                                 Positioned(
-                                   bottom: 0,
-                                   right: languageProvider.isArabic ? null : 0,
-                                   left: languageProvider.isArabic ? 0 : null,
-                                   child: Container(
-                                     padding: const EdgeInsets.all(6),
-                                     decoration: BoxDecoration(
-                                       color: theme.colorScheme.surface,
-                                       border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300),
-                                       shape: BoxShape.circle,
-                                     ),
-                                     child: Icon(Icons.camera_alt_outlined, size: 16, color: theme.colorScheme.onSurface),
-                                   ),
-                                 ),
-                               ],
-                             ),
-                           ),
-                          const SizedBox(width: 20),
-                          // Text Info
+                          // GestureDetector(
+                          //    onTap: _pickImage,
+                          //    child: Stack(
+                          //      children: [
+                          //        Container(
+                          //          width: 90,
+                          //          height: 90,
+                          //          decoration: BoxDecoration(
+                          //            shape: BoxShape.circle,
+                          //            color: theme.colorScheme.secondary,
+                          //            border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300, width: 2),
+                          //          ),
+                          //          child: ClipOval(
+                          //            child: _buildAvatarImage(profileProvider.userProfile!.profileImageUrl),
+                          //          ),
+                          //        ),
+                          //        Positioned(
+                          //          bottom: 0,
+                          //          right: languageProvider.isArabic ? null : 0,
+                          //          left: languageProvider.isArabic ? 0 : null,
+                          //          child: Container(
+                          //            padding: const EdgeInsets.all(6),
+                          //            decoration: BoxDecoration(
+                          //              color: theme.colorScheme.surface,
+                          //              border: Border.all(color: isDark ? Colors.white24 : Colors.grey.shade300),
+                          //              shape: BoxShape.circle,
+                          //            ),
+                          //            child: Icon(Icons.camera_alt_outlined, size: 16, color: theme.colorScheme.onSurface),
+                          //          ),
+                          //        ),
+                          //      ],
+                          //    ),
+                          //  ),
+                          // const SizedBox(width: 20),
+                          // // Text Info
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

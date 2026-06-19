@@ -66,7 +66,14 @@ class ChatHistoryScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final chatbotVm = context.watch<ChatbotViewModel>();
     final user = FirebaseAuth.instance.currentUser;
-    final List<ChatSession> sessions = chatbotVm.pastSessions;
+    final List<ChatSession> sessions = List.from(chatbotVm.pastSessions);
+    
+    // Sort to pin General Chats to the top, then by timestamp descending
+    sessions.sort((a, b) {
+      if (a.isGeneralChat && !b.isGeneralChat) return -1;
+      if (!a.isGeneralChat && b.isGeneralChat) return 1;
+      return b.timestamp.compareTo(a.timestamp);
+    });
 
     if (user == null) {
       return Center(
@@ -142,7 +149,8 @@ class ChatHistoryScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     
-    final cleanDisease = session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
+    final bool isGeneral = session.isGeneralChat;
+    final cleanDisease = isGeneral ? 'General Chat' : session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
     final bool isHealthy = cleanDisease.toLowerCase().contains('healthy');
     final String lastMessage = session.messages.isNotEmpty 
         ? session.messages.last.text.replaceAll('\n', ' ')
@@ -198,22 +206,26 @@ class ChatHistoryScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isTomato 
-                        ? Colors.red.withAlpha(isDark ? 35 : 20) 
-                        : Colors.amber.withAlpha(isDark ? 35 : 20),
+                    color: isGeneral
+                        ? primaryColor.withAlpha(isDark ? 35 : 20)
+                        : (isTomato 
+                            ? Colors.red.withAlpha(isDark ? 35 : 20) 
+                            : Colors.amber.withAlpha(isDark ? 35 : 20)),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(
-                    session.cropType.toUpperCase(),
-                    style: TextStyle(
-                      color: isTomato 
-                          ? (isDark ? Colors.red.shade300 : Colors.red.shade800) 
-                          : (isDark ? Colors.amber.shade300 : Colors.amber.shade900),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 9,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  child: isGeneral
+                      ? const Text('🌱', style: TextStyle(fontSize: 14))
+                      : Text(
+                          session.cropType.toUpperCase(),
+                          style: TextStyle(
+                            color: isTomato 
+                                ? (isDark ? Colors.red.shade300 : Colors.red.shade800) 
+                                : (isDark ? Colors.amber.shade300 : Colors.amber.shade900),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 9,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                 ),
                 const SizedBox(width: 14),
                 // Texts details
@@ -236,13 +248,22 @@ class ChatHistoryScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Text(
-                            _formatDate(session.timestamp),
-                            style: TextStyle(
-                              color: colorScheme.onSurface.withAlpha(120),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          Row(
+                            children: [
+                              if (isGeneral)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
+                                  child: Icon(Icons.push_pin_rounded, size: 12, color: primaryColor),
+                                ),
+                              Text(
+                                _formatDate(session.timestamp),
+                                style: TextStyle(
+                                  color: colorScheme.onSurface.withAlpha(120),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

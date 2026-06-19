@@ -20,6 +20,7 @@ class ProfileProvider with ChangeNotifier {
   }
 
   Future<void> loadProfile() async {
+    if (_isLoading) return; // Prevent race conditions from multiple calls
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -39,8 +40,14 @@ class ProfileProvider with ChangeNotifier {
           profileImageUrl: 'assets/app_images/icons/logo.svg',
         );
       } else {
-        _userProfile = await _profileService.getUserProfile(user.uid);
-        // If profile doesn't exist in Firestore, create default using Firebase Auth data
+        try {
+          _userProfile = await _profileService.getUserProfile(user.uid);
+        } catch (e) {
+          debugPrint('Error fetching profile from Firestore: $e');
+          // If Firestore fails (e.g., permissions, offline), do not leave _userProfile as null.
+        }
+
+        // If profile doesn't exist in Firestore (or fetch failed), create default using Firebase Auth data
         if (_userProfile == null) {
           final displayName = user.displayName ?? '';
           final nameParts = displayName.trim().split(' ');
@@ -56,7 +63,12 @@ class ProfileProvider with ChangeNotifier {
             phone: user.phoneNumber ?? '',
             profileImageUrl: 'assets/app_images/icons/logo.svg',
           );
-          await _profileService.updateUserProfile(_userProfile!);
+          
+          try {
+            await _profileService.updateUserProfile(_userProfile!);
+          } catch (e) {
+            debugPrint('Error creating default profile in Firestore: $e');
+          }
         }
       }
 

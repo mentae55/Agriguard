@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'features/authentication/view_model/user_view_model.dart';
 import 'features/connection_to_device/services/device_provider.dart';
 import 'features/connection_to_device/view_model/connection_view_model.dart';
-import 'core/widgets/global_connection_monitor.dart'; // [Added] global monitor
+import 'core/widgets/global_connection_monitor.dart';
 import 'features/chatbot/view_model/chatbot_view_model.dart';
 import 'features/home/presentation/view/home_screen.dart';
 import 'firebase_options.dart';

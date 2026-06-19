@@ -4,14 +4,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/spectral_prediction.dart';
+import '../models/spectral_reading.dart';
+import '../../../../core/constants/app_constants.dart';
 
 class SpectralApiService {
-  static const String _baseUrl = 'https://malakmohamed21-robot-api.hf.space';
-  static const Duration _defaultTimeout = Duration(seconds: 45); // Extended for HF cold starts
+  final String _baseUrl;
+  static const Duration _defaultTimeout = Duration(seconds: 45);
 
   final http.Client _client;
-  SpectralApiService({http.Client? client}) : _client = client ?? http.Client();
+  SpectralApiService({http.Client? client}) 
+      : _client = client ?? http.Client(),
+        _baseUrl = AppConstants.baseUrl;
 
   /// Helper with exponential backoff
   Future<http.Response> _requestWithRetry(
@@ -27,7 +30,6 @@ class SpectralApiService {
         if (attempt >= maxRetries) {
           rethrow;
         }
-        // Exponential backoff: 2s, 4s, 8s
         await Future.delayed(Duration(seconds: 2 * attempt));
       }
     }
@@ -42,12 +44,10 @@ class SpectralApiService {
               Uri.parse('$_baseUrl/spectral/stream/start'),
               headers: {'Content-Type': 'application/json'},
             )
-            .timeout(const Duration(seconds: 60)), // Allow more time for cold start
+            .timeout(const Duration(seconds: 60)),
         maxRetries: 2,
       );
-    } catch (_) {
-      // Non-fatal — dashboard can still poll latest
-    }
+    } catch (_) {}
   }
 
   /// POST /spectral/stream/stop
@@ -63,7 +63,7 @@ class SpectralApiService {
   }
 
   /// GET /spectral/stream/latest
-  Future<SpectralPrediction> fetchLatest() async {
+  Future<SpectralReading> fetchLatest() async {
     final res = await _requestWithRetry(
       () => _client
           .get(Uri.parse('$_baseUrl/spectral/stream/latest'))
@@ -75,7 +75,7 @@ class SpectralApiService {
       try {
         final body = jsonDecode(res.body);
         if (body is Map<String, dynamic>) {
-          return SpectralPrediction.fromJson(body);
+          return SpectralReading.fromJson(body);
         }
         throw const FormatException('Unexpected JSON root format');
       } catch (e) {

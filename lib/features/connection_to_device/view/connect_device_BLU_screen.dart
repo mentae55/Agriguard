@@ -54,7 +54,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
 
     if (mounted) {
       if (success) {
-        _showToast(context, 'âœ… Connected to ${device.platformName}', isSuccess: true);
+        _showToast(context, 'Connected to ${device.platformName}', isSuccess: true);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -62,7 +62,7 @@ class _ConnectDeviceBLUScreenState extends State<ConnectDeviceBLUScreen>
           ),
         );
       } else {
-        _showToast(context, 'âŒ Connection Failed. Try again.', isSuccess: false);
+        _showToast(context, 'Connection Failed. Try again.', isSuccess: false);
       }
     }
   }

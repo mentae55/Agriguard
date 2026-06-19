@@ -1,7 +1,9 @@
 // lib/presentation/widgets/home/features_grid.dart
+import 'package:agriguard_project/features/chatbot/view/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../chatbot/view/chatbot_main_screen.dart';
 import '../../../../chatbot/view/phone_capture_screen.dart';
 import '../../view/soil_analysis_screen.dart';
 import '../../view_model/home_viewmodel.dart';
@@ -34,6 +36,18 @@ class FeaturesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final items = [
+      _GridItem(
+      networkImage:
+      '',
+      localImage: 'assets/app_images/images/logo.png',
+      title: 'Chat with Ai  ',
+      subtitle: 'Chat about your crops',
+      icon: Icons.smart_toy_rounded,
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ChatbotMainScreen()),
+      ),
+    ),
       _GridItem(
         networkImage:
         'https://www.yarbo.com/cdn/shop/files/Yarbo_Robot_1_200kb.jpg?v=1781161297&width=1280',
@@ -91,6 +105,7 @@ class FeaturesGrid extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const SpectralDashboardScreen()),
         ),
       ),
+
     ];
 
     return GridView.builder(

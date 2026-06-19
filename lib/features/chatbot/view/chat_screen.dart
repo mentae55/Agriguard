@@ -180,7 +180,8 @@ class _ChatScreenState extends State<ChatScreen> {
       );
     }
 
-    final cleanDisease = session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
+    final bool isGeneral = session.isGeneralChat;
+    final cleanDisease = isGeneral ? 'General Chat' : session.diagnosisResult.replaceAll('___', ' ').replaceAll('_', ' ').trim();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -188,20 +189,21 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: [
             // Sub-header showing current context context
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: isDark ? Colors.white10 : Colors.black.withAlpha(10),
-              width: double.infinity,
-              child: Text(
-                'Active Session: ${session.cropType} — $cleanDisease',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: grayColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+            if (!isGeneral)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                color: isDark ? Colors.white10 : Colors.black.withAlpha(10),
+                width: double.infinity,
+                child: Text(
+                  'Active Session: ${session.cropType} — $cleanDisease',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: grayColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
             // 1. Message Bubble list
             Expanded(
               child: ListView.builder(
@@ -236,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
 
             // 2. Suggestion Quick Chips
-            if (!chatbotVm.isSendingMessage && !chatbotVm.isSelectionMode) _buildSuggestionChips(session.cropType, cleanDisease),
+            if (!chatbotVm.isSendingMessage && !chatbotVm.isSelectionMode && !isGeneral) _buildSuggestionChips(session.cropType, cleanDisease),
 
             // 3. Message Input Bar
             if (!chatbotVm.isSelectionMode) _buildInputBar(chatbotVm),

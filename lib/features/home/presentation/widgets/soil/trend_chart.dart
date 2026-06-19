@@ -1,436 +1,194 @@
-// lib/presentation/widgets/soil/trends_section.dart
-import 'dart:math' as math;
+// lib/features/home/presentation/widgets/soil/trend_chart.dart
 import 'package:flutter/material.dart';
-
-import '../../../../../core/constants/app_colors.dart';
-import '../../../data/model/soil_model.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../../view_model/soil_analysis_viewmodel.dart';
 
-class TrendsSection extends StatelessWidget {
+class TrendsSection extends StatefulWidget {
   final SoilAnalysisViewModel vm;
+
   const TrendsSection({super.key, required this.vm});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+  State<TrendsSection> createState() => _TrendsSectionState();
+}
 
-    if (vm.history.length < 2) {
-      return Container(
-        height: 80,
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 40 : 5),
-              blurRadius: isDark ? 8 : 10,
-              offset: const Offset(0, 3),
+class _TrendsSectionState extends State<TrendsSection> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final List<String> _params = [
+    'moisture', 'ph', 'nitrogen', 'phosphorus',
+    'potassium', 'temperature', 'ec', 'organic_matter'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _params.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.vm.history.length < 2) {
+      return Card(
+        elevation: 1,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Center(
+            child: Text(
+              'Not enough data yet — check back after the next reading',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
             ),
-          ],
-        ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                    color: primaryColor, strokeWidth: 2),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Collecting data for trends...',
-                style: TextStyle(
-                  color: grayColor,
-                  fontFamily: 'AbhayaLibre',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
           ),
         ),
       );
     }
 
-    return Column(
-      children: [
-        _LineChart(
-          title: 'Moisture (%)',
-          color: Colors.blue.shade400,
-          values: vm.history.map((s) => s.reading.moisturePct).toList(),
-          safeMin: 15,
-          safeMax: 50,
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              labelColor: Theme.of(context).primaryColor,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Theme.of(context).primaryColor,
+              tabs: _params.map((p) => Tab(text: p.replaceAll('_', ' ').toUpperCase())).toList(),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 250,
+              child: TabBarView(
+                controller: _tabController,
+                children: _params.map((p) => _buildChart(p)).toList(),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
-        _LineChart(
-          title: 'pH',
-          color: Colors.purple.shade400,
-          values: vm.history.map((s) => s.reading.ph).toList(),
-          safeMin: 5.5,
-          safeMax: 7.8,
-        ),
-        const SizedBox(height: 16),
-        _NpkChart(history: vm.history),
-        const SizedBox(height: 16),
-        _LineChart(
-          title: 'Temperature (°C)',
-          color: Colors.orange.shade400,
-          values: vm.history.map((s) => s.reading.temperatureC).toList(),
-          safeMin: 8,
-          safeMax: 38,
-        ),
-        const SizedBox(height: 16),
-        _LineChart(
-          title: 'EC (dS/m)',
-          color: Colors.teal.shade400,
-          values: vm.history.map((s) => s.reading.ecDsM).toList(),
-          safeMin: 0.3,
-          safeMax: 3.0,
-        ),
-      ],
+      ),
     );
   }
-}
 
-class _LineChart extends StatelessWidget {
-  final String title;
-  final Color color;
-  final List<double> values;
-  final double safeMin;
-  final double safeMax;
+  Widget _buildChart(String param) {
+    final history = widget.vm.history;
+    
+    // safe ranges map
+    final ranges = {
+      'moisture': [40.0, 70.0],
+      'ph': [5.5, 7.5],
+      'nitrogen': [20.0, 60.0],
+      'phosphorus': [10.0, 40.0],
+      'potassium': [100.0, 300.0],
+      'temperature': [15.0, 30.0],
+      'ec': [0.2, 1.5],
+      'organic_matter': [2.0, 5.0],
+    };
+    
+    final range = ranges[param]!;
+    
+    final spots = <FlSpot>[];
+    double minY = range[0];
+    double maxY = range[1];
+    
+    for (int i = 0; i < history.length; i++) {
+      final reading = history[i];
+      if (reading.readings.containsKey(param)) {
+        final val = reading.readings[param]!.value;
+        spots.add(FlSpot(i.toDouble(), val));
+        if (val < minY) minY = val;
+        if (val > maxY) maxY = val;
+      }
+    }
 
-  const _LineChart({
-    required this.title,
-    required this.color,
-    required this.values,
-    required this.safeMin,
-    required this.safeMax,
-  });
+    // Give some padding to Y axis
+    final yPadding = (maxY - minY) * 0.2;
+    minY -= yPadding;
+    maxY += yPadding;
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+    if (minY < 0 && param != 'temperature') minY = 0; // Prevent negative unless temp
 
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 40 : 5),
-            blurRadius: isDark ? 8 : 10,
-            offset: const Offset(0, 3),
+    return Padding(
+      padding: const EdgeInsets.only(right: 24.0, left: 8.0),
+      child: LineChart(
+        LineChartData(
+          minY: minY,
+          maxY: maxY,
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: (maxY - minY) / 4,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          titlesData: FlTitlesData(
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final intIndex = value.toInt();
+                  if (intIndex >= 0 && intIndex < history.length) {
+                    final ts = history[intIndex].timestamp;
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        DateFormat('HH:mm').format(ts),
+                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+                interval: (history.length / 4).ceil().toDouble().clamp(1, 100),
+                reservedSize: 30,
               ),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'AbhayaLibre',
-                  color: colorScheme.onSurface,
-                ),
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          extraLinesData: ExtraLinesData(
+            horizontalLines: [
+              HorizontalLine(
+                y: range[0],
+                color: Colors.green.withOpacity(0.5),
+                strokeWidth: 2,
+                dashArray: [5, 5],
               ),
-              const Spacer(),
-              Text(
-                values.last.toStringAsFixed(1),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'AbhayaLibre',
-                  color: color,
-                ),
+              HorizontalLine(
+                y: range[1],
+                color: Colors.green.withOpacity(0.5),
+                strokeWidth: 2,
+                dashArray: [5, 5],
               ),
             ],
+            extraLinesOnTop: false,
           ),
-          const SizedBox(height: 14),
-          SizedBox(
-            height: 80,
-            child: CustomPaint(
-              size: const Size(double.infinity, 80),
-              painter: _LinePainter(
-                values: values,
-                color: color,
-                safeMin: safeMin,
-                safeMax: safeMax,
-                surfaceColor: colorScheme.surface,
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              color: Theme.of(context).primaryColor,
+              barWidth: 3,
+              isStrokeCapRound: true,
+              dotData: const FlDotData(show: true),
+              belowBarData: BarAreaData(
+                show: true,
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NpkChart extends StatelessWidget {
-  final List<SoilSnapshot> history;
-  const _NpkChart({required this.history});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 40 : 5),
-            blurRadius: isDark ? 8 : 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'NPK (ppm)',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'AbhayaLibre',
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _Legend('N', Colors.green.shade600),
-              const SizedBox(width: 12),
-              _Legend('P', Colors.blue.shade400),
-              const SizedBox(width: 12),
-              _Legend('K', Colors.orange.shade400),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 80,
-            child: CustomPaint(
-              size: const Size(double.infinity, 80),
-              painter: _NPKPainter(history: history),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Legend extends StatelessWidget {
-  final String label;
-  final Color color;
-  const _Legend(this.label, this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ],
         ),
-        const SizedBox(width: 4),
-        Text(label,
-            style: const TextStyle(
-                color: grayColor, fontSize: 10, fontWeight: FontWeight.w700)),
-      ],
-    );
-  }
-}
-
-class _LinePainter extends CustomPainter {
-  final List<double> values;
-  final Color color;
-  final double safeMin;
-  final double safeMax;
-  final Color surfaceColor;
-
-  _LinePainter({
-    required this.values,
-    required this.color,
-    required this.safeMin,
-    required this.safeMax,
-    required this.surfaceColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (values.length < 2) return;
-
-    double dataMin = values.reduce(math.min);
-    double dataMax = values.reduce(math.max);
-    final rangeMin = math.min(dataMin, safeMin) - 1;
-    final rangeMax = math.max(dataMax, safeMax) + 1;
-    final range = (rangeMax - rangeMin).clamp(0.001, double.infinity);
-
-    double toY(double v) =>
-        size.height - ((v - rangeMin) / range * size.height);
-
-    final bandPaint = Paint()
-      ..color = color.withAlpha(18)
-      ..style = PaintingStyle.fill;
-    final bandTop = toY(safeMax);
-    final bandBottom = toY(safeMin);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTRB(0, bandTop, size.width, bandBottom),
-        const Radius.circular(4),
       ),
-      bandPaint,
     );
-
-    final dashPaint = Paint()
-      ..color = color.withAlpha(40)
-      ..strokeWidth = 0.8
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(
-        Offset(0, bandTop), Offset(size.width, bandTop), dashPaint);
-    canvas.drawLine(
-        Offset(0, bandBottom), Offset(size.width, bandBottom), dashPaint);
-
-    final step = size.width / (values.length - 1);
-    final fillPath = Path();
-    fillPath.moveTo(0, size.height);
-    for (int i = 0; i < values.length; i++) {
-      fillPath.lineTo(i * step, toY(values[i]));
-    }
-    fillPath.lineTo(size.width, size.height);
-    fillPath.close();
-
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [color.withAlpha(40), color.withAlpha(5)],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(fillPath, fillPaint);
-
-    final linePaint = Paint()
-      ..color = color
-      ..strokeWidth = 2.2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path();
-    for (int i = 0; i < values.length; i++) {
-      final x = i * step;
-      final y = toY(values[i]);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    canvas.drawPath(path, linePaint);
-
-    final dotPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    final dotBorderPaint = Paint()
-      ..color = surfaceColor
-      ..style = PaintingStyle.fill;
-    for (int i = 0; i < values.length; i++) {
-      final offset = Offset(i * step, toY(values[i]));
-      canvas.drawCircle(offset, 3.5, dotBorderPaint);
-      canvas.drawCircle(offset, 2.2, dotPaint);
-    }
   }
-
-  @override
-  bool shouldRepaint(covariant _LinePainter old) =>
-      old.values.length != values.length ||
-          (values.isNotEmpty && old.values.last != values.last);
-}
-
-class _NPKPainter extends CustomPainter {
-  final List<SoilSnapshot> history;
-
-  _NPKPainter({required this.history});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (history.length < 2) return;
-
-    final nValues = history.map((s) => s.reading.nitrogenPpm).toList();
-    final pValues = history.map((s) => s.reading.phosphorusPpm).toList();
-    final kValues = history.map((s) => s.reading.potassiumPpm).toList();
-
-    final allValues = [...nValues, ...pValues, ...kValues];
-    final dataMin = allValues.reduce(math.min);
-    final dataMax = allValues.reduce(math.max);
-    final rangeMin = dataMin - 5;
-    final rangeMax = dataMax + 5;
-    final range = (rangeMax - rangeMin).clamp(0.001, double.infinity);
-
-    double toY(double v) =>
-        size.height - ((v - rangeMin) / range * size.height);
-
-    final step = size.width / (history.length - 1);
-
-    void drawLine(List<double> vals, Color color) {
-      final paint = Paint()
-        ..color = color
-        ..strokeWidth = 2
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round;
-
-      final dotPaint = Paint()
-        ..color = color
-        ..style = PaintingStyle.fill;
-
-      final path = Path();
-      for (int i = 0; i < vals.length; i++) {
-        final x = i * step;
-        final y = toY(vals[i]);
-        if (i == 0) {
-          path.moveTo(x, y);
-        } else {
-          path.lineTo(x, y);
-        }
-      }
-      canvas.drawPath(path, paint);
-
-      if (vals.isNotEmpty) {
-        final lastX = (vals.length - 1) * step;
-        canvas.drawCircle(Offset(lastX, toY(vals.last)), 3, dotPaint);
-      }
-    }
-
-    drawLine(nValues, Colors.green.shade600);
-    drawLine(pValues, Colors.blue.shade400);
-    drawLine(kValues, Colors.orange.shade400);
-  }
-
-  @override
-  bool shouldRepaint(covariant _NPKPainter old) =>
-      old.history.length != history.length;
 }

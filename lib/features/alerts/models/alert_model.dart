@@ -111,11 +111,7 @@ class GeneratedAlert {
       value: (json['value'] as num).toDouble(),
       unit: json['unit'] as String,
       recommendation: json['recommendation'] as String,
-      icon: IconData(
-        json['iconCodePoint'] as int,
-        fontFamily: json['iconFontFamily'] as String?,
-        fontPackage: json['iconFontPackage'] as String?,
-      ),
+      icon: _getIconFromCodePoint(json['iconCodePoint'] as int),
       timestamp: DateTime.parse(json['timestamp'] as String),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
@@ -129,5 +125,34 @@ class GeneratedAlert {
       isResolved: json['isResolved'] as bool? ?? false,
       historyId: json['historyId'] as String? ?? '',
     );
+  }
+
+  static IconData _getIconFromCodePoint(int codePoint) {
+    switch (codePoint) {
+      case 983988:
+        return Icons.water_drop_rounded;
+      case 983343:
+        return Icons.science_rounded;
+      case 63422:
+        return Icons.grass_rounded;
+      case 62918:
+        return Icons.blur_circular_rounded;
+      case 63596:
+        return Icons.local_florist_rounded;
+      case 983596:
+        return Icons.thermostat_rounded;
+      case 985076:
+        return Icons.electric_bolt_rounded;
+      case 63218:
+        return Icons.eco_rounded;
+      case 983372:
+        return Icons.sensors_rounded;
+      case 63029:
+        return Icons.check_circle_rounded;
+      case 983712:
+        return Icons.warning_amber_rounded;
+      default:
+        return Icons.warning_amber_rounded;
+    }
   }
 }

@@ -141,10 +141,10 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
                       icon: Icon(Icons.history_rounded, size: 20),
                       text: 'History',
                     ),
-                    Tab(
-                      icon: Icon(Icons.star_outline_rounded, size: 20),
-                      text: 'Favorites',
-                    ),
+                    // Tab(
+                    //   icon: Icon(Icons.star_outline_rounded, size: 20),
+                    //   text: 'Favorites',
+                    // ),
                   ],
                 ),
               ),
@@ -153,7 +153,7 @@ class _ChatbotMainScreenState extends State<ChatbotMainScreen> {
           children: [
             ChatScreen(),
             ChatHistoryScreen(),
-            ChatFavoritesScreen(),
+            // ChatFavoritesScreen(),
           ],
         ),
       ),

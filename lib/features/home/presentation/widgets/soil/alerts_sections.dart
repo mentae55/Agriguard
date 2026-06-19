@@ -1,200 +1,128 @@
-// lib/presentation/widgets/soil/alerts_section.dart
+// lib/features/home/presentation/widgets/soil/alerts_sections.dart
 import 'package:flutter/material.dart';
-
-import '../../../../../core/constants/app_colors.dart';
-import '../../../data/model/soil_model.dart';
 import '../../view_model/soil_analysis_viewmodel.dart';
+import 'package:agriguard_project/features/home/data/model/soil_analysis_model.dart';
 
 class AlertsSection extends StatelessWidget {
   final SoilAnalysisViewModel vm;
-  final SoilSnapshot snap;
-  const AlertsSection({super.key, required this.vm, required this.snap});
+
+  const AlertsSection({super.key, required this.vm});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+    final latest = vm.latest;
+    if (latest == null) {
+      return const Center(child: Text('No data available'));
+    }
 
-    if (snap.nAlerts == 0) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-              color: isDark
-                  ? Colors.green.withAlpha(90)
-                  : Colors.green.shade300.withAlpha(100),
-              width: 1.5),
+    if (latest.nAlerts == 0 || latest.alerts.isEmpty) {
+      return Card(
+        color: Colors.green.shade50,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.green.shade300),
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.green.withAlpha(30),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.check_circle_outline_rounded,
-                  color: Colors.green, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                '✅ Soil is healthy — no active alerts.',
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 12),
+              Text(
+                'Soil conditions are healthy ✓',
                 style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'AbhayaLibre',
-                  color: colorScheme.onSurface,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
 
+    final sortedAlerts = List<SoilAlert>.from(latest.alerts);
+    sortedAlerts.sort((a, b) {
+      final sA = _severityScore(a.severity);
+      final sB = _severityScore(b.severity);
+      return sA.compareTo(sB); // high first (lower score)
+    });
+
     return Column(
-      children: snap.alerts
-          .map((a) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: _AlertCard(vm: vm, alert: a),
-      ))
-          .toList(),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Active Alerts',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'AbhayaLibre'),
+        ),
+        const SizedBox(height: 12),
+        ...sortedAlerts.map((alert) => _buildAlertTile(alert)),
+      ],
     );
   }
-}
 
-class _AlertCard extends StatelessWidget {
-  final SoilAnalysisViewModel vm;
-  final SoilAlert alert;
+  int _severityScore(String severity) {
+    switch (severity.toLowerCase()) {
+      case 'high': return 1;
+      case 'medium': return 2;
+      case 'low': return 3;
+      default: return 4;
+    }
+  }
 
-  const _AlertCard({required this.vm, required this.alert});
+  Widget _buildAlertTile(SoilAlert alert) {
+    Color color;
+    IconData icon;
+    switch (alert.severity.toLowerCase()) {
+      case 'high':
+        color = Colors.red;
+        icon = Icons.error;
+        break;
+      case 'medium':
+        color = Colors.orange;
+        icon = Icons.warning;
+        break;
+      case 'low':
+        color = Colors.amber;
+        icon = Icons.info;
+        break;
+      default:
+        color = Colors.grey;
+        icon = Icons.help_outline;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final isCritical = alert.severity.toLowerCase() == 'critical';
-    final sevColor = isCritical ? redColor : orangeColor;
-    final sevBg = isCritical
-        ? (isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE))
-        : (isDark ? const Color(0xFF3A2F1A) : const Color(0xFFFFF8E1));
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: sevColor.withAlpha(isDark ? 90 : 60), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 40 : 5),
-            blurRadius: isDark ? 8 : 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: color.withOpacity(0.5)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                isCritical
-                    ? Icons.error_outline_rounded
-                    : Icons.warning_amber_rounded,
-                color: sevColor,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  vm.formatParamName(alert.param),
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'AbhayaLibre',
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: sevBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: sevColor.withAlpha(80)),
-                ),
-                child: Text(
-                  alert.severity.toUpperCase(),
-                  style: TextStyle(
-                    color: sevColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
+      child: ListTile(
+        leading: Icon(icon, color: color, size: 32),
+        title: Text(
+          alert.parameter.toUpperCase(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(alert.message),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: color),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? colorScheme.onSurface.withAlpha(15)
-                      : const Color(0xFFF5F8F3),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${alert.value} ${alert.unit}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'AbhayaLibre',
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: sevColor.withAlpha(20),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  alert.status.toUpperCase(),
-                  style: TextStyle(
-                    color: sevColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            alert.recommendation,
+          child: Text(
+            alert.severity.toUpperCase(),
             style: TextStyle(
-              color: colorScheme.onSurface.withAlpha(180),
-              fontSize: 13,
-              height: 1.4,
-              fontWeight: FontWeight.w600,
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
             ),
           ),
-        ],
+        ),
       ),
     );
   }

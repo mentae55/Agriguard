@@ -1,107 +1,161 @@
-// lib/presentation/viewmodels/soil_analysis_viewmodel.dart
+// lib/features/home/presentation/view_model/soil_analysis_viewmodel.dart
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../data/model/soil_model.dart';
-import '../../domain/usecases/fetch_soil_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:agriguard_project/core/constants/app_colors.dart';
+import '../../data/model/soil_analysis_model.dart';
+import '../../data/datasources/remote/soil_analysis_service.dart';
+
+const int kSoilPollIntervalSeconds = 1800;
+
+enum SoilState { initial, loading, refreshing, loaded, error }
 
 class SoilAnalysisViewModel extends ChangeNotifier {
-  final FetchSoilDataUseCase _fetchSoilData;
+  final SoilAnalysisService _apiService;
 
-  SoilAnalysisViewModel({required FetchSoilDataUseCase fetchSoilData})
-      : _fetchSoilData = fetchSoilData;
+  SoilAnalysisViewModel({SoilAnalysisService? apiService})
+      : _apiService = apiService ?? SoilAnalysisService();
 
-  SoilSnapshot? latest;
-  final List<SoilSnapshot> history = [];
-  bool isLoading = true;
-  bool hasError = false;
+  SoilState state = SoilState.initial;
+  SoilReading? latest;
+  List<SoilReading> history = [];
   String errorMessage = '';
 
-  StreamSubscription<SoilSnapshot>? _sub;
+  Timer? _timer;
+  int secondsUntilNextUpdate = kSoilPollIntervalSeconds;
 
   Future<void> initialize() async {
+    state = SoilState.loading;
+    notifyListeners();
+
+    await _loadHistory();
+    await _fetchData();
+    _startTimer();
+  }
+
+  Future<void> refreshNow() async {
+    _timer?.cancel();
+    state = SoilState.refreshing;
+    notifyListeners();
+    await _fetchData();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    secondsUntilNextUpdate = kSoilPollIntervalSeconds;
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (secondsUntilNextUpdate > 0) {
+        secondsUntilNextUpdate--;
+        notifyListeners();
+      } else {
+        refreshNow();
+      }
+    });
+  }
+
+  Future<void> _fetchData() async {
     try {
-      _sub = _fetchSoilData().listen(
-            (snap) {
-          latest = snap;
-          history.add(snap);
-          if (history.length > 20) history.removeAt(0);
-          isLoading = false;
-          hasError = false;
-          notifyListeners();
-        },
-        onError: (e) {
-          isLoading = false;
-          hasError = true;
-          errorMessage = e.toString();
-          notifyListeners();
-        },
-      );
+      final snap = await _apiService.fetchLatest();
+      latest = snap;
+      history.add(snap);
+      if (history.length > 20) {
+        history.removeAt(0);
+      }
+      await _saveHistory();
+
+      state = SoilState.loaded;
+      errorMessage = '';
+      notifyListeners();
     } catch (e) {
-      isLoading = false;
-      hasError = true;
       errorMessage = e.toString();
+      if (latest != null) {
+        // Keep showing last successful data on background refresh error
+        state = SoilState.loaded;
+      } else {
+        state = SoilState.error;
+      }
       notifyListeners();
     }
   }
 
-  Color statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'healthy': return Colors.green.shade600;
-      case 'warning': return orangeColor;
-      case 'critical': return redColor;
-      default: return grayColor;
-    }
-  }
-
-  Color statusBg(String status, {bool isDark = false}) {
-    switch (status.toLowerCase()) {
-      case 'healthy': return isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4);
-      case 'warning': return isDark ? const Color(0xFF3A2F1A) : const Color(0xFFFFF8E1);
-      case 'critical': return isDark ? const Color(0xFF3A1A1A) : const Color(0xFFFFEBEE);
-      default: return isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5);
-    }
-  }
-
-  String formatTimestamp(String ts) {
-    if (ts.isEmpty) return '--';
-    try {
-      final dt = DateTime.parse(ts);
-      final h = dt.hour.toString().padLeft(2, '0');
-      final m = dt.minute.toString().padLeft(2, '0');
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return '${months[dt.month - 1]} ${dt.day}, $h:$m';
-    } catch (_) {
-      return ts;
-    }
-  }
-
-  String formatParamName(String raw) {
-    return raw
-        .replaceAll('_ppm', '')
-        .replaceAll('_pct', '')
-        .replaceAll('_c', '')
-        .replaceAll('_ds_m', '')
-        .replaceAll('_', ' ')
-        .trim()
-        .split(' ')
-        .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
-        .join(' ');
-  }
-
-  Color? alertColorForParam(String paramKey) {
-    if (latest == null) return null;
-    for (final a in latest!.alerts) {
-      if (a.param == paramKey) {
-        return a.severity.toLowerCase() == 'critical' ? redColor : orangeColor;
+  Future<void> _loadHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? historyJson = prefs.getString('soil_history');
+    if (historyJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(historyJson);
+        history = decoded.map((e) => SoilReading.fromJson(e)).toList();
+        if (history.isNotEmpty) {
+          latest = history.last;
+        }
+      } catch (e) {
+        // Ignore parse errors on load
       }
     }
-    return null;
+  }
+
+  Future<void> _saveHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final historyJson = jsonEncode(history.map((e) => e.toJson()).toList());
+    await prefs.setString('soil_history', historyJson);
   }
 
   @override
   void dispose() {
-    _sub?.cancel();
+    _timer?.cancel();
     super.dispose();
+  }
+
+  Color getGaugeColor(String param, double value) {
+    if (latest == null) return Colors.grey;
+
+    final alert = latest!.alerts
+        .where((a) => a.parameter.toLowerCase() == param.toLowerCase())
+        .firstOrNull;
+        
+    if (alert != null) {
+      switch (alert.severity.toLowerCase()) {
+        case 'low':
+          return Colors.amber;
+        case 'medium':
+          return Colors.orange;
+        case 'high':
+          return Colors.red;
+        default:
+          return Colors.orange;
+      }
+    }
+
+    bool isSafe = true;
+    switch (param.toLowerCase()) {
+      case 'moisture':
+        isSafe = value >= 40 && value <= 70;
+        break;
+      case 'ph':
+        isSafe = value >= 5.5 && value <= 7.5;
+        break;
+      case 'nitrogen':
+        isSafe = value >= 20 && value <= 60;
+        break;
+      case 'phosphorus':
+        isSafe = value >= 10 && value <= 40;
+        break;
+      case 'potassium':
+        isSafe = value >= 100 && value <= 300;
+        break;
+      case 'temperature':
+        isSafe = value >= 15 && value <= 30;
+        break;
+      case 'ec':
+        isSafe = value >= 0.2 && value <= 1.5;
+        break;
+      case 'organic_matter':
+        isSafe = value >= 2 && value <= 5;
+        break;
+    }
+
+    return isSafe ? Colors.green : Colors.red;
   }
 }

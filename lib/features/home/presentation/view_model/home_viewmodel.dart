@@ -1,39 +1,52 @@
-// lib/presentation/viewmodels/home_viewmodel.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../data/model/soil_model.dart';
-import '../../domain/usecases/fetch_soil_data.dart';
+import '../../data/datasources/remote/soil_analysis_service.dart';
+import '../../../alerts/models/alert_model.dart';
+import '../../../alerts/repositories/alerts_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final FetchSoilDataUseCase _fetchSoilData;
+  final SoilAnalysisService _soilService;
+  final AlertsRepository _alertsRepo;
   final String serial;
 
   HomeViewModel({
-    required FetchSoilDataUseCase fetchSoilData,
+    SoilAnalysisService? soilService,
+    AlertsRepository? alertsRepo,
     required this.serial,
-  }) : _fetchSoilData = fetchSoilData;
+  })  : _soilService = soilService ?? SoilAnalysisService(),
+        _alertsRepo = alertsRepo ?? AlertsRepository();
 
   // State
   double? soilTemperature;
   double? soilMoisture;
   String? soilStatus;
-  List<SoilAlert> liveAlerts = [];
+  List<GeneratedAlert> liveAlerts = [];
   bool dataLoaded = false;
   int selectedNavIndex = 2;
 
-  StreamSubscription<SoilSnapshot>? _sub;
+  Timer? _timer;
 
   void initialize() {
-    _sub = _fetchSoilData().listen(_onSoilData);
+    _fetchData();
+    _timer = Timer.periodic(const Duration(minutes: 5), (_) => _fetchData());
   }
 
-  void _onSoilData(SoilSnapshot snap) {
-    soilTemperature = snap.reading.temperatureC;
-    soilMoisture = snap.reading.moisturePct;
-    soilStatus = snap.soilStatus;
-    liveAlerts = SoilAlertEngine.evaluate(snap);
-    dataLoaded = true;
+  Future<void> _fetchData() async {
+    try {
+      final soilReading = await _soilService.fetchLatest();
+      soilTemperature = soilReading.readings['temperature']?.value ?? 0.0;
+      soilMoisture = soilReading.readings['moisture']?.value ?? 0.0;
+      soilStatus = soilReading.nAlerts == 0 ? 'Healthy' : 'Needs Attention';
+      dataLoaded = true;
+    } catch (_) {
+      // Keep old data if fetch fails
+    }
+
+    try {
+      liveAlerts = await _alertsRepo.fetchAndEvaluateAlerts();
+    } catch (_) {}
+
     notifyListeners();
   }
 
@@ -43,13 +56,13 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   int get criticalCount =>
-      liveAlerts.where((a) => a.severity == 'critical').length;
+      liveAlerts.where((a) => a.severity == AlertSeverity.critical).length;
 
   int get totalAlerts =>
-      liveAlerts.where((a) => a.severity != 'info').length;
+      liveAlerts.where((a) => a.severity != AlertSeverity.info).length;
 
-  SoilAlert? get topAlert {
-    final nonInfo = liveAlerts.where((a) => a.severity != 'info').toList();
+  GeneratedAlert? get topAlert {
+    final nonInfo = liveAlerts.where((a) => a.severity != AlertSeverity.info).toList();
     return nonInfo.isEmpty ? null : nonInfo.first;
   }
 
@@ -75,13 +88,7 @@ class HomeViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    _sub?.cancel();
+    _timer?.cancel();
     super.dispose();
-  }
-}
-
-class SoilAlertEngine {
-  static List<SoilAlert> evaluate(SoilSnapshot snap) {
-    return snap.alerts;
   }
 }
