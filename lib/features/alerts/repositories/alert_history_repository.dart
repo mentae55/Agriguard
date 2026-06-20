@@ -51,6 +51,19 @@ class AlertHistoryRepository {
     }
   }
 
+  // NEW: mark an alert as viewed without touching its resolution state
+  Future<void> markAsViewed(String historyId, DateTime viewedAt) async {
+    final history = await fetchHistory();
+    final idx = history.indexWhere((a) => a.historyId == historyId);
+    if (idx != -1 && !history[idx].isViewed) {
+      history[idx] = history[idx].copyWith(
+        isViewed: true,
+        viewedAt: viewedAt,
+      );
+      await saveHistory(history);
+    }
+  }
+
   Future<void> clearHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);

@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/alert_model.dart';
@@ -21,21 +20,18 @@ class AlertsViewModel extends ChangeNotifier {
   final AlertHistoryRepository _historyRepository;
   Timer? _pollTimer;
 
-  // State
   List<GeneratedAlert> _alerts = [];
   List<GeneratedAlert> _history = [];
   AlertsViewState _state = AlertsViewState.loading;
   String _errorMessage = '';
   DateTime? _lastUpdated;
 
-  // Getters
   List<GeneratedAlert> get alerts => List.unmodifiable(_alerts);
   List<GeneratedAlert> get history => List.unmodifiable(_history);
   AlertsViewState get state => _state;
   String get errorMessage => _errorMessage;
   DateTime? get lastUpdated => _lastUpdated;
 
-  // Computed
   List<GeneratedAlert> get criticalAlerts =>
       _alerts.where((a) => a.severity == AlertSeverity.critical).toList();
 
@@ -68,6 +64,23 @@ class AlertsViewModel extends ChangeNotifier {
     await _fetchData();
   }
 
+  // NEW: dismiss an alert from the active list once the user has viewed it,
+  // without marking the underlying condition as resolved.
+  Future<void> markAlertAsViewed(GeneratedAlert alert) async {
+    if (alert.historyId.isEmpty || alert.isViewed) return;
+
+    final viewedAt = DateTime.now();
+    await _historyRepository.markAsViewed(alert.historyId, viewedAt);
+
+    final idx = _history.indexWhere((a) => a.historyId == alert.historyId);
+    if (idx != -1) {
+      _history[idx] = _history[idx].copyWith(isViewed: true, viewedAt: viewedAt);
+    }
+
+    _recomputeActiveAlerts();
+    notifyListeners();
+  }
+
   Future<void> clearAlertHistory() async {
     await _historyRepository.clearHistory();
     _history = [];
@@ -91,38 +104,34 @@ class AlertsViewModel extends ChangeNotifier {
   Future<void> _fetchData() async {
     try {
       final rawAlerts = await _repository.fetchAndEvaluateAlerts();
-      
-      // Load history from storage
+
       var historyList = await _historyRepository.fetchHistory();
-      
-      // Filter out healthy alert for lifecycle state machine
+
       final newIssues = rawAlerts.where((a) => a.id != 'healthy').toList();
       final activeAlerts = historyList.where((a) => !a.isResolved).toList();
-      
+
       final allParams = <String>{
         ...newIssues.map((a) => a.paramName),
         ...activeAlerts.map((a) => a.paramName),
       };
-      
+
       for (final paramName in allParams) {
         final currentIssue = newIssues.firstWhereOrNull((a) => a.paramName == paramName);
         final activeIssue = activeAlerts.firstWhereOrNull((a) => a.paramName == paramName);
-        
+
         if (activeIssue == null && currentIssue != null) {
-          // A new issue appears
           final newAlert = currentIssue.copyWith(
             historyId: 'hist_${DateTime.now().millisecondsSinceEpoch}_${currentIssue.id}',
             isResolved: false,
           );
           await _historyRepository.saveAlert(newAlert);
         } else if (activeIssue != null && currentIssue == null) {
-          // Resolve alerts automatically when conditions return to normal
           await _historyRepository.resolveAlert(activeIssue.historyId, DateTime.now());
         } else if (activeIssue != null && currentIssue != null) {
           final isEscalated = activeIssue.severity == AlertSeverity.warning &&
               currentIssue.severity == AlertSeverity.critical;
           if (isEscalated) {
-            // A warning becomes critical
+            // Escalation always resurfaces as a fresh, unviewed alert
             await _historyRepository.resolveAlert(activeIssue.historyId, DateTime.now());
             final newAlert = currentIssue.copyWith(
               historyId: 'hist_${DateTime.now().millisecondsSinceEpoch}_${currentIssue.id}',
@@ -130,7 +139,6 @@ class AlertsViewModel extends ChangeNotifier {
             );
             await _historyRepository.saveAlert(newAlert);
           } else {
-            // Cooldown check (12-Hour)
             final timeDiff = DateTime.now().difference(activeIssue.createdAt);
             if (timeDiff.inHours >= 12) {
               await _historyRepository.resolveAlert(activeIssue.historyId, DateTime.now());
@@ -140,7 +148,7 @@ class AlertsViewModel extends ChangeNotifier {
               );
               await _historyRepository.saveAlert(newAlert);
             } else {
-              // Update existing active alert
+              // Updates an already-viewed alert in place — it stays viewed/hidden
               final updatedAlert = activeIssue.copyWith(
                 value: currentIssue.value,
                 description: currentIssue.description,
@@ -153,19 +161,12 @@ class AlertsViewModel extends ChangeNotifier {
           }
         }
       }
-      
-      // Reload history and state
+
       historyList = await _historyRepository.fetchHistory();
       _history = historyList;
-      
-      final active = historyList.where((a) => !a.isResolved).toList();
-      if (active.isEmpty) {
-        final healthyAlert = rawAlerts.firstWhereOrNull((a) => a.id == 'healthy') ?? rawAlerts.first;
-        _alerts = [healthyAlert];
-      } else {
-        _alerts = active;
-      }
-      
+
+      _recomputeActiveAlerts();
+
       _lastUpdated = DateTime.now();
       _setState(AlertsViewState.loaded);
     } catch (e) {
@@ -173,6 +174,29 @@ class AlertsViewModel extends ChangeNotifier {
       if (_state != AlertsViewState.loaded) {
         _setState(AlertsViewState.error);
       }
+    }
+  }
+
+  // NEW: active list now excludes resolved AND viewed alerts
+  void _recomputeActiveAlerts() {
+    final active = _history.where((a) => !a.isResolved && !a.isViewed).toList();
+    if (active.isEmpty) {
+      _alerts = [
+        GeneratedAlert(
+          id: 'healthy',
+          title: 'All Systems Healthy',
+          description: 'All soil parameters are within optimal ranges. Your field is in excellent condition.',
+          severity: AlertSeverity.info,
+          paramName: 'All Parameters',
+          value: 0,
+          unit: '',
+          recommendation: 'Continue current irrigation and fertilisation schedule. Next recommended scan in 24 hours.',
+          icon: Icons.check_circle_rounded,
+          timestamp: DateTime.now(),
+        )
+      ];
+    } else {
+      _alerts = active;
     }
   }
 

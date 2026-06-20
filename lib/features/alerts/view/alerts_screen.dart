@@ -587,6 +587,9 @@ class _AlertCard extends StatelessWidget {
   }
 
   void _navigateToDetails(BuildContext context) {
+    if (alert.historyId.isNotEmpty && !alert.isViewed) {
+      context.read<AlertsViewModel>().markAlertAsViewed(alert);
+    }
     Navigator.push(
       context,
       MaterialPageRoute(

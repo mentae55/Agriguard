@@ -2,7 +2,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../view_model/soil_analysis_viewmodel.dart';
-import 'package:agriguard_project/features/home/data/model/soil_analysis_model.dart';
 
 class GaugesGrid extends StatelessWidget {
   final SoilAnalysisViewModel vm;
@@ -11,9 +10,9 @@ class GaugesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final params = [
+    const params = [
       'moisture', 'ph', 'nitrogen', 'phosphorus',
-      'potassium', 'temperature', 'ec', 'organic_matter'
+      'potassium', 'temperature', 'ec', 'organic_matter',
     ];
 
     return GridView.builder(
@@ -26,9 +25,7 @@ class GaugesGrid extends StatelessWidget {
         mainAxisSpacing: 16,
       ),
       itemCount: params.length,
-      itemBuilder: (context, index) {
-        return GaugeCard(param: params[index], vm: vm);
-      },
+      itemBuilder: (context, index) => GaugeCard(param: params[index], vm: vm),
     );
   }
 }
@@ -39,21 +36,41 @@ class GaugeCard extends StatelessWidget {
 
   const GaugeCard({super.key, required this.param, required this.vm});
 
+  /// Maps a sensor value to a 0–1 fill proportion using a display range that is
+  /// slightly wider than the safe range so the arc can show both under- and
+  /// over-range visually.
+  double _fillProportion(double value) {
+    final range = SoilAnalysisViewModel.safeRanges[param];
+    if (range == null) return 0.5;
+
+    final safeMin = range[0];
+    final safeMax = range[1];
+    final span = safeMax - safeMin;
+
+    // Display window: safe range ± 30 % of the span
+    final displayMin = safeMin - span * 0.3;
+    final displayMax = safeMax + span * 0.3;
+    final displaySpan = displayMax - displayMin;
+
+    return ((value - displayMin) / displaySpan).clamp(0.05, 0.95);
+  }
+
   @override
   Widget build(BuildContext context) {
     final latest = vm.latest;
     double? value;
     String unit = '';
-    
+
     if (latest != null && latest.readings.containsKey(param)) {
       value = latest.readings[param]!.value;
       unit = latest.readings[param]!.unit;
     }
 
     final color = value != null ? vm.getGaugeColor(param, value) : Colors.grey;
+    final fill = value != null ? _fillProportion(value) : 0.0;
 
-    String label = param.replaceAll('_', ' ').toUpperCase();
-    
+    final label = param.replaceAll('_', ' ').toUpperCase();
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -64,7 +81,7 @@ class GaugeCard extends StatelessWidget {
             color: color.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       padding: const EdgeInsets.all(12),
@@ -83,11 +100,12 @@ class GaugeCard extends StatelessWidget {
             height: 80,
             width: 80,
             child: CustomPaint(
-              painter: _ArcGaugePainter(color: color, value: value),
+              painter: _ArcGaugePainter(color: color, fillProportion: fill),
               child: Center(
                 child: Text(
                   value != null ? value.toStringAsFixed(1) : '--',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ),
             ),
@@ -105,15 +123,15 @@ class GaugeCard extends StatelessWidget {
 
 class _ArcGaugePainter extends CustomPainter {
   final Color color;
-  final double? value;
+  final double fillProportion; // 0.0 – 1.0
 
-  _ArcGaugePainter({required this.color, this.value});
+  _ArcGaugePainter({required this.color, required this.fillProportion});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = min(size.width / 2, size.height / 2);
-    
+
     final bgPaint = Paint()
       ..color = Colors.grey.withOpacity(0.2)
       ..style = PaintingStyle.stroke
@@ -137,22 +155,16 @@ class _ArcGaugePainter extends CustomPainter {
       bgPaint,
     );
 
-    if (value != null) {
-      // Dummy visual fill proportion just for the UI
-      // In a real app we'd map value min-max to 0-1
-      final fillProportion = 0.6; // hardcoded for visual or map to 0.1-0.9 based on safe ranges
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepAngle * fillProportion,
-        false,
-        valuePaint,
-      );
-    }
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle * fillProportion,
+      false,
+      valuePaint,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant _ArcGaugePainter oldDelegate) {
-    return oldDelegate.color != color || oldDelegate.value != value;
-  }
+  bool shouldRepaint(covariant _ArcGaugePainter old) =>
+      old.color != color || old.fillProportion != fillProportion;
 }

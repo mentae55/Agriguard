@@ -602,7 +602,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hello, ${name.isNotEmpty ? name.split(' ').first : 'Farmer'}! ðŸ‘‹',
+                  'Hello, ${name.isNotEmpty ? name.split(' ').first : 'Farmer'}!',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,

@@ -13,11 +13,13 @@ class TrendsSection extends StatefulWidget {
   State<TrendsSection> createState() => _TrendsSectionState();
 }
 
-class _TrendsSectionState extends State<TrendsSection> with SingleTickerProviderStateMixin {
+class _TrendsSectionState extends State<TrendsSection>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _params = [
+
+  static const List<String> _params = [
     'moisture', 'ph', 'nitrogen', 'phosphorus',
-    'potassium', 'temperature', 'ec', 'organic_matter'
+    'potassium', 'temperature', 'ec', 'organic_matter',
   ];
 
   @override
@@ -65,7 +67,9 @@ class _TrendsSectionState extends State<TrendsSection> with SingleTickerProvider
               labelColor: Theme.of(context).primaryColor,
               unselectedLabelColor: Colors.grey,
               indicatorColor: Theme.of(context).primaryColor,
-              tabs: _params.map((p) => Tab(text: p.replaceAll('_', ' ').toUpperCase())).toList(),
+              tabs: _params
+                  .map((p) => Tab(text: p.replaceAll('_', ' ').toUpperCase()))
+                  .toList(),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -83,25 +87,14 @@ class _TrendsSectionState extends State<TrendsSection> with SingleTickerProvider
 
   Widget _buildChart(String param) {
     final history = widget.vm.history;
-    
-    // safe ranges map
-    final ranges = {
-      'moisture': [40.0, 70.0],
-      'ph': [5.5, 7.5],
-      'nitrogen': [20.0, 60.0],
-      'phosphorus': [10.0, 40.0],
-      'potassium': [100.0, 300.0],
-      'temperature': [15.0, 30.0],
-      'ec': [0.2, 1.5],
-      'organic_matter': [2.0, 5.0],
-    };
-    
-    final range = ranges[param]!;
-    
+
+    // Spec-correct safe ranges
+    final range = SoilAnalysisViewModel.safeRanges[param] ?? [0.0, 100.0];
+
     final spots = <FlSpot>[];
     double minY = range[0];
     double maxY = range[1];
-    
+
     for (int i = 0; i < history.length; i++) {
       final reading = history[i];
       if (reading.readings.containsKey(param)) {
@@ -117,7 +110,8 @@ class _TrendsSectionState extends State<TrendsSection> with SingleTickerProvider
     minY -= yPadding;
     maxY += yPadding;
 
-    if (minY < 0 && param != 'temperature') minY = 0; // Prevent negative unless temp
+    // Prevent negative unless temperature
+    if (minY < 0 && param != 'temperature') minY = 0;
 
     return Padding(
       padding: const EdgeInsets.only(right: 24.0, left: 8.0),
@@ -131,31 +125,35 @@ class _TrendsSectionState extends State<TrendsSection> with SingleTickerProvider
             horizontalInterval: (maxY - minY) / 4,
           ),
           titlesData: FlTitlesData(
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  final intIndex = value.toInt();
-                  if (intIndex >= 0 && intIndex < history.length) {
-                    final ts = history[intIndex].timestamp;
+                  final i = value.toInt();
+                  if (i >= 0 && i < history.length) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
-                        DateFormat('HH:mm').format(ts),
-                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        DateFormat('HH:mm').format(history[i].timestamp),
+                        style: const TextStyle(
+                            fontSize: 10, color: Colors.grey),
                       ),
                     );
                   }
                   return const SizedBox();
                 },
-                interval: (history.length / 4).ceil().toDouble().clamp(1, 100),
+                interval:
+                (history.length / 4).ceil().toDouble().clamp(1, 100),
                 reservedSize: 30,
               ),
             ),
           ),
           borderData: FlBorderData(show: false),
+          // Dashed lines showing the safe range boundaries
           extraLinesData: ExtraLinesData(
             horizontalLines: [
               HorizontalLine(

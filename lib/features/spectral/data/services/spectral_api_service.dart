@@ -4,7 +4,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/spectral_reading.dart';
+import '../models/spectral_prediction.dart';
 import '../../../../core/constants/app_constants.dart';
 
 class SpectralApiService {
@@ -63,19 +63,18 @@ class SpectralApiService {
   }
 
   /// GET /spectral/stream/latest
-  Future<SpectralReading> fetchLatest() async {
+  Future<SpectralPrediction> fetchLatest() async {
     final res = await _requestWithRetry(
-      () => _client
+          () => _client
           .get(Uri.parse('$_baseUrl/spectral/stream/latest'))
           .timeout(_defaultTimeout),
       maxRetries: 3,
     );
-
     if (res.statusCode == 200) {
       try {
         final body = jsonDecode(res.body);
         if (body is Map<String, dynamic>) {
-          return SpectralReading.fromJson(body);
+          return SpectralPrediction.fromJson(body);
         }
         throw const FormatException('Unexpected JSON root format');
       } catch (e) {

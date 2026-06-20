@@ -41,7 +41,7 @@ class NoWifiScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              CircularProgressIndicator(color: colorScheme.onPrimary), // Visual cue it's waiting
+              Center(child: CircularProgressIndicator(color: colorScheme.onPrimary)), // Visual cue it's waiting
             ],
           ),
         ),

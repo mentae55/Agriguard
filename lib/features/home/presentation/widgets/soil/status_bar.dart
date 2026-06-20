@@ -47,7 +47,7 @@ class SoilStatusBar extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       'Last updated: $lastUpdatedStr',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -71,13 +71,25 @@ class SoilStatusBar extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Field: ${latest.fieldId} | Device: ${latest.deviceId}',
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                  Text(
-                    'Next update in $nextUpdateMin min',
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        maxLines: 3,
+                        'Field: ${latest.fieldId}',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      Text(
+                        maxLines: 3,
+                        'Device: ${latest.deviceId}',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      Text(
+                        maxLines:3 ,
+                        'Next update in $nextUpdateMin min',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ],
               ),

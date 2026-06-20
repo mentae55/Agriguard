@@ -3,12 +3,12 @@
 // ============================================================
 import 'dart:async';
 import 'dart:convert';
+import 'package:agriguard_project/features/spectral/data/models/spectral_prediction.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../data/models/spectral_reading.dart';
 import '../data/services/spectral_api_service.dart';
 
-const Duration kSpectralPollInterval = Duration(minutes: 30);
+const Duration kSpectralPollInterval = Duration(seconds:  30);
 
 enum SpectralState { idle, loading, loaded, error }
 
@@ -20,15 +20,15 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
   }) : _api = api ?? SpectralApiService();
 
   SpectralState _state = SpectralState.idle;
-  SpectralReading? _reading;
+  SpectralPrediction? _reading;
   String _errorMessage = '';
   Timer? _pollingTimer;
   bool _disposed = false;
   
-  List<SpectralReading> history = [];
+  List<SpectralPrediction> history = [];
 
   SpectralState get state => _state;
-  SpectralReading? get reading => _reading;
+  SpectralPrediction? get reading => _reading;
   String get errorMessage => _errorMessage;
   bool get isLoading => _state == SpectralState.loading;
   bool get hasData => _reading != null;
@@ -110,7 +110,7 @@ class SpectralViewModel extends ChangeNotifier with WidgetsBindingObserver {
     if (historyJson != null) {
       try {
         final List<dynamic> decoded = jsonDecode(historyJson);
-        history = decoded.map((e) => SpectralReading.fromJson(e)).toList();
+        history = decoded.map((e) => SpectralPrediction.fromJson(e)).toList();
         if (history.isNotEmpty) {
           _reading = history.last;
         }

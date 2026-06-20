@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../data/datasources/remote/soil_analysis_service.dart';
 import '../../../alerts/models/alert_model.dart';
-import '../../../alerts/repositories/alerts_repository.dart';
+import '../../../alerts/repositories/alert_history_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final SoilAnalysisService _soilService;
-  final AlertsRepository _alertsRepo;
+  final AlertHistoryRepository _historyRepository;
   final String serial;
 
   HomeViewModel({
     SoilAnalysisService? soilService,
-    AlertsRepository? alertsRepo,
+    AlertHistoryRepository? historyRepository,
     required this.serial,
   })  : _soilService = soilService ?? SoilAnalysisService(),
-        _alertsRepo = alertsRepo ?? AlertsRepository();
+        _historyRepository = historyRepository ?? AlertHistoryRepository();
 
   // State
   double? soilTemperature;
@@ -44,9 +44,23 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     try {
-      liveAlerts = await _alertsRepo.fetchAndEvaluateAlerts();
+      // Same source of truth as AlertsViewModel: active + not-yet-viewed alerts
+      final history = await _historyRepository.fetchHistory();
+      liveAlerts = history.where((a) => !a.isResolved && !a.isViewed).toList();
     } catch (_) {}
 
+    notifyListeners();
+  }
+
+  // NEW: dismiss an alert from the home banner (and from the Alerts tab)
+  // once the user has opened it, without marking it as resolved.
+  Future<void> markAlertAsViewed(GeneratedAlert alert) async {
+    if (alert.historyId.isEmpty || alert.isViewed) return;
+
+    final viewedAt = DateTime.now();
+    await _historyRepository.markAsViewed(alert.historyId, viewedAt);
+
+    liveAlerts = liveAlerts.where((a) => a.historyId != alert.historyId).toList();
     notifyListeners();
   }
 

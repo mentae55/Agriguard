@@ -44,8 +44,8 @@ class AgriGuardNavBar extends StatelessWidget {
               ),
               _NavItem(
                 index: 1,
-                outlined: Icons.warning_amber_outlined,
-                solid: Icons.warning_outlined,
+                outlined: Icons.notifications_none,
+                solid: Icons.notifications,
                 badge: vm.criticalCount > 0 ? '${vm.criticalCount}' : null,
               ),
               _FloatingHomeItem(index: 2),

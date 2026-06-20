@@ -21,6 +21,10 @@ class GeneratedAlert {
   final bool isResolved;
   final String historyId;
 
+  // NEW: viewed state — independent from resolution
+  final bool isViewed;
+  final DateTime? viewedAt;
+
   const GeneratedAlert({
     required this.id,
     required this.title,
@@ -37,6 +41,8 @@ class GeneratedAlert {
     this.resolvedAt,
     this.isResolved = false,
     this.historyId = '',
+    this.isViewed = false,
+    this.viewedAt,
   })  : createdAt = createdAt ?? timestamp,
         updatedAt = updatedAt ?? timestamp;
 
@@ -56,6 +62,8 @@ class GeneratedAlert {
     DateTime? resolvedAt,
     bool? isResolved,
     String? historyId,
+    bool? isViewed,
+    DateTime? viewedAt,
   }) {
     return GeneratedAlert(
       id: id ?? this.id,
@@ -73,6 +81,8 @@ class GeneratedAlert {
       resolvedAt: resolvedAt ?? this.resolvedAt,
       isResolved: isResolved ?? this.isResolved,
       historyId: historyId ?? this.historyId,
+      isViewed: isViewed ?? this.isViewed,
+      viewedAt: viewedAt ?? this.viewedAt,
     );
   }
 
@@ -95,6 +105,8 @@ class GeneratedAlert {
       'resolvedAt': resolvedAt?.toIso8601String(),
       'isResolved': isResolved,
       'historyId': historyId,
+      'isViewed': isViewed,
+      'viewedAt': viewedAt?.toIso8601String(),
     };
   }
 
@@ -104,7 +116,7 @@ class GeneratedAlert {
       title: json['title'] as String,
       description: json['description'] as String,
       severity: AlertSeverity.values.firstWhere(
-        (e) => e.name == json['severity'],
+            (e) => e.name == json['severity'],
         orElse: () => AlertSeverity.warning,
       ),
       paramName: json['paramName'] as String,
@@ -124,6 +136,10 @@ class GeneratedAlert {
           : null,
       isResolved: json['isResolved'] as bool? ?? false,
       historyId: json['historyId'] as String? ?? '',
+      isViewed: json['isViewed'] as bool? ?? false,
+      viewedAt: json['viewedAt'] != null
+          ? DateTime.parse(json['viewedAt'] as String)
+          : null,
     );
   }
 

@@ -60,9 +60,7 @@ class SoilAnalysisViewModel extends ChangeNotifier {
       final snap = await _apiService.fetchLatest();
       latest = snap;
       history.add(snap);
-      if (history.length > 20) {
-        history.removeAt(0);
-      }
+      if (history.length > 20) history.removeAt(0);
       await _saveHistory();
 
       state = SoilState.loaded;
@@ -71,7 +69,6 @@ class SoilAnalysisViewModel extends ChangeNotifier {
     } catch (e) {
       errorMessage = e.toString();
       if (latest != null) {
-        // Keep showing last successful data on background refresh error
         state = SoilState.loaded;
       } else {
         state = SoilState.error;
@@ -87,12 +84,8 @@ class SoilAnalysisViewModel extends ChangeNotifier {
       try {
         final List<dynamic> decoded = jsonDecode(historyJson);
         history = decoded.map((e) => SoilReading.fromJson(e)).toList();
-        if (history.isNotEmpty) {
-          latest = history.last;
-        }
-      } catch (e) {
-        // Ignore parse errors on load
-      }
+        if (history.isNotEmpty) latest = history.last;
+      } catch (_) {}
     }
   }
 
@@ -108,54 +101,57 @@ class SoilAnalysisViewModel extends ChangeNotifier {
     super.dispose();
   }
 
+  // Safe ranges matching the API spec exactly
+  static const Map<String, List<double>> safeRanges = {
+    'moisture':       [15.0, 50.0],
+    'ph':             [5.5,  7.8],
+    'nitrogen':       [10.0, 70.0],
+    'phosphorus':     [5.0,  60.0],
+    'potassium':      [50.0, 300.0],
+    'temperature':    [8.0,  38.0],
+    'ec':             [0.3,  3.0],
+    'organic_matter': [1.0,  6.5],
+  };
+
+  /// Returns the gauge color for a parameter.
+  /// Priority: backend alert severity → fallback to safe-range check.
   Color getGaugeColor(String param, double value) {
     if (latest == null) return Colors.grey;
 
-    final alert = latest!.alerts
-        .where((a) => a.parameter.toLowerCase() == param.toLowerCase())
-        .firstOrNull;
-        
+    // The alert `param` field uses the raw API key (e.g. "moisture_pct"),
+    // so we normalise both sides for matching.
+    final alert = latest!.alerts.where((a) {
+      final alertKey = _normaliseParam(a.param);
+      return alertKey == param;
+    }).firstOrNull;
+
     if (alert != null) {
       switch (alert.severity.toLowerCase()) {
-        case 'low':
-          return Colors.amber;
-        case 'medium':
-          return Colors.orange;
-        case 'high':
+        case 'critical':
           return Colors.red;
+        case 'warning':
+          return Colors.amber;
         default:
           return Colors.orange;
       }
     }
 
-    bool isSafe = true;
-    switch (param.toLowerCase()) {
-      case 'moisture':
-        isSafe = value >= 40 && value <= 70;
-        break;
-      case 'ph':
-        isSafe = value >= 5.5 && value <= 7.5;
-        break;
-      case 'nitrogen':
-        isSafe = value >= 20 && value <= 60;
-        break;
-      case 'phosphorus':
-        isSafe = value >= 10 && value <= 40;
-        break;
-      case 'potassium':
-        isSafe = value >= 100 && value <= 300;
-        break;
-      case 'temperature':
-        isSafe = value >= 15 && value <= 30;
-        break;
-      case 'ec':
-        isSafe = value >= 0.2 && value <= 1.5;
-        break;
-      case 'organic_matter':
-        isSafe = value >= 2 && value <= 5;
-        break;
-    }
-
+    // Fallback: check against spec safe ranges
+    final range = safeRanges[param];
+    if (range == null) return Colors.grey;
+    final isSafe = value >= range[0] && value <= range[1];
     return isSafe ? Colors.green : Colors.red;
+  }
+
+  /// Normalises API param names (e.g. "moisture_pct" → "moisture",
+  /// "nitrogen_ppm" → "nitrogen", "ec_ds_m" → "ec") to match the display keys
+  /// used in [readings] and [safeRanges].
+  static String _normaliseParam(String raw) {
+    return raw
+        .replaceAll('_pct', '')
+        .replaceAll('_ppm', '')
+        .replaceAll('_c', '')
+        .replaceAll('_ds_m', '')
+        .replaceAll('_matter', '_matter'); // keep organic_matter as-is
   }
 }

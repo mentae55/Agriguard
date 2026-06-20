@@ -14,6 +14,15 @@ class SoilAnalysisService {
       : _client = client ?? http.Client(),
         _baseUrl = AppConstants.baseUrl;
 
+  Future<void> startStream({int intervalSeconds = 1800}) async {
+    final url = Uri.parse('$_baseUrl/soil/stream/start?interval_seconds=$intervalSeconds');
+    await http.post(url);
+  }
+
+  Future<void> stopStream() async {
+    final url = Uri.parse('$_baseUrl/soil/stream/stop');
+    await http.post(url);
+  }
   Future<SoilReading> fetchLatest() async {
     final res = await _client
         .get(Uri.parse('$_baseUrl/soil/stream/latest'))

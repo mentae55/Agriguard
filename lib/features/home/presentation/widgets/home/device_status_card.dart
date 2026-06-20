@@ -16,7 +16,7 @@ class DeviceStatusCard extends StatelessWidget {
     final statusLabel = vm.soilStatus != null
         ? vm.soilStatus![0].toUpperCase() + vm.soilStatus!.substring(1)
         : 'Loading…';
-    final statusColor = vm.soilStatus == null
+    final statusColor = vm.soilStatus != null
         ? grayColor
         : vm.soilStatus == 'healthy'
         ? theme.primaryColor

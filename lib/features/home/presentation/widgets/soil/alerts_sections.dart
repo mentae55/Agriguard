@@ -43,19 +43,19 @@ class AlertsSection extends StatelessWidget {
       );
     }
 
-    final sortedAlerts = List<SoilAlert>.from(latest.alerts);
-    sortedAlerts.sort((a, b) {
-      final sA = _severityScore(a.severity);
-      final sB = _severityScore(b.severity);
-      return sA.compareTo(sB); // high first (lower score)
-    });
+    // Sort: critical first, then warning
+    final sortedAlerts = List<SoilAlert>.from(latest.alerts)
+      ..sort((a, b) => _severityScore(a.severity).compareTo(_severityScore(b.severity)));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text(
           'Active Alerts',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'AbhayaLibre'),
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'AbhayaLibre'),
         ),
         const SizedBox(height: 12),
         ...sortedAlerts.map((alert) => _buildAlertTile(alert)),
@@ -65,33 +65,36 @@ class AlertsSection extends StatelessWidget {
 
   int _severityScore(String severity) {
     switch (severity.toLowerCase()) {
-      case 'high': return 1;
-      case 'medium': return 2;
-      case 'low': return 3;
-      default: return 4;
+      case 'critical': return 1;
+      case 'warning':  return 2;
+      default:         return 3;
     }
   }
 
   Widget _buildAlertTile(SoilAlert alert) {
     Color color;
     IconData icon;
+
     switch (alert.severity.toLowerCase()) {
-      case 'high':
+      case 'critical':
         color = Colors.red;
         icon = Icons.error;
         break;
-      case 'medium':
-        color = Colors.orange;
-        icon = Icons.warning;
-        break;
-      case 'low':
-        color = Colors.amber;
-        icon = Icons.info;
-        break;
+      case 'warning':
       default:
-        color = Colors.grey;
-        icon = Icons.help_outline;
+        color = Colors.amber;
+        icon = Icons.warning_amber_rounded;
+        break;
     }
+
+    // Human-readable parameter label: "moisture_pct" → "Moisture"
+    final label = alert.param
+        .replaceAll('_pct', '')
+        .replaceAll('_ppm', '')
+        .replaceAll('_c', '')
+        .replaceAll('_ds_m', '')
+        .replaceAll('_', ' ')
+        .toUpperCase();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -100,28 +103,75 @@ class AlertsSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: color.withOpacity(0.5)),
       ),
-      child: ListTile(
-        leading: Icon(icon, color: color, size: 32),
-        title: Text(
-          alert.parameter.toUpperCase(),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(alert.message),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: color),
-          ),
-          child: Text(
-            alert.severity.toUpperCase(),
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 24),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
+                // Severity badge
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: color),
+                  ),
+                  child: Text(
+                    alert.severity.toUpperCase(),
+                    style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10),
+                  ),
+                ),
+              ],
             ),
-          ),
+            const SizedBox(height: 8),
+            // Current value + status
+            Row(
+              children: [
+                Text(
+                  '${alert.value} ${alert.unit}',
+                  style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    alert.status.toUpperCase(),
+                    style: TextStyle(
+                        color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            // Recommendation text
+            Text(
+              alert.recommendation,
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+          ],
         ),
       ),
     );

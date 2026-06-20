@@ -38,7 +38,7 @@ class FeaturesGrid extends StatelessWidget {
     final items = [
       _GridItem(
       networkImage:
-      '',
+      'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTGqElC61PCCs9EHURsb4TQSUsaCDPq6XGwrhkw7mx1V-iWYHNB',
       localImage: 'assets/app_images/images/logo.png',
       title: 'Chat with Ai  ',
       subtitle: 'Chat about your crops',
@@ -48,27 +48,6 @@ class FeaturesGrid extends StatelessWidget {
         MaterialPageRoute(builder: (_) => const ChatbotMainScreen()),
       ),
     ),
-      _GridItem(
-        networkImage:
-        'https://www.yarbo.com/cdn/shop/files/Yarbo_Robot_1_200kb.jpg?v=1781161297&width=1280',
-        localImage: 'assets/app_images/images/location.png',
-        title: 'Live Location',
-        subtitle: 'Track robot GPS',
-        icon: Icons.location_on_rounded,
-        onTap: () => context.read<HomeViewModel>().setNavIndex(0),
-      ),
-      _GridItem(
-        networkImage:
-        'https://agriconnutritech.com/wp-content/uploads/2024/08/hand-holding.webp',
-        localImage: 'assets/app_images/images/soil.png',
-        title: 'Soil Analysis',
-        subtitle: 'Monitor nutrients',
-        icon: Icons.grass_rounded,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const SoilAnalysisScreen()),
-        ),
-      ),
       _GridItem(
         networkImage:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRi3heGGlGC_n_bzu2bb85TEwuYzX7lsOvmWA&s',
@@ -81,19 +60,19 @@ class FeaturesGrid extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const PhoneCaptureScreen()),
         ),
       ),
+
       _GridItem(
         networkImage:
-        'https://img.magnific.com/premium-vector/simple-weather-forecast-panel-with-daily-icons-degrees_141130-18605.jpg',
-        localImage: 'assets/app_images/images/weather.png',
-        title: 'Weather',
-        subtitle: 'Wind, humidity & rain',
-        icon: Icons.cloud_rounded,
+        'https://agriconnutritech.com/wp-content/uploads/2024/08/hand-holding.webp',
+        localImage: 'assets/app_images/images/soil.png',
+        title: 'Soil Analysis',
+        subtitle: 'Monitor nutrients',
+        icon: Icons.grass_rounded,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const WeatherDetailsScreen()),
+          MaterialPageRoute(builder: (_) => const SoilAnalysisScreen()),
         ),
-      ),
-      _GridItem(
+      ), _GridItem(
         networkImage:
         'https://cdn8.futura-sciences.com/a1920/images/photosynthese.jpeg',
         localImage: 'assets/app_images/images/camera.png',
@@ -105,6 +84,28 @@ class FeaturesGrid extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const SpectralDashboardScreen()),
         ),
       ),
+      _GridItem(
+        networkImage:
+        'https://www.yarbo.com/cdn/shop/files/Yarbo_Robot_1_200kb.jpg?v=1781161297&width=1280',
+        localImage: 'assets/app_images/images/location.png',
+        title: 'Live Location',
+        subtitle: 'Track robot GPS',
+        icon: Icons.location_on_rounded,
+        onTap: () => context.read<HomeViewModel>().setNavIndex(0),
+      ),
+      _GridItem(
+        networkImage:
+        'https://i.postimg.cc/YCX2M0m7/weather.png',
+        localImage: 'assets/app_images/images/weather.png',
+        title: 'Weather',
+        subtitle: 'Wind, humidity & rain',
+        icon: Icons.cloud_rounded,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const WeatherDetailsScreen()),
+        ),
+      ),
+
 
     ];
 

@@ -1,6 +1,9 @@
 // lib/presentation/widgets/home/live_stats_row.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../alerts/models/alert_model.dart';
+import '../../../../alerts/viewmodels/alerts_view_model.dart';
 import '../../view/soil_analysis_screen.dart';
 import '../../view_model/home_viewmodel.dart';
 import '../common/stat_card.dart';
@@ -50,16 +53,25 @@ class LiveStatsRow extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: StatCard(
-            icon: Icons.notifications_rounded,
-            iconColor: vm.criticalCount > 0
-                ? redColor
-                : (vm.totalAlerts > 0 ? orangeColor : primaryColor),
-            label: 'Alerts',
-            value: vm.dataLoaded ? '${vm.totalAlerts}' : '--',
-            isLoading: !vm.dataLoaded,
-            badge: vm.criticalCount > 0 ? '${vm.criticalCount}' : null,
-            onTap: () => vm.setNavIndex(1),
+          child: Consumer<AlertsViewModel>(
+            builder: (context, alertsVm, _) {
+              final totalAlerts = alertsVm.alerts
+                  .where((a) => a.severity != AlertSeverity.info)
+                  .length;
+              final criticalCount = alertsVm.criticalAlerts.length;
+
+              return StatCard(
+                icon: Icons.notifications_rounded,
+                iconColor: criticalCount > 0
+                    ? redColor
+                    : (totalAlerts > 0 ? orangeColor : primaryColor),
+                label: 'Alerts',
+                value: alertsVm.isLoading ? '--' : '$totalAlerts',
+                isLoading: alertsVm.isLoading,
+                badge: criticalCount > 0 ? '$criticalCount' : null,
+                onTap: () => vm.setNavIndex(1),
+              );
+            },
           ),
         ),
       ],

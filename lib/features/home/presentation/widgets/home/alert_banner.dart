@@ -8,6 +8,7 @@ import '../common/scale_on_tap.dart';
 
 class AlertBanner extends StatelessWidget {
   final HomeViewModel vm;
+
   const AlertBanner({super.key, required this.vm});
 
   @override
@@ -20,58 +21,70 @@ class AlertBanner extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     if (top == null) {
-      return Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: theme.primaryColor.withAlpha(60)),
-          boxShadow: [
-            BoxShadow(
-              color: theme.primaryColor.withAlpha(isDark ? 25 : 12),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withAlpha(25),
-                shape: BoxShape.circle,
+      return ScaleOnTap(
+        onTap: () {
+          vm.markAlertAsViewed(top!);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => AlertDetailsScreen(alert: top)),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A3A1A) : const Color(0xFFF0FDF4),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: theme.primaryColor.withAlpha(60)),
+            boxShadow: [
+              BoxShadow(
+                color: theme.primaryColor.withAlpha(isDark ? 25 : 12),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
               ),
-              child: Icon(Icons.verified_rounded,
-                  color: theme.primaryColor, size: 26),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'All Systems Healthy',
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'AbhayaLibre',
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Soil parameters are within optimal ranges.',
-                    style: TextStyle(
-                      color: grayColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withAlpha(25),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.verified_rounded,
+                  color: theme.primaryColor,
+                  size: 26,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'All Systems Healthy',
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'AbhayaLibre',
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Soil parameters are within optimal ranges.',
+                      style: TextStyle(
+                        color: grayColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -91,7 +104,9 @@ class AlertBanner extends StatelessWidget {
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               title: '${top.paramName} Alert',
               description: top.description,
-              severity: isCritical ? AlertSeverity.critical : AlertSeverity.warning,
+              severity: isCritical
+                  ? AlertSeverity.critical
+                  : AlertSeverity.warning,
               paramName: top.paramName,
               value: top.value,
               unit: top.unit,
@@ -136,7 +151,9 @@ class AlertBanner extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 2),
+                          horizontal: 7,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: color,
                           borderRadius: BorderRadius.circular(8),
@@ -161,7 +178,7 @@ class AlertBanner extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ]
+                      ],
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -186,8 +203,7 @@ class AlertBanner extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded,
-                color: grayColor, size: 22),
+            const Icon(Icons.chevron_right_rounded, color: grayColor, size: 22),
           ],
         ),
       ),
@@ -209,9 +225,10 @@ class _AlertBannerSkeleton extends StatelessWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: isDark
-                ? theme.colorScheme.onSurface.withAlpha(30)
-                : Colors.grey.withAlpha(40)),
+          color: isDark
+              ? theme.colorScheme.onSurface.withAlpha(30)
+              : Colors.grey.withAlpha(40),
+        ),
       ),
       child: Row(
         children: [
@@ -230,22 +247,26 @@ class _AlertBannerSkeleton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                    height: 14,
-                    width: 140,
-                    decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF2A2A2A)
-                            : const Color(0xFFEEEEEE),
-                        borderRadius: BorderRadius.circular(4))),
+                  height: 14,
+                  width: 140,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF2A2A2A)
+                        : const Color(0xFFEEEEEE),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
                 const SizedBox(height: 6),
                 Container(
-                    height: 10,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF2E2E2E)
-                            : const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(4))),
+                  height: 10,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF2E2E2E)
+                        : const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
               ],
             ),
           ),

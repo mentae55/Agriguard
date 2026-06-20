@@ -7,8 +7,10 @@ class AlertsRepository {
   final SoilAnalysisService _soilService;
   final SpectralApiService _spectralService;
 
-  AlertsRepository({SoilAnalysisService? soilService, SpectralApiService? spectralService})
-      : _soilService = soilService ?? SoilAnalysisService(),
+  AlertsRepository({
+    SoilAnalysisService? soilService,
+    SpectralApiService? spectralService,
+  })  : _soilService = soilService ?? SoilAnalysisService(),
         _spectralService = spectralService ?? SpectralApiService();
 
   Future<List<GeneratedAlert>> fetchAndEvaluateAlerts() async {
@@ -19,14 +21,16 @@ class AlertsRepository {
       final soilReading = await _soilService.fetchLatest();
       for (final a in soilReading.alerts) {
         alerts.add(GeneratedAlert(
-          id: 'soil_\${a.parameter}',
-          title: 'Soil \${a.parameter} Alert',
-          description: a.message,
-          severity: a.severity.toLowerCase() == 'high' ? AlertSeverity.critical : AlertSeverity.warning,
-          paramName: a.parameter,
-          value: soilReading.readings[a.parameter]?.value ?? 0.0,
-          unit: soilReading.readings[a.parameter]?.unit ?? '',
-          recommendation: '',
+          id: 'soil_${a.param}',
+          title: 'Soil ${a.param.replaceAll('_pct', '').replaceAll('_ppm', '').replaceAll('_c', '').replaceAll('_ds_m', '').replaceAll('_', ' ')} Alert',
+          description: a.recommendation,
+          severity: a.severity.toLowerCase() == 'critical'
+              ? AlertSeverity.critical
+              : AlertSeverity.warning,
+          paramName: a.param,
+          value: a.value,
+          unit: a.unit,
+          recommendation: a.recommendation,
           icon: Icons.sensors_rounded,
           timestamp: now,
         ));
@@ -35,16 +39,23 @@ class AlertsRepository {
 
     try {
       final spectralReading = await _spectralService.fetchLatest();
-      if (spectralReading.riskLevel.toUpperCase() == 'HIGH' || spectralReading.riskLevel.toUpperCase() == 'MEDIUM') {
+      if (spectralReading.riskLevel.toUpperCase() == 'HIGH' ||
+          spectralReading.riskLevel.toUpperCase() == 'MEDIUM') {
         alerts.add(GeneratedAlert(
           id: 'spectral_disease',
           title: 'Disease Risk Detected',
-          description: 'Risk Level: \${spectralReading.riskLevel}. Cluster: \${spectralReading.cluster}. Disease: \${spectralReading.disease}.',
-          severity: spectralReading.riskLevel.toUpperCase() == 'HIGH' ? AlertSeverity.critical : AlertSeverity.warning,
+          description: 'Risk Level: ${spectralReading.riskLevel}. '
+              'Group: ${spectralReading.predictedGroup}. '
+              'Likely Disease: ${spectralReading.likelyDisease}.',
+          severity: spectralReading.riskLevel.toUpperCase() == 'HIGH'
+              ? AlertSeverity.critical
+              : AlertSeverity.warning,
           paramName: 'Disease Detection',
           value: spectralReading.riskProbability,
           unit: '%',
-          recommendation: spectralReading.recommendation?.primaryAction ?? '',
+          recommendation: spectralReading.actions.isNotEmpty
+              ? spectralReading.actions[0]
+              : '',
           icon: Icons.grass_rounded,
           timestamp: now,
         ));
@@ -55,7 +66,8 @@ class AlertsRepository {
       alerts.add(GeneratedAlert(
         id: 'healthy',
         title: 'All Systems Healthy',
-        description: 'No soil or spectral issues detected. Your field is in excellent condition.',
+        description:
+        'No soil or spectral issues detected. Your field is in excellent condition.',
         severity: AlertSeverity.info,
         paramName: 'All Parameters',
         value: 0,
